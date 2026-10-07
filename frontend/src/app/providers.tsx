@@ -1,0 +1,22 @@
+import { QueryClientProvider, type QueryClient } from '@tanstack/react-query'
+import { useState, type ReactNode } from 'react'
+import { ObservationsApiProvider } from '@/features/observations/api/ObservationsApiProvider'
+import type { ObservationsApi } from '@/features/observations/api/types'
+import { createQueryClient } from './queryClient'
+
+interface AppProvidersProps {
+  children: ReactNode
+  /** Override the API implementation, mainly for tests. */
+  api?: ObservationsApi
+  /** Override the query client, mainly for tests. */
+  queryClient?: QueryClient
+}
+
+export function AppProviders({ children, api, queryClient }: AppProvidersProps) {
+  const [client] = useState(() => queryClient ?? createQueryClient())
+  return (
+    <QueryClientProvider client={client}>
+      <ObservationsApiProvider api={api ?? null}>{children}</ObservationsApiProvider>
+    </QueryClientProvider>
+  )
+}

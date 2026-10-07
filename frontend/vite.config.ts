@@ -14,7 +14,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    css: false,
+    // Only the token file is read in tests (as ?raw, to check it against src/lib/density.ts).
+    css: { include: [/tokens\.css/] },
     include: ['src/**/*.test.{ts,tsx}'],
   },
 })
