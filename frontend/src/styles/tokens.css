@@ -3,8 +3,11 @@
  * Values mirror frontend/CLAUDE.md. Change them here, never inline in components.
  * src/styles/tokens.test.ts checks text contrast; src/lib/density.test.ts checks that the
  * severity colours match src/lib/density.ts.
+ *
+ * `static` emits every token as a CSS variable, used or not, so plain CSS (map.css) and
+ * JavaScript can rely on var(--token) at runtime.
  */
-@theme {
+@theme static {
   /* Only project tokens exist: Tailwind's default palette and type sizes are removed. */
   --color-*: initial;
   --text-*: initial;
@@ -54,6 +57,9 @@
   --color-danger-soft: #fbeae6;
   --color-info: #2f6f6d;
   --color-info-soft: #e6f0ef;
+
+  /* Map: flat neutral behind the basemap, shown when tiles cannot load. */
+  --color-map-fallback: #eef2f1;
 
   /* Type */
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;

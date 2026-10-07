@@ -1,0 +1,242 @@
+import 'leaflet/dist/leaflet.css'
+import './map.css'
+import {
+  latLngBounds,
+  type FitBoundsOptions,
+  type LatLngBoundsExpression,
+  type Map as LeafletMap,
+} from 'leaflet'
+import {
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useState,
+  type ReactNode,
+  type Ref,
+} from 'react'
+import { AttributionControl, MapContainer, useMapEvent } from 'react-leaflet'
+import { Banner } from '@/components/ui'
+import type { Observation } from '@/features/observations/types'
+import { analyzeObservation } from '@/lib/analysis'
+import { cn } from '@/lib/cn'
+import { boundsOfGeometries, boundsToLeaflet, geometryBounds } from '@/lib/geo'
+import { MAP_MAX_ZOOM, MAP_MIN_ZOOM, type BasemapId } from '@/lib/map/basemaps'
+import type { VisibleLayers } from '@/lib/map/layers'
+import { BasemapLayer } from './layers/BasemapLayer'
+import { DensityLayer } from './layers/DensityLayer'
+import { DetectionsLayer } from './layers/DetectionsLayer'
+import { FootprintLayer } from './layers/FootprintLayer'
+import { HotspotsLayer } from './layers/HotspotsLayer'
+import { ReadoutStrip } from './ReadoutStrip'
+
+export interface MapHandle {
+  fitToDetections: () => void
+  resetView: () => void
+  flyToDetection: (id: string) => void
+  flyToHotspot: (id: string) => void
+  zoomIn: () => void
+  zoomOut: () => void
+}
+
+export interface MapViewProps {
+  observation: Observation
+  visibleLayers: VisibleLayers
+  basemap: BasemapId
+  selectedDetectionId?: string | null
+  selectedHotspotId?: string | null
+  onSelectDetection?: (id: string | null) => void
+  onSelectHotspot?: (id: string | null) => void
+  /** False for small previews: no panning, zooming, hover or selection. */
+  interactive?: boolean
+  /** Shown over the map, for example the "No debris detected" state. */
+  overlay?: ReactNode
+  className?: string
+  ref?: Ref<MapHandle>
+}
+
+/** Fallback view (India) when an observation has neither bounds nor detections. */
+const FALLBACK_BOUNDS: LatLngBoundsExpression = [
+  [6, 68],
+  [24, 92],
+]
+const FIT_PADDING: FitBoundsOptions = { padding: [48, 48] }
+const FOCUS_MAX_ZOOM = 18
+/** Hotspots are a few hundred meters across; stop short so the surroundings stay in view. */
+const HOTSPOT_MAX_ZOOM = 16
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+}
+
+function ClearSelectionOnMapClick({ onClear }: { onClear: () => void }) {
+  useMapEvent('click', onClear)
+  return null
+}
+
+const noop = () => {}
+
+/**
+ * The map canvas: basemap, footprint, density grid, detections and hotspots on Leaflet's
+ * canvas renderer. Controls and the legend are separate overlays that drive it through the
+ * imperative handle.
+ */
+export function MapView({
+  observation,
+  visibleLayers,
+  basemap,
+  selectedDetectionId = null,
+  selectedHotspotId = null,
+  onSelectDetection = noop,
+  onSelectHotspot = noop,
+  interactive = true,
+  overlay,
+  className,
+  ref,
+}: MapViewProps) {
+  const [map, setMap] = useState<LeafletMap | null>(null)
+  const [unavailableBasemap, setUnavailableBasemap] = useState<BasemapId | null>(null)
+  const basemapUnavailable = unavailableBasemap === basemap
+  const onImagery = basemap === 'satellite' && !basemapUnavailable
+
+  const analysis = useMemo(() => analyzeObservation(observation), [observation])
+  const detectionBounds = useMemo(
+    () => boundsOfGeometries(observation.detections.map((d) => d.geometry)),
+    [observation.detections],
+  )
+  const homeBounds = useMemo<LatLngBoundsExpression>(() => {
+    const bounds = observation.bounds ?? detectionBounds
+    return bounds ? boundsToLeaflet(bounds) : FALLBACK_BOUNDS
+  }, [observation.bounds, detectionBounds])
+
+  const animate = interactive && !prefersReducedMotion()
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      fitToDetections: () =>
+        map?.fitBounds(detectionBounds ? boundsToLeaflet(detectionBounds) : homeBounds, {
+          ...FIT_PADDING,
+          animate,
+        }),
+      resetView: () => map?.fitBounds(homeBounds, { ...FIT_PADDING, animate }),
+      flyToDetection: (id) => {
+        const detection = observation.detections.find((d) => d.id === id)
+        if (!map || !detection) return
+        const target = latLngBounds(boundsToLeaflet(geometryBounds(detection.geometry)))
+        const zoom = Math.min(map.getBoundsZoom(target.pad(4)), FOCUS_MAX_ZOOM)
+        if (animate) map.flyTo(target.getCenter(), zoom, { duration: 0.6 })
+        else map.setView(target.getCenter(), zoom)
+      },
+      flyToHotspot: (id) => {
+        const hotspot = analysis.hotspots.find((h) => h.id === id)
+        if (!map || !hotspot) return
+        const target = latLngBounds(boundsToLeaflet(hotspot.bounds))
+        const options = { ...FIT_PADDING, maxZoom: HOTSPOT_MAX_ZOOM }
+        if (animate) map.flyToBounds(target, { ...options, duration: 0.6 })
+        else map.fitBounds(target, options)
+      },
+      zoomIn: () => map?.zoomIn(),
+      zoomOut: () => map?.zoomOut(),
+    }),
+    [map, observation.detections, analysis.hotspots, detectionBounds, homeBounds, animate],
+  )
+
+  const onMapReady = useCallback(
+    (instance: LeafletMap | null) => {
+      if (!instance) return
+      setMap(instance)
+      const container = instance.getContainer()
+      container.setAttribute('aria-roledescription', 'map')
+      container.setAttribute('aria-label', `Map of ${observation.region}`)
+    },
+    [observation.region],
+  )
+
+  const clearSelection = useCallback(() => {
+    onSelectDetection(null)
+    onSelectHotspot(null)
+  }, [onSelectDetection, onSelectHotspot])
+
+  const onAvailabilityChange = useCallback((id: BasemapId, available: boolean) => {
+    setUnavailableBasemap((current) => (available ? (current === id ? null : current) : id))
+  }, [])
+
+  return (
+    <div className={cn('relative isolate overflow-hidden bg-map-fallback', className)}>
+      <MapContainer
+        // A new observation gets a fresh map fitted to its own bounds.
+        key={observation.id}
+        ref={onMapReady}
+        bounds={homeBounds}
+        boundsOptions={FIT_PADDING}
+        minZoom={MAP_MIN_ZOOM}
+        maxZoom={MAP_MAX_ZOOM}
+        preferCanvas
+        zoomControl={false}
+        attributionControl={false}
+        dragging={interactive}
+        touchZoom={interactive}
+        doubleClickZoom={interactive}
+        scrollWheelZoom={interactive}
+        boxZoom={interactive}
+        keyboard={interactive}
+        className={cn('mwi-map h-full w-full', basemapUnavailable && 'mwi-map--no-basemap')}
+      >
+        <AttributionControl position="bottomright" prefix={false} />
+        <BasemapLayer key={basemap} basemap={basemap} onAvailabilityChange={onAvailabilityChange} />
+        {visibleLayers.footprint && observation.bounds ? (
+          <FootprintLayer
+            bounds={observation.bounds}
+            approximate={observation.crs === null}
+            onImagery={onImagery}
+          />
+        ) : null}
+        {visibleLayers.density && analysis.grid ? (
+          <DensityLayer grid={analysis.grid} interactive={interactive} onImagery={onImagery} />
+        ) : null}
+        {visibleLayers.detections ? (
+          <DetectionsLayer
+            detections={observation.detections}
+            selectedId={selectedDetectionId}
+            interactive={interactive}
+            onImagery={onImagery}
+            onSelect={onSelectDetection}
+          />
+        ) : null}
+        {visibleLayers.hotspots ? (
+          <HotspotsLayer
+            hotspots={analysis.hotspots}
+            selectedId={selectedHotspotId}
+            interactive={interactive}
+            onSelect={onSelectHotspot}
+          />
+        ) : null}
+        {interactive ? <ClearSelectionOnMapClick onClear={clearSelection} /> : null}
+      </MapContainer>
+
+      {basemapUnavailable ? (
+        <div className="pointer-events-none absolute inset-x-0 top-3 z-[500] flex justify-center px-3">
+          <Banner tone="info" className="pointer-events-auto py-2 shadow-subtle">
+            Basemap unavailable, detections are still shown
+          </Banner>
+        </div>
+      ) : null}
+
+      {overlay ? (
+        <div className="pointer-events-none absolute inset-0 z-[450] flex items-center justify-center p-4">
+          <div className="pointer-events-auto">{overlay}</div>
+        </div>
+      ) : null}
+
+      {interactive && map ? (
+        <div className="pointer-events-none absolute right-2 bottom-6 z-[500]">
+          <ReadoutStrip map={map} />
+        </div>
+      ) : null}
+    </div>
+  )
+}

@@ -20,6 +20,17 @@ export function formatInteger(value: number | null | undefined): string {
   return isUsable(value) ? formatNumber(Math.round(value), 0) : EMPTY_VALUE
 }
 
+/** Length: "2.5 m", "250 m", "1.2 km". */
+export function formatLength(meters: number | null | undefined): string {
+  if (!isUsable(meters) || meters < 0) return EMPTY_VALUE
+  if (meters >= 1000) {
+    const km = meters / 1000
+    return `${formatNumber(km, km < 10 ? 1 : 0)} km`
+  }
+  if (meters < 10) return `${formatNumber(meters, 1)} m`
+  return `${formatNumber(meters, 0)} m`
+}
+
 export type AreaUnit = 'auto' | 'm2' | 'ha' | 'km2'
 
 const M2_PER_HA = 10_000
