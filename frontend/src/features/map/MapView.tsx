@@ -8,8 +8,10 @@ import {
 } from 'leaflet'
 import {
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
   type Ref,
@@ -17,7 +19,7 @@ import {
 import { AttributionControl, MapContainer, useMapEvent } from 'react-leaflet'
 import { Banner } from '@/components/ui'
 import type { Observation } from '@/features/observations/types'
-import { analyzeObservation } from '@/lib/analysis'
+import { analyzeObservation, type ObservationAnalysis } from '@/lib/analysis'
 import { cn } from '@/lib/cn'
 import { boundsOfGeometries, boundsToLeaflet, geometryBounds } from '@/lib/geo'
 import { MAP_MAX_ZOOM, MAP_MIN_ZOOM, type BasemapId } from '@/lib/map/basemaps'
@@ -50,6 +52,14 @@ export interface MapViewProps {
   interactive?: boolean
   /** Shown over the map, for example the "No debris detected" state. */
   overlay?: ReactNode
+  /** Grid and hotspots computed by the page, so both use the same filtered result. */
+  analysis?: ObservationAnalysis
+  /** Hotspot to emphasise from outside the map (hovering a list row). */
+  highlightedHotspotId?: string | null
+  /** Run one smooth fit-to-detections animation after the map first loads. */
+  introAnimation?: boolean
+  /** Space kept around the observation when fitting, in pixels. Small previews use less. */
+  fitPadding?: number
   className?: string
   ref?: Ref<MapHandle>
 }
@@ -59,7 +69,7 @@ const FALLBACK_BOUNDS: LatLngBoundsExpression = [
   [6, 68],
   [24, 92],
 ]
-const FIT_PADDING: FitBoundsOptions = { padding: [48, 48] }
+const DEFAULT_FIT_PADDING = 48
 const FOCUS_MAX_ZOOM = 18
 /** Hotspots are a few hundred meters across; stop short so the surroundings stay in view. */
 const HOTSPOT_MAX_ZOOM = 16
@@ -94,6 +104,10 @@ export function MapView({
   onSelectHotspot = noop,
   interactive = true,
   overlay,
+  analysis: providedAnalysis,
+  highlightedHotspotId = null,
+  introAnimation = false,
+  fitPadding = DEFAULT_FIT_PADDING,
   className,
   ref,
 }: MapViewProps) {
@@ -102,7 +116,10 @@ export function MapView({
   const basemapUnavailable = unavailableBasemap === basemap
   const onImagery = basemap === 'satellite' && !basemapUnavailable
 
-  const analysis = useMemo(() => analyzeObservation(observation), [observation])
+  const analysis = useMemo(
+    () => providedAnalysis ?? analyzeObservation(observation),
+    [providedAnalysis, observation],
+  )
   const detectionBounds = useMemo(
     () => boundsOfGeometries(observation.detections.map((d) => d.geometry)),
     [observation.detections],
@@ -113,6 +130,23 @@ export function MapView({
   }, [observation.bounds, detectionBounds])
 
   const animate = interactive && !prefersReducedMotion()
+  const FIT_PADDING = useMemo<FitBoundsOptions>(
+    () => ({ padding: [fitPadding, fitPadding] }),
+    [fitPadding],
+  )
+
+  // Result arrival: one fit-to-detections flight once the map is ready.
+  const introPlayed = useRef(false)
+  useEffect(() => {
+    if (!map || !introAnimation || introPlayed.current || !detectionBounds) return
+    const timer = window.setTimeout(() => {
+      introPlayed.current = true
+      const target = boundsToLeaflet(detectionBounds)
+      if (animate) map.flyToBounds(target, { ...FIT_PADDING, duration: 1.2 })
+      else map.fitBounds(target, FIT_PADDING)
+    }, 300)
+    return () => window.clearTimeout(timer)
+  }, [map, introAnimation, detectionBounds, animate, FIT_PADDING])
 
   useImperativeHandle(
     ref,
@@ -142,7 +176,15 @@ export function MapView({
       zoomIn: () => map?.zoomIn(),
       zoomOut: () => map?.zoomOut(),
     }),
-    [map, observation.detections, analysis.hotspots, detectionBounds, homeBounds, animate],
+    [
+      map,
+      observation.detections,
+      analysis.hotspots,
+      detectionBounds,
+      homeBounds,
+      animate,
+      FIT_PADDING,
+    ],
   )
 
   const onMapReady = useCallback(
@@ -211,6 +253,7 @@ export function MapView({
           <HotspotsLayer
             hotspots={analysis.hotspots}
             selectedId={selectedHotspotId}
+            highlightedId={highlightedHotspotId}
             interactive={interactive}
             onSelect={onSelectHotspot}
           />

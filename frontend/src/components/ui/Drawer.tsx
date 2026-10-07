@@ -118,7 +118,7 @@ export function Drawer({
             'fixed z-50 flex flex-col bg-surface shadow-popover focus:outline-none',
             isDesktop
               ? cn(
-                  'right-0 bottom-0 w-[400px] max-w-full border-l border-border',
+                  'right-0 bottom-0 w-drawer max-w-full border-l border-border',
                   placement === 'below-topbar' ? 'top-[var(--spacing-topbar)]' : 'top-0',
                 )
               : 'inset-x-0 bottom-0 max-h-[85dvh] rounded-t-card border-t border-border',

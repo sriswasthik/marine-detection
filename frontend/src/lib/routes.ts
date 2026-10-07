@@ -10,12 +10,14 @@ export function observationIdFromPath(pathname: string): string | null {
 }
 
 /**
- * Where to go when another observation is picked: stay on the same kind of page
- * (map, detail or report) for the new observation, otherwise open it on the map.
+ * Where to go when another observation is picked on an observation page: the same kind of page
+ * (map, detail or report) for the new one. Null on other pages, which stay where they are and
+ * simply show the new selection (the overview, for example).
  */
-export function pathForObservation(currentPathname: string, observationId: string): string {
+export function pathForObservation(currentPathname: string, observationId: string): string | null {
   const id = encodeURIComponent(observationId)
   if (matchPath('/observations/:id/report', currentPathname)) return `/observations/${id}/report`
   if (matchPath('/observations/:id', currentPathname)) return `/observations/${id}`
-  return `/map/${id}`
+  if (matchPath('/map/:id?', currentPathname)) return `/map/${id}`
+  return null
 }

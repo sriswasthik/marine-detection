@@ -12,6 +12,13 @@ export const CONFIDENCE_BAND_LABELS: Readonly<Record<ConfidenceBand, string>> = 
   high: 'High',
 }
 
+/** Plain-language meaning of each band, for people deciding whether to act. */
+export const CONFIDENCE_BAND_MEANINGS: Readonly<Record<ConfidenceBand, string>> = {
+  high: 'The model is confident this is floating debris.',
+  medium: 'Likely debris. A quick visual check is worthwhile.',
+  low: 'Uncertain. Check it against the image before acting on it.',
+}
+
 export function confidenceBand(confidence: number): ConfidenceBand {
   if (confidence >= CONFIDENCE_THRESHOLDS.high) return 'high'
   if (confidence >= CONFIDENCE_THRESHOLDS.low) return 'medium'

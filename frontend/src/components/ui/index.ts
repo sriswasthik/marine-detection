@@ -25,7 +25,8 @@ export {
   type SegmentedControlProps,
   type SegmentedOption,
 } from './SegmentedControl'
-export { Select, type SelectOption, type SelectProps } from './Select'
+export { Popover, type PopoverProps, type PopoverTriggerProps } from './Popover'
+export { Select, type SelectOption, type SelectOptionGroup, type SelectProps } from './Select'
 export { SeverityBadge, SeveritySwatch, type SeverityBadgeProps } from './SeverityBadge'
 export { Skeleton, SkeletonText } from './Skeleton'
 export { RangeSlider, Slider, type RangeSliderProps, type SliderProps } from './Slider'

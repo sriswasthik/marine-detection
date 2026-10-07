@@ -1,9 +1,13 @@
 import { ChevronDown, CloudOff } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { observationIdFromPath, pathForObservation } from '@/lib/routes'
+import { pathForObservation } from '@/lib/routes'
 import { Badge, DropdownMenu, Skeleton, type DropdownMenuEntry } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { formatDate, formatInteger } from '@/lib/format'
+import {
+  useCurrentObservationId,
+  useCurrentObservationSelection,
+} from '../currentObservationContext'
 import { useObservations } from '../hooks'
 import { SOURCE_LABELS } from '../labels'
 import type { ObservationSummary } from '../types'
@@ -22,8 +26,9 @@ export interface ObservationChipProps {
 }
 
 /**
- * The observation in view, with a menu to switch. The current one comes from the URL,
- * or is the most recent observation when the page is not about a specific one.
+ * The observation in view, with a menu to switch. The current one comes from the URL path,
+ * else the session selection, else the most recent observation. Picking one remembers it and,
+ * on an observation page, opens the same page for the new observation.
  */
 export function ObservationChip({
   fullWidth = false,
@@ -33,6 +38,8 @@ export function ObservationChip({
   const { data, isPending, isError } = useObservations()
   const location = useLocation()
   const navigate = useNavigate()
+  const { setSelectedId } = useCurrentObservationSelection()
+  const currentId = useCurrentObservationId(data?.data)
 
   if (isPending) {
     return <Skeleton className={cn('h-8', fullWidth ? 'w-full' : 'w-48', className)} />
@@ -46,8 +53,7 @@ export function ObservationChip({
   }
 
   const observations = data.data
-  const routeId = observationIdFromPath(location.pathname)
-  const current = observations.find((o) => o.id === routeId) ?? observations[0]
+  const current = observations.find((o) => o.id === currentId) ?? observations[0]
   if (!current) {
     return <Badge className={className}>No observations yet</Badge>
   }
@@ -60,7 +66,11 @@ export function ObservationChip({
       description: `${formatDate(observation.capturedAt)} · ${SOURCE_LABELS[observation.source]} · ${detectionsLabel(observation)}`,
       icon: <SourceIcon source={observation.source} />,
       checked: observation.id === current.id,
-      onSelect: () => navigate(pathForObservation(location.pathname, observation.id)),
+      onSelect: () => {
+        setSelectedId(observation.id)
+        const path = pathForObservation(location.pathname, observation.id)
+        if (path) navigate(path)
+      },
     })),
   ]
 

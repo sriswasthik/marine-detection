@@ -9,9 +9,16 @@ export interface SelectOption {
   disabled?: boolean
 }
 
+export interface SelectOptionGroup {
+  label: string
+  options: readonly SelectOption[]
+}
+
 export interface SelectProps extends Omit<ComponentPropsWithRef<'select'>, 'size' | 'children'> {
   label: ReactNode
-  options: readonly SelectOption[]
+  options?: readonly SelectOption[]
+  /** Grouped options, rendered as optgroups after any ungrouped options. */
+  groups?: readonly SelectOptionGroup[]
   hint?: ReactNode
   error?: ReactNode
   hideLabel?: boolean
@@ -23,7 +30,8 @@ export interface SelectProps extends Omit<ComponentPropsWithRef<'select'>, 'size
 /** Native select for reliable keyboard, screen reader and mobile behaviour. */
 export function Select({
   label,
-  options,
+  options = [],
+  groups = [],
   hint,
   error,
   hideLabel,
@@ -66,6 +74,15 @@ export function Select({
               <option key={option.value} value={option.value} disabled={option.disabled}>
                 {option.label}
               </option>
+            ))}
+            {groups.map((group) => (
+              <optgroup key={group.label} label={group.label}>
+                {group.options.map((option) => (
+                  <option key={option.value} value={option.value} disabled={option.disabled}>
+                    {option.label}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
           <ChevronDown

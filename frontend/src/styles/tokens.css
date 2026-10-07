@@ -104,8 +104,12 @@
 
   /* Layout */
   --spacing-topbar: 56px;
+  /* Side drawer width; map controls step aside by this much when it is open. */
+  --spacing-drawer: 380px;
 
   /* Extra breakpoints: xs for the product name, nav where the top bar shows full navigation. */
   --breakpoint-xs: 30rem;
   --breakpoint-nav: 56.25rem;
+  /* The map filter bar fits on one row from here; below it collapses to a Filters button. */
+  --breakpoint-filters: 68.75rem;
 }

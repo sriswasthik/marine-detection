@@ -21,14 +21,18 @@ function renderAt(path: string) {
 describe('app shell', () => {
   it('renders the overview inside the shell with a skip link', async () => {
     renderAt('/')
-    expect(await screen.findByRole('heading', { level: 1, name: 'Overview' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', {
+        level: 1,
+        name: 'Detect marine debris and understand exactly where it is.',
+      }),
+    ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Skip to content' })).toHaveAttribute('href', '#main')
     expect(screen.getByRole('link', { name: /Marine Waste Intelligence/ })).toBeInTheDocument()
     expect(screen.getByText('Sample data')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Analyze new imagery' })).toHaveAttribute(
-      'href',
-      '/analyze',
-    )
+    for (const link of screen.getAllByRole('link', { name: /Analyze new imagery/ })) {
+      expect(link).toHaveAttribute('href', '/analyze')
+    }
   })
 
   it('marks the active navigation link', async () => {

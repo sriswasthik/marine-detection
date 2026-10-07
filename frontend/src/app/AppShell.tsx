@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
+import { useRememberRouteObservation } from '@/features/observations/currentObservationContext'
 import { TopBar } from './shell/TopBar'
 
 function SkipLink() {
@@ -17,6 +18,7 @@ function SkipLink() {
 export function AppShell() {
   const location = useLocation()
   const reduceMotion = useReducedMotion()
+  useRememberRouteObservation()
 
   return (
     <div className="flex min-h-dvh flex-col">

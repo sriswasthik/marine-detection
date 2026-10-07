@@ -1,8 +1,9 @@
 import { divIcon, DomEvent, type LeafletMouseEvent } from 'leaflet'
 import { memo, useMemo } from 'react'
-import { Marker } from 'react-leaflet'
+import { Marker, Rectangle } from 'react-leaflet'
 import { DENSITY_LEVELS } from '@/lib/density'
-import { latLngToTuple } from '@/lib/geo'
+import { boundsToLeaflet, latLngToTuple } from '@/lib/geo'
+import { MAP_COLORS } from '@/lib/map/basemaps'
 import type { Hotspot } from '@/lib/hotspots'
 
 /** Lucide "flag" glyph, inline so the marker needs no extra request. */
@@ -63,25 +64,48 @@ const HotspotMarker = memo(function HotspotMarker({
   )
 })
 
-/** Ranked hotspot markers. Critical hotspots carry a small flag. No glow, no pulsing. */
+const HOTSPOT_OUTLINE = {
+  color: MAP_COLORS.accent,
+  weight: 1.5,
+  opacity: 1,
+  dashArray: '5 4',
+  fill: false,
+}
+
+/**
+ * Ranked hotspot markers. Critical hotspots carry a small flag. No glow, no pulsing.
+ * The selected or highlighted hotspot also gets a dashed outline of the cells it covers.
+ */
 export const HotspotsLayer = memo(function HotspotsLayer({
   hotspots,
   selectedId,
+  highlightedId,
   interactive,
   onSelect,
 }: {
   hotspots: readonly Hotspot[]
   selectedId: string | null
+  /** Emphasised from outside the map, for example while hovering a row in a list. */
+  highlightedId?: string | null
   interactive: boolean
   onSelect: (id: string) => void
 }) {
+  const outlined = hotspots.find((h) => h.id === (highlightedId ?? selectedId))
   return (
     <>
+      {outlined ? (
+        <Rectangle
+          key={outlined.id}
+          bounds={boundsToLeaflet(outlined.bounds)}
+          pathOptions={HOTSPOT_OUTLINE}
+          interactive={false}
+        />
+      ) : null}
       {hotspots.map((hotspot) => (
         <HotspotMarker
           key={hotspot.id}
           hotspot={hotspot}
-          selected={hotspot.id === selectedId}
+          selected={hotspot.id === selectedId || hotspot.id === highlightedId}
           interactive={interactive}
           onSelect={onSelect}
         />

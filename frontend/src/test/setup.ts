@@ -23,6 +23,20 @@ if (typeof window.matchMedia !== 'function') {
   })
 }
 
+// jsdom has no canvas. Leaflet's canvas renderer only needs a 2D context that accepts calls,
+// so give it one where every method is a no-op and every property can be set.
+function noopContext(canvas: HTMLCanvasElement): object {
+  return new Proxy(
+    { canvas },
+    {
+      get: (target, prop) => (prop in target ? Reflect.get(target, prop) : () => undefined),
+    },
+  )
+}
+HTMLCanvasElement.prototype.getContext = function getContext(this: HTMLCanvasElement) {
+  return noopContext(this)
+} as unknown as HTMLCanvasElement['getContext']
+
 // jsdom does not implement scrolling; React Router scroll restoration calls it.
 window.scrollTo = () => {}
 

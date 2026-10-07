@@ -14,7 +14,13 @@ describe('observation routes', () => {
     expect(pathForObservation('/observations/a/report', 'b')).toBe('/observations/b/report')
     expect(pathForObservation('/observations/a', 'b')).toBe('/observations/b')
     expect(pathForObservation('/map/a', 'b')).toBe('/map/b')
-    expect(pathForObservation('/settings', 'b')).toBe('/map/b')
-    expect(pathForObservation('/', 'id with space')).toBe('/map/id%20with%20space')
+    expect(pathForObservation('/map', 'b')).toBe('/map/b')
+    expect(pathForObservation('/map/a', 'id with space')).toBe('/map/id%20with%20space')
+  })
+
+  it('stays put on pages that are not about one observation', () => {
+    expect(pathForObservation('/', 'b')).toBeNull()
+    expect(pathForObservation('/settings', 'b')).toBeNull()
+    expect(pathForObservation('/observations', 'b')).toBeNull()
   })
 })

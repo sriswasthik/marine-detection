@@ -14,6 +14,10 @@ export const HOTSPOT_LEVEL_WEIGHTS: Readonly<Record<DensityLevel, number>> = {
 export const PRIORITY_SCORE_RULE =
   'Priority score = debris area in the hotspot (m²) × mean detection confidence × level weight (Low 1, Moderate 2, High 3, Critical 4). Higher scores are cleaned up first.'
 
+/** The same rule in plain words, for the inspection panel. */
+export const PRIORITY_SCORE_EXPLANATION =
+  'Hotspots are ranked by priority score: the debris area inside the hotspot, times the average model confidence, times a weight for the density level (Low 1, Moderate 2, High 3, Critical 4). Larger, denser and more certain hotspots come first.'
+
 export interface Hotspot {
   /** `hotspot-{rank}`. */
   id: string

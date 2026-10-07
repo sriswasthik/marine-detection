@@ -201,6 +201,12 @@ export function formatDuration(ms: number | null | undefined): string {
   return `${hours} h ${String(minutes).padStart(2, '0')} min`
 }
 
+/** Last segment of an id, for compact display: "obs-ennore-20261003-d012" becomes "d012". */
+export function shortId(id: string): string {
+  const parts = id.split('-').filter(Boolean)
+  return parts[parts.length - 1] ?? id
+}
+
 /** Lowercase, ASCII, hyphen-separated: "Ennore coast, Bay of Bengal" becomes "ennore-coast-bay-of-bengal". */
 export function slugify(value: string): string {
   return value
