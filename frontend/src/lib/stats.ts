@@ -6,6 +6,12 @@ import type { Hotspot } from '@/lib/hotspots'
 export type ConfidenceBand = 'low' | 'medium' | 'high'
 export const CONFIDENCE_BANDS: readonly ConfidenceBand[] = ['low', 'medium', 'high']
 
+export const CONFIDENCE_BAND_LABELS: Readonly<Record<ConfidenceBand, string>> = {
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
+}
+
 export function confidenceBand(confidence: number): ConfidenceBand {
   if (confidence >= CONFIDENCE_THRESHOLDS.high) return 'high'
   if (confidence >= CONFIDENCE_THRESHOLDS.low) return 'medium'

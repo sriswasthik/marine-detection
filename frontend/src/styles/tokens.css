@@ -1,10 +1,14 @@
 /*
  * Design tokens: the single source for colour, type, radius, shadow and motion.
  * Values mirror frontend/CLAUDE.md. Change them here, never inline in components.
+ * src/styles/tokens.test.ts checks text contrast; src/lib/density.test.ts checks that the
+ * severity colours match src/lib/density.ts.
  */
 @theme {
-  /* Reset Tailwind's default palette so only project tokens exist. */
+  /* Only project tokens exist: Tailwind's default palette and type sizes are removed. */
   --color-*: initial;
+  --text-*: initial;
+  --shadow-*: initial;
 
   --color-white: #ffffff;
   --color-transparent: transparent;
@@ -23,7 +27,7 @@
   --color-accent-hover: #265957;
   --color-accent-soft: #e6f0ef;
 
-  /* Severity scale */
+  /* Severity scale. Text on a severity background is always ink, never the stroke colour. */
   --color-low: #e8cf7a;
   --color-low-stroke: #b8993a;
   --color-low-soft: #faf3d9;
@@ -37,9 +41,14 @@
   --color-critical-stroke: #5c1824;
   --color-critical-soft: #ebd3d7;
 
-  /* Status */
-  --color-success: #3f7d58;
-  --color-warning: #a66a12;
+  /*
+   * Status. success and warning are slightly darker than the CLAUDE.md values
+   * (#3F7D58, #A66A12) so text reaches 4.5:1 on their soft backgrounds.
+   * success-soft is an addition for success badges.
+   */
+  --color-success: #3c7854;
+  --color-success-soft: #ebf3ee;
+  --color-warning: #996211;
   --color-warning-soft: #fbf3e3;
   --color-danger: #a8402f;
   --color-danger-soft: #fbeae6;
@@ -51,18 +60,46 @@
   --font-mono:
     ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 
+  /* Type scale. Large sizes only for the product title and KPI figures. */
+  --text-display: 1.75rem;
+  --text-display--line-height: 2.125rem;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 600;
+  --text-title: 1.25rem;
+  --text-title--line-height: 1.75rem;
+  --text-title--letter-spacing: -0.01em;
+  --text-title--font-weight: 600;
+  --text-heading: 0.9375rem;
+  --text-heading--line-height: 1.375rem;
+  --text-heading--font-weight: 600;
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.375rem;
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.25rem;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+  --text-mono-label: 0.75rem;
+  --text-mono-label--line-height: 1rem;
+
   /* Radius */
   --radius-badge: 6px;
   --radius-control: 8px;
   --radius-card: 12px;
 
-  /* Shadow */
+  /* Shadow: subtle only */
   --shadow-subtle: 0 1px 2px rgba(24, 33, 43, 0.04);
   --shadow-popover: 0 8px 24px rgba(24, 33, 43, 0.08);
 
-  /* Motion */
+  /* Motion: 120-200 ms, ease-out */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --duration-fast: 120ms;
   --duration-base: 160ms;
   --duration-slow: 200ms;
+
+  /* Layout */
+  --spacing-topbar: 56px;
+
+  /* Extra breakpoints: xs for the product name, nav where the top bar shows full navigation. */
+  --breakpoint-xs: 30rem;
+  --breakpoint-nav: 56.25rem;
 }

@@ -1,7 +1,8 @@
+import { useState } from 'react'
+import { RouterProvider } from 'react-router-dom'
+import { createAppRouter } from './router'
+
 export function App() {
-  return (
-    <main className="min-h-dvh bg-bg px-6 py-8">
-      <h1 className="text-xl font-semibold tracking-tight text-ink">Marine Waste Intelligence</h1>
-    </main>
-  )
+  const [router] = useState(createAppRouter)
+  return <RouterProvider router={router} />
 }

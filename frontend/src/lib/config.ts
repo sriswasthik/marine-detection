@@ -16,11 +16,12 @@ export const DENSITY_THRESHOLDS = {
 } as const
 
 /**
- * Detection confidence bands, 0 to 1.
- * Low: below `low`. Medium: from `low` up to `high`. High: `high` and above.
+ * Detection confidence bands, 0 to 1. Used by ConfidenceBadge and the stats.
+ * Low: below `low` (under 0.60). Medium: from `low` up to `high` (0.60 to 0.79).
+ * High: `high` and above (0.80 or more).
  */
 export const CONFIDENCE_THRESHOLDS = {
-  low: 0.5,
+  low: 0.6,
   high: 0.8,
 } as const
 

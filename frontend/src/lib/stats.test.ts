@@ -69,8 +69,9 @@ describe('computeObservationStats', () => {
   })
 
   it('bands confidence at the configured thresholds', () => {
-    expect(confidenceBand(0.49)).toBe('low')
-    expect(confidenceBand(0.5)).toBe('medium')
+    expect(confidenceBand(0.59)).toBe('low')
+    expect(confidenceBand(0.6)).toBe('medium')
+    expect(confidenceBand(0.79)).toBe('medium')
     expect(confidenceBand(0.8)).toBe('high')
   })
 })
