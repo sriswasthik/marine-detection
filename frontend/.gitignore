@@ -1,0 +1,20 @@
+# Dependencies and build output
+node_modules
+dist
+dist-ssr
+coverage
+
+# Environment (keep .env.example tracked)
+.env
+.env.local
+.env.*.local
+*.local
+
+# Logs
+*.log
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store

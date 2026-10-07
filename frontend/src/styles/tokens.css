@@ -1,0 +1,68 @@
+/*
+ * Design tokens: the single source for colour, type, radius, shadow and motion.
+ * Values mirror frontend/CLAUDE.md. Change them here, never inline in components.
+ */
+@theme {
+  /* Reset Tailwind's default palette so only project tokens exist. */
+  --color-*: initial;
+
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* Base */
+  --color-bg: #f7f8f7;
+  --color-surface: #ffffff;
+  --color-border: #e3e7e5;
+  --color-border-strong: #cdd4d1;
+  --color-ink: #18212b;
+  --color-ink-muted: #66717d;
+
+  /* Accent */
+  --color-accent: #2f6f6d;
+  --color-accent-hover: #265957;
+  --color-accent-soft: #e6f0ef;
+
+  /* Severity scale */
+  --color-low: #e8cf7a;
+  --color-low-stroke: #b8993a;
+  --color-low-soft: #faf3d9;
+  --color-moderate: #e0954f;
+  --color-moderate-stroke: #b86d2c;
+  --color-moderate-soft: #fae9d6;
+  --color-high: #c4503a;
+  --color-high-stroke: #983728;
+  --color-high-soft: #f7ddd7;
+  --color-critical: #7f2432;
+  --color-critical-stroke: #5c1824;
+  --color-critical-soft: #ebd3d7;
+
+  /* Status */
+  --color-success: #3f7d58;
+  --color-warning: #a66a12;
+  --color-warning-soft: #fbf3e3;
+  --color-danger: #a8402f;
+  --color-danger-soft: #fbeae6;
+  --color-info: #2f6f6d;
+  --color-info-soft: #e6f0ef;
+
+  /* Type */
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  /* Radius */
+  --radius-badge: 6px;
+  --radius-control: 8px;
+  --radius-card: 12px;
+
+  /* Shadow */
+  --shadow-subtle: 0 1px 2px rgba(24, 33, 43, 0.04);
+  --shadow-popover: 0 8px 24px rgba(24, 33, 43, 0.08);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 120ms;
+  --duration-base: 160ms;
+  --duration-slow: 200ms;
+}
