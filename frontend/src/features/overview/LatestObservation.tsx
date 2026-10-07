@@ -6,11 +6,14 @@ import { MapPreview } from '@/features/map'
 import { SourceIcon } from '@/features/observations/components/SourceIcon'
 import { SOURCE_LABELS, STATUS_LABELS, STATUS_TONES } from '@/features/observations/labels'
 import { DENSITY_LEVEL_IDS, type Observation } from '@/features/observations/types'
-import { analyzeObservation } from '@/lib/analysis'
+import { ObservationNotices } from '@/features/observations/components/ObservationNotices'
+import { ObservationStatusState } from '@/features/observations/components/ObservationStates'
+import { hasResult } from '@/features/observations/status'
+import { analyzeObservation, type ObservationAnalysis } from '@/lib/analysis'
 import { DENSITY_LEVELS } from '@/lib/density'
 import { ENV } from '@/lib/env'
 import { formatArea, formatDateTime } from '@/lib/format'
-import { observationKpis } from '@/lib/kpis'
+import { observationKpis, type Kpi } from '@/lib/kpis'
 import type { VisibleLayers } from '@/lib/map/layers'
 import { InspectNext } from './InspectNext'
 
@@ -42,10 +45,13 @@ function LevelKey() {
 export function LatestObservation({
   observation,
   isLatest,
+  partialData = false,
 }: {
   observation: Observation
   /** True when this is the most recent observation, not one picked in the top bar. */
   isLatest: boolean
+  /** Some detections failed validation and were dropped. */
+  partialData?: boolean
 }) {
   const analysis = useMemo(() => analyzeObservation(observation), [observation])
   const kpis = observationKpis(observation, analysis.hotspots)
@@ -54,6 +60,7 @@ export function LatestObservation({
 
   return (
     <section aria-labelledby="latest-title" className="flex flex-col gap-6">
+      <ObservationNotices observation={observation} partialData={partialData} />
       <header className="flex flex-col gap-1.5">
         <p className="text-caption font-medium tracking-wide text-ink-muted uppercase">
           {isLatest ? 'Latest observation' : 'Selected observation'}
@@ -75,6 +82,36 @@ export function LatestObservation({
         </div>
       </header>
 
+      {hasResult(observation) ? (
+        <ObservationResult
+          observation={observation}
+          analysis={analysis}
+          kpis={kpis}
+          mapPath={mapPath}
+          noDebris={noDebris}
+        />
+      ) : (
+        <ObservationStatusState observation={observation} />
+      )}
+    </section>
+  )
+}
+
+function ObservationResult({
+  observation,
+  analysis,
+  kpis,
+  mapPath,
+  noDebris,
+}: {
+  observation: Observation
+  analysis: ObservationAnalysis
+  kpis: Kpi[]
+  mapPath: string
+  noDebris: boolean
+}) {
+  return (
+    <>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {kpis.map((kpi) => (
           <MetricCard
@@ -126,6 +163,6 @@ export function LatestObservation({
 
         <InspectNext observation={observation} hotspots={analysis.hotspots} />
       </div>
-    </section>
+    </>
   )
 }

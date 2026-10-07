@@ -33,13 +33,17 @@ export function NoDebrisCard({ observation }: { observation: Observation }) {
           <dt className="text-ink-muted">Captured</dt>
           <dd className="num text-right text-ink">{formatDateTime(observation.capturedAt)}</dd>
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <dt className="text-ink-muted">Model precision</dt>
-          <dd className="flex items-center gap-2">
-            {metrics.isPlaceholder ? <Badge tone="warning">Sample values</Badge> : null}
-            <span className="num font-medium text-ink">{formatConfidence(metrics.precision)}</span>
-          </dd>
-        </div>
+        {metrics ? (
+          <div className="flex items-center justify-between gap-4">
+            <dt className="text-ink-muted">Model precision</dt>
+            <dd className="flex items-center gap-2">
+              {metrics.isPlaceholder ? <Badge tone="warning">Sample values</Badge> : null}
+              <span className="num font-medium text-ink">
+                {formatConfidence(metrics.precision)}
+              </span>
+            </dd>
+          </div>
+        ) : null}
       </dl>
     </section>
   )

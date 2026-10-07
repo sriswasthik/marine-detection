@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { ApiError, networkError } from '@/features/observations/api/errors'
+import {
+  ApiError,
+  networkError,
+  offlineError,
+  timeoutError,
+} from '@/features/observations/api/errors'
+import { ERROR_COPY } from '@/lib/errors/errorCopy'
 import type { Job } from '@/features/observations/api/types'
 import {
   failureFromError,
@@ -159,7 +165,7 @@ describe('stepStatuses', () => {
 })
 
 describe('failure wording', () => {
-  it('reads an invalid image from the job', () => {
+  it('reads an invalid image from the job, with the shared copy', () => {
     const result = failureFromJob(
       job({
         status: 'failed',
@@ -167,22 +173,34 @@ describe('failure wording', () => {
         error: { code: 'INVALID_IMAGE', message: 'Not an image.', recoverable: true },
       }),
     )
-    expect(result).toMatchObject({
+    expect(result).toEqual({
       kind: 'invalid',
-      message: 'Not an image.',
+      title: ERROR_COPY.INVALID_IMAGE.title,
+      message: ERROR_COPY.INVALID_IMAGE.message,
       code: 'INVALID_IMAGE',
     })
   })
 
-  it('reads a model failure as "The detection step failed"', () => {
-    const result = failureFromJob(
-      job({
-        status: 'failed',
-        step: 'detect',
-        error: { code: 'MODEL_ERROR', message: 'Stopped.', recoverable: true },
-      }),
-    )
-    expect(result).toMatchObject({ kind: 'server', title: 'The detection step failed' })
+  it('reads a model failure as "The detection step failed", only at the detection step', () => {
+    const at = (step: Job['step']) =>
+      failureFromJob(
+        job({
+          status: 'failed',
+          step,
+          error: { code: 'MODEL_ERROR', message: 'Stopped.', recoverable: true },
+        }),
+      )
+    expect(at('detect')).toMatchObject({ kind: 'server', title: 'The detection step failed' })
+    expect(at('map')).toMatchObject({ kind: 'server', code: 'SERVER' })
+  })
+
+  it('treats an upload failure without a code as an unusable file', () => {
+    expect(failureFromJob(job({ status: 'failed', step: 'upload' }))).toMatchObject({
+      kind: 'invalid',
+    })
+    expect(failureFromJob(job({ status: 'failed', step: 'preprocess' }))).toMatchObject({
+      kind: 'server',
+    })
   })
 
   it('classifies request errors', () => {
@@ -190,24 +208,39 @@ describe('failure wording', () => {
       kind: 'network',
       title: "Can't reach the processing service",
     })
+    expect(failureFromError(offlineError())).toMatchObject({
+      kind: 'network',
+      title: "You're offline",
+    })
+    expect(failureFromError(timeoutError(20_000))).toMatchObject({ kind: 'network' })
     expect(
       failureFromError(new ApiError('Too big.', { status: 413, code: 'FILE_TOO_LARGE' })),
-    ).toMatchObject({ kind: 'invalid' })
+    ).toMatchObject({ kind: 'invalid', code: 'FILE_TOO_LARGE' })
     expect(
       failureFromError(new ApiError('Down.', { status: 503, code: 'SERVER_ERROR' })),
-    ).toMatchObject({ kind: 'server' })
+    ).toMatchObject({ kind: 'server', code: 'SERVICE_UNAVAILABLE' })
     expect(failureFromError(new Error('boom'))).toMatchObject({ kind: 'server' })
     expect(failureFromError(new DOMException('stop', 'AbortError'))).toBeNull()
+  })
+
+  it('never passes on raw messages', () => {
+    const result = failureFromError(new Error('TypeError: x is undefined at foo.ts:12'))
+    expect(result?.message).not.toMatch(/undefined|foo\.ts/)
+    expect(result?.title).not.toBe('Something went wrong')
   })
 })
 
 describe('summaryText', () => {
   it('words counts and the no-debris result', () => {
-    expect(summaryText({ detectionCount: 42, hotspotCount: 3 })).toBe(
+    expect(summaryText({ detectionCount: 42, hotspotCount: 3, notices: [] })).toBe(
       '42 regions detected, 3 hotspots',
     )
-    expect(summaryText({ detectionCount: 1, hotspotCount: 1 })).toBe('1 region detected, 1 hotspot')
-    expect(summaryText({ detectionCount: 0, hotspotCount: 0 })).toMatch(/^No debris detected/)
+    expect(summaryText({ detectionCount: 1, hotspotCount: 1, notices: [] })).toBe(
+      '1 region detected, 1 hotspot',
+    )
+    expect(summaryText({ detectionCount: 0, hotspotCount: 0, notices: [] })).toMatch(
+      /^No debris detected/,
+    )
     expect(summaryText(null)).toBe('Detection finished.')
   })
 })

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { describeWarnings } from './warnings'
+import type { ObservationWarning } from '@/features/observations/types'
+import { CONFIDENCE_THRESHOLDS } from './config'
+import {
+  describeWarnings,
+  hasApproximatePositions,
+  isLowConfidenceResult,
+  observationNotices,
+} from './warnings'
 
 describe('describeWarnings', () => {
   it('returns nothing without warnings', () => {
@@ -26,5 +33,95 @@ describe('describeWarnings', () => {
       (m) => m.title,
     )
     expect(titles).toEqual(['Approximate positions', 'Coarse resolution'])
+  })
+})
+
+describe('low-confidence rule', () => {
+  const base = { averageConfidence: 0.75, warnings: [] as ObservationWarning[] }
+
+  it('triggers below the threshold, at it does not', () => {
+    expect(
+      isLowConfidenceResult({ ...base, averageConfidence: CONFIDENCE_THRESHOLDS.low - 0.01 }),
+    ).toBe(true)
+    expect(isLowConfidenceResult({ ...base, averageConfidence: CONFIDENCE_THRESHOLDS.low })).toBe(
+      false,
+    )
+  })
+
+  it('triggers on the LOW_CONFIDENCE flag even with a good average', () => {
+    expect(isLowConfidenceResult({ ...base, warnings: ['LOW_CONFIDENCE'] })).toBe(true)
+  })
+
+  it('does not trigger without detections to doubt', () => {
+    expect(isLowConfidenceResult({ ...base, averageConfidence: null })).toBe(false)
+  })
+})
+
+describe('observationNotices', () => {
+  const observation = {
+    averageConfidence: 0.75,
+    warnings: [] as ObservationWarning[],
+    crs: 'EPSG:32644',
+    bounds: { north: 1, south: 0, east: 1, west: 0 },
+    detections: [{}],
+  }
+
+  it('is empty for a confident, placed result', () => {
+    expect(observationNotices(observation)).toEqual([])
+  })
+
+  it('states the average and the threshold when confidence is low', () => {
+    const [notice] = observationNotices({ ...observation, averageConfidence: 0.54 })
+    expect(notice).toMatchObject({ id: 'low-confidence', title: 'Low confidence' })
+    expect(notice?.message).toMatch(/Average confidence is 54%, below the 60% threshold/)
+    expect(notice?.message).toMatch(/dashed, lighter/)
+  })
+
+  it('says nothing about confidence when there is nothing detected', () => {
+    expect(
+      observationNotices({
+        ...observation,
+        averageConfidence: null,
+        detections: [],
+        warnings: ['LOW_CONFIDENCE'],
+      }),
+    ).toEqual([])
+  })
+
+  it('treats a missing CRS, missing bounds or PARTIAL_GEOREF as approximate positions', () => {
+    const ids = (o: Parameters<typeof observationNotices>[0]) =>
+      observationNotices(o).map((n) => n.id)
+    expect(ids({ ...observation, crs: null })).toEqual(['approximate-positions'])
+    expect(ids({ ...observation, bounds: null })).toEqual(['approximate-positions'])
+    expect(ids({ ...observation, warnings: ['PARTIAL_GEOREF'] })).toEqual(['approximate-positions'])
+    expect(hasApproximatePositions(observation)).toBe(false)
+  })
+
+  it('orders notices by importance and can be narrowed', () => {
+    const all = observationNotices(
+      {
+        ...observation,
+        averageConfidence: 0.4,
+        crs: null,
+        warnings: ['HIGH_CLOUD', 'LOW_RESOLUTION'],
+        cloudCoveragePercent: 41,
+      },
+      { partialData: true },
+    )
+    expect(all.map((n) => n.id)).toEqual([
+      'low-confidence',
+      'approximate-positions',
+      'partial-data',
+      'cloud-cover',
+      'coarse-resolution',
+    ])
+    expect(
+      observationNotices(
+        { ...observation, averageConfidence: 0.4, warnings: ['HIGH_CLOUD'] },
+        {
+          only: ['low-confidence'],
+        },
+      ).map((n) => n.id),
+    ).toEqual(['low-confidence'])
   })
 })

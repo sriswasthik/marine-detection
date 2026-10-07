@@ -106,10 +106,17 @@ describe('Overview page', { timeout: 15_000 }, () => {
     expect(screen.getByText('Selected observation')).toBeInTheDocument()
   })
 
-  it('shows warnings for an observation that has them', async () => {
+  it('shows the low-confidence banner and other caveats at the top', async () => {
     renderOverview(fastMock(), SAMPLE_IDS.visakhapatnam)
-    expect(await screen.findByText('Read these results with care')).toBeInTheDocument()
-    expect(screen.getByText(/Cloud covered 41\.0% of the image/)).toBeInTheDocument()
+    const notices = await screen.findByTestId('observation-notices', {}, { timeout: 5000 })
+    expect(within(notices).getByText('Low confidence')).toBeInTheDocument()
+    expect(within(notices).getByText(/Cloud covered 41\.0% of the image/)).toBeInTheDocument()
+  })
+
+  it('shows no caveat banners for a confident, fully placed result', async () => {
+    renderOverview(fastMock(), SAMPLE_IDS.ennore)
+    await kpiValues()
+    expect(screen.queryByTestId('observation-notices')).not.toBeInTheDocument()
   })
 
   it('shows an empty state with both actions when there are no observations', async () => {
@@ -140,7 +147,8 @@ describe('Overview page', { timeout: 15_000 }, () => {
       undefined,
       new QueryClient({ defaultOptions: { queries: { retry: false } } }),
     )
-    expect(await screen.findByText('Observations could not load')).toBeInTheDocument()
+    expect(await screen.findByText("Can't reach the processing service")).toBeInTheDocument()
+    expect(screen.getByText(/Check your connection, then try again/)).toBeInTheDocument()
     const calls = listObservations.mock.calls.length
     await userEvent.setup().click(screen.getByRole('button', { name: 'Try again' }))
     expect(listObservations.mock.calls.length).toBeGreaterThan(calls)

@@ -1,6 +1,14 @@
+import { Inbox, ScanSearch } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Banner, ErrorState, Spinner, useToast } from '@/components/ui'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import {
+  buttonStyles,
+  EmptyState,
+  ErrorBoundary,
+  PageSkeleton,
+  SkeletonMap,
+  useToast,
+} from '@/components/ui'
 import { MapControls, MapLegend, MapView, type MapHandle } from '@/features/map'
 import { DetectionDrawer } from '@/features/map/monitoring/DetectionDrawer'
 import { FilterBar } from '@/features/map/monitoring/FilterBar'
@@ -9,7 +17,14 @@ import { NoDebrisCard } from '@/features/map/monitoring/NoDebrisCard'
 import { ResultStrip } from '@/features/map/monitoring/ResultStrip'
 import { useMapState } from '@/features/map/useMapState'
 import { useCurrentObservationId } from '@/features/observations/currentObservationContext'
+import { ObservationNotices } from '@/features/observations/components/ObservationNotices'
+import {
+  LoadError,
+  ObservationNotFound,
+  ObservationStatusState,
+} from '@/features/observations/components/ObservationStates'
 import { useObservation, useObservations } from '@/features/observations/hooks'
+import { hasResult, isNotFound } from '@/features/observations/status'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { analyzeObservation } from '@/lib/analysis'
@@ -18,6 +33,10 @@ import { gridCellSizeForResolution } from '@/lib/config'
 import { applyFilters, hasActiveFilters } from '@/lib/filters'
 import { formatInteger } from '@/lib/format'
 import { serializeMapSearch } from '@/lib/mapUrlState'
+import type { NoticeId } from '@/lib/warnings'
+
+/** The map has little room: only the caveats about what it draws. */
+const MAP_NOTICES: readonly NoticeId[] = ['low-confidence', 'approximate-positions', 'partial-data']
 
 /**
  * Map / Monitoring: the full-bleed map with filters, the inspection list and the detail drawer.
@@ -108,30 +127,40 @@ export function MapPage() {
     ) : null
 
   return (
-    <div className="relative isolate h-[calc(100dvh-var(--spacing-topbar))] w-full overflow-hidden">
+    <div className="relative isolate h-[calc(100dvh-var(--spacing-topbar)-var(--offline-bar-height,0px))] w-full overflow-hidden">
       <h1 className="sr-only">Map{observation ? `: ${observation.region}` : ''}</h1>
 
-      {observation && filtered && analysis ? (
+      {observation && !hasResult(observation) ? (
+        <div className="flex h-full items-center justify-center bg-map-fallback px-4">
+          <ObservationStatusState observation={observation} className="w-full max-w-lg" />
+        </div>
+      ) : observation && filtered && analysis ? (
         <>
-          <MapView
-            ref={mapRef}
-            observation={filtered.observation}
-            analysis={analysis}
-            visibleLayers={mapState.layers}
-            basemap={mapState.basemap}
-            selectedDetectionId={selectedDetection?.id ?? null}
-            selectedHotspotId={selectedHotspot?.id ?? null}
-            highlightedHotspotId={highlightedHotspotId}
-            onSelectDetection={selectDetection}
-            onSelectHotspot={onSelectHotspot}
-            introAnimation={arrivedFresh}
-            className="h-full w-full"
-            overlay={
-              observation.detections.length === 0 ? (
-                <NoDebrisCard observation={observation} />
-              ) : null
-            }
-          />
+          <ErrorBoundary
+            label="The map"
+            resetKeys={[observation.id]}
+            className="h-full w-full rounded-none border-0"
+          >
+            <MapView
+              ref={mapRef}
+              observation={filtered.observation}
+              analysis={analysis}
+              visibleLayers={mapState.layers}
+              basemap={mapState.basemap}
+              selectedDetectionId={selectedDetection?.id ?? null}
+              selectedHotspotId={selectedHotspot?.id ?? null}
+              highlightedHotspotId={highlightedHotspotId}
+              onSelectDetection={selectDetection}
+              onSelectHotspot={onSelectHotspot}
+              introAnimation={arrivedFresh}
+              className="h-full w-full"
+              overlay={
+                observation.detections.length === 0 ? (
+                  <NoDebrisCard observation={observation} />
+                ) : null
+              }
+            />
+          </ErrorBoundary>
 
           {/* Top left: filters, result count, notices and, on desktop, the inspection list. */}
           <div
@@ -161,23 +190,13 @@ export function MapPage() {
                 onReset={mapState.resetFilters}
               />
             </div>
-            {observation.crs === null ? (
-              <Banner
-                tone="warning"
-                title="Approximate positions"
-                className="pointer-events-auto max-w-sm"
-              >
-                This image had no coordinate reference system, so it was placed from approximate
-                bounds. Positions may be off by a few hundred meters. Areas and counts are measured
-                within the image and are still correct.
-              </Banner>
-            ) : null}
-            {issues.length > 0 ? (
-              <Banner tone="warning" title="Partial data" className="pointer-events-auto max-w-sm">
-                Some detections could not be read and are not shown. The rest of the result is
-                complete.
-              </Banner>
-            ) : null}
+            <ObservationNotices
+              observation={observation}
+              partialData={issues.length > 0}
+              only={MAP_NOTICES}
+              className="w-full max-w-sm"
+              bannerClassName="pointer-events-auto shadow-subtle"
+            />
             {isDesktop ? priorityPanel : null}
           </div>
 
@@ -217,18 +236,36 @@ export function MapPage() {
             onShowDetectionOnMap={(detectionId) => mapRef.current?.flyToDetection(detectionId)}
           />
         </>
+      ) : query.isError && isNotFound(query.error) ? (
+        <div className="flex h-full items-center justify-center bg-map-fallback px-4">
+          <ObservationNotFound id={id} headingLevel={2} />
+        </div>
       ) : query.isError || list.isError ? (
-        <div className="flex h-full items-center justify-center px-4">
-          <ErrorState
-            title="The map could not load"
-            description="The observation could not be loaded. Check your connection and try again."
+        <div className="flex h-full items-center justify-center bg-map-fallback px-4">
+          <LoadError
+            error={query.isError ? query.error : list.error}
             onRetry={() => void (query.isError ? query.refetch() : list.refetch())}
           />
         </div>
-      ) : (
-        <div className="flex h-full items-center justify-center bg-map-fallback text-ink-muted">
-          <Spinner label="Loading map" />
+      ) : list.isSuccess && list.data.data.length === 0 && !observationId ? (
+        <div className="flex h-full items-center justify-center bg-map-fallback px-4">
+          <EmptyState
+            icon={<Inbox />}
+            headingLevel={2}
+            title="Nothing to map yet"
+            description="Analyze a satellite or drone image, and its detections appear here on the map."
+            action={
+              <Link to="/analyze" className={buttonStyles({ variant: 'primary' })}>
+                <ScanSearch aria-hidden />
+                Analyze new imagery
+              </Link>
+            }
+          />
         </div>
+      ) : (
+        <PageSkeleton label="Loading map" className="h-full">
+          <SkeletonMap className="h-full w-full" />
+        </PageSkeleton>
       )}
     </div>
   )

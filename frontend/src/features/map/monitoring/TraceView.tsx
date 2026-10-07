@@ -6,9 +6,9 @@ import { Link } from 'react-router-dom'
 import { buttonStyles, Switch } from '@/components/ui'
 import type { Detection } from '@/features/observations/types'
 import { cn } from '@/lib/cn'
-import { DENSITY_LEVELS } from '@/lib/density'
 import { boundsToLeaflet, geometryBounds, geometryToLeaflet } from '@/lib/geo'
-import { BASEMAPS, MAP_COLORS, MAP_MAX_ZOOM } from '@/lib/map/basemaps'
+import { BASEMAPS, MAP_MAX_ZOOM } from '@/lib/map/basemaps'
+import { getDetectionStyle } from '@/lib/map/detectionStyle'
 
 type TraceStep = 'source' | 'segmentation' | 'map'
 
@@ -61,7 +61,6 @@ export function TraceView({
     [detection.geometry],
   )
   const positions = useMemo(() => geometryToLeaflet(detection.geometry), [detection.geometry])
-  const level = DENSITY_LEVELS[detection.densityLevel]
   const step: TraceStep = showDetection ? 'segmentation' : 'source'
 
   return (
@@ -92,12 +91,12 @@ export function TraceView({
             <Polygon
               positions={positions}
               interactive={false}
-              pathOptions={{
-                color: MAP_COLORS.halo,
-                weight: 1.5,
-                fillColor: level.color,
-                fillOpacity: 0.6,
-              }}
+              // Same style as on the map, so low confidence stays dashed and lighter here too.
+              pathOptions={getDetectionStyle(detection, {
+                selected: false,
+                hovered: false,
+                onImagery: true,
+              })}
             />
           ) : null}
         </MapContainer>

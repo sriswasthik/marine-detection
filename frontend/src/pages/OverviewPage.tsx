@@ -1,6 +1,5 @@
-import { Inbox, ScanSearch } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { buttonStyles, EmptyState, ErrorState } from '@/components/ui'
+import { ErrorBoundary, PageSkeleton } from '@/components/ui'
+import { LoadError, NoObservations } from '@/features/observations/components/ObservationStates'
 import { useCurrentObservationId } from '@/features/observations/currentObservationContext'
 import { useObservation, useObservations } from '@/features/observations/hooks'
 import { IntroBand } from '@/features/overview/IntroBand'
@@ -31,51 +30,34 @@ export function OverviewPage() {
       <div className="h-px bg-border" aria-hidden />
 
       {list.isPending ? (
-        <>
+        <PageSkeleton label="Loading observations" className="flex flex-col gap-14">
           <LatestObservationSkeleton />
           <RecentObservationsSkeleton />
-        </>
+        </PageSkeleton>
       ) : list.isError ? (
-        <ErrorState
-          title="Observations could not load"
-          description="The list of observations did not arrive. Check your connection and try again."
-          onRetry={() => void list.refetch()}
-        />
+        <LoadError error={list.error} onRetry={() => void list.refetch()} />
       ) : !observations || observations.length === 0 ? (
-        <EmptyState
-          headingLevel={2}
-          icon={<Inbox />}
-          title="No observations yet"
-          description="Analyze a satellite or drone image to see detections, density and where to inspect first."
-          action={
-            <>
-              <Link to="/analyze" className={buttonStyles({ variant: 'primary' })}>
-                <ScanSearch aria-hidden />
-                Analyze new imagery
-              </Link>
-              <Link to="/analyze?sample=1" className={buttonStyles({ variant: 'secondary' })}>
-                Load a sample scene
-              </Link>
-            </>
-          }
-        />
+        <NoObservations />
       ) : (
         <>
           {detail.isError ? (
-            <ErrorState
-              title="This observation could not load"
-              description="The details did not arrive. Check your connection and try again, or pick another observation in the top bar."
-              onRetry={() => void detail.refetch()}
-            />
+            <LoadError error={detail.error} onRetry={() => void detail.refetch()} />
           ) : detail.data ? (
-            <LatestObservation
-              observation={detail.data.data}
-              isLatest={detail.data.data.id === latestId}
-            />
+            <ErrorBoundary label="The selected observation" resetKeys={[detail.data.data.id]}>
+              <LatestObservation
+                observation={detail.data.data}
+                isLatest={detail.data.data.id === latestId}
+                partialData={detail.data.issues.length > 0}
+              />
+            </ErrorBoundary>
           ) : (
-            <LatestObservationSkeleton />
+            <PageSkeleton label="Loading observation">
+              <LatestObservationSkeleton />
+            </PageSkeleton>
           )}
-          <RecentObservations observations={observations} />
+          <ErrorBoundary label="Recent observations">
+            <RecentObservations observations={observations} />
+          </ErrorBoundary>
         </>
       )}
     </div>

@@ -121,7 +121,7 @@ const observationFields = {
   coveragePercent: percent,
   averageConfidence: unitInterval.nullable(),
   densityLevel: z.enum(DENSITY_LEVEL_IDS).nullable(),
-  modelMetrics: ModelMetricsSchema,
+  modelMetrics: ModelMetricsSchema.optional(),
   warnings: z.array(z.enum(OBSERVATION_WARNINGS)).optional(),
   cloudCoveragePercent: percent.optional(),
   resolutionM: finite.positive().optional(),

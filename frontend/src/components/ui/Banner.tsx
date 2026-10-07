@@ -17,6 +17,8 @@ export interface BannerProps {
   /** A button or link, for example "Review warnings". */
   action?: ReactNode
   onDismiss?: () => void
+  /** `card` sits in the page; `bar` spans the full width inside the top bar, for app-wide notices. */
+  variant?: 'card' | 'bar'
   className?: string
 }
 
@@ -27,6 +29,7 @@ export function Banner({
   children,
   action,
   onDismiss,
+  variant = 'card',
   className,
 }: BannerProps) {
   const { box, icon, Icon } = TONES[tone]
@@ -34,7 +37,8 @@ export function Banner({
     <div
       role={tone === 'danger' ? 'alert' : 'status'}
       className={cn(
-        'flex items-start gap-3 rounded-card border px-4 py-3 text-small text-ink',
+        'flex items-start gap-3 text-small text-ink',
+        variant === 'card' ? 'rounded-card border px-4 py-3' : 'border-t px-4 py-2 sm:px-6',
         box,
         className,
       )}

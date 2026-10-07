@@ -4,6 +4,7 @@ import { useObservationsApi } from '@/features/observations/api/apiContext'
 import type { CreateObservationInput, JobStep } from '@/features/observations/api/types'
 import { JOB_POLL_INTERVAL_MS, observationKeys } from '@/features/observations/hooks'
 import { analyzeObservation } from '@/lib/analysis'
+import { observationNotices } from '@/lib/warnings'
 import {
   failureFromError,
   failureFromJob,
@@ -81,6 +82,10 @@ export function useAnalysisRun() {
               summary = {
                 detectionCount: result.data.detections.length,
                 hotspotCount: analyzeObservation(result.data).hotspots.length,
+                notices: observationNotices(result.data, {
+                  partialData: result.issues.length > 0,
+                  only: ['low-confidence', 'approximate-positions', 'partial-data'],
+                }),
               }
             } catch {
               // The result exists even if the summary cannot be fetched; the map will load it.

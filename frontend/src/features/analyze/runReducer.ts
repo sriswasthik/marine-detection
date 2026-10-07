@@ -1,6 +1,8 @@
-import { ApiError, isAbortError } from '@/features/observations/api/errors'
 import { JOB_STEPS, type Job, type JobStep } from '@/features/observations/api/types'
+import { createAppError, toAppError, type AppError } from '@/lib/errors/appError'
+import type { AppErrorCode } from '@/lib/errors/errorCopy'
 import { formatInteger } from '@/lib/format'
+import type { ObservationNotice } from '@/lib/warnings'
 
 export type StepStatus = 'pending' | 'active' | 'done' | 'failed'
 export type RunFailureKind = 'invalid' | 'server' | 'network'
@@ -15,6 +17,8 @@ export interface RunFailure {
 export interface RunSummary {
   detectionCount: number
   hotspotCount: number
+  /** Caveats to read the result with: low confidence, approximate positions. */
+  notices: ObservationNotice[]
 }
 
 export type RunState =
@@ -131,62 +135,51 @@ export function stepStatuses(state: RunState): Record<JobStep, StepStatus> {
 }
 
 // ---------------------------------------------------------------------------
-// Failure wording
+// Failure wording: every failure goes through toAppError, so the copy lives in errorCopy.ts.
 // ---------------------------------------------------------------------------
 
-const NETWORK: Omit<RunFailure, 'code'> = {
-  kind: 'network',
-  title: "Can't reach the processing service",
-  message: 'Check your connection, then retry. Your file and details are kept.',
+const NETWORK_CODES: ReadonlySet<AppErrorCode> = new Set(['OFFLINE', 'NETWORK', 'TIMEOUT'])
+const INVALID_CODES: ReadonlySet<AppErrorCode> = new Set([
+  'INVALID_IMAGE',
+  'FILE_TOO_LARGE',
+  'UNSUPPORTED_FILE',
+  'BAD_REQUEST',
+])
+
+/**
+ * How the Analyze page treats a failure: `invalid` sends the user back to pick another file,
+ * `network` and `server` offer Retry with the same file and details.
+ */
+export function failureFromAppError(error: AppError): RunFailure {
+  const kind: RunFailureKind = NETWORK_CODES.has(error.code)
+    ? 'network'
+    : INVALID_CODES.has(error.code)
+      ? 'invalid'
+      : 'server'
+  return { kind, title: error.title, message: error.message, code: error.code }
 }
 
-/** A failed job, as reported by the backend. */
+/** A failed job, as reported by the backend. An upload that fails means the file was unusable. */
 export function failureFromJob(job: Job): RunFailure {
-  const code = job.error?.code ?? null
-  if (code === 'INVALID_IMAGE' || job.step === 'upload') {
-    return {
-      kind: 'invalid',
-      title: "This image can't be analysed",
-      message: job.error?.message ?? 'The file could not be read as an image. Choose another file.',
-      code,
-    }
+  if (!job.error) {
+    return failureFromAppError(createAppError(job.step === 'upload' ? 'INVALID_IMAGE' : 'SERVER'))
   }
-  return {
-    kind: 'server',
-    title: job.step === 'detect' ? 'The detection step failed' : `The ${job.step} step failed`,
-    message: job.error?.message ?? 'The service stopped before finishing. Try again.',
-    code,
+  const error = toAppError(job.error)
+  if (job.step === 'upload' && error.code === 'SERVER') {
+    return failureFromAppError(createAppError('INVALID_IMAGE'))
   }
+  // "The detection step failed" only when it was the detection step.
+  if (error.code === 'MODEL_FAILED' && job.step !== 'detect') {
+    return failureFromAppError(createAppError('SERVER'))
+  }
+  return failureFromAppError(error)
 }
 
 /** A request that rejected, from createObservation or getJob. Null for a cancelled request. */
 export function failureFromError(error: unknown): RunFailure | null {
-  if (isAbortError(error)) return null
-  if (error instanceof ApiError) {
-    if (error.code === 'NETWORK_ERROR' || error.status === null) {
-      return { ...NETWORK, code: error.code }
-    }
-    if (error.status >= 400 && error.status < 500) {
-      return {
-        kind: 'invalid',
-        title: "This image can't be analysed",
-        message: error.message,
-        code: error.code,
-      }
-    }
-    return {
-      kind: 'server',
-      title: 'The processing service had a problem',
-      message: `${error.message} Try again in a moment.`,
-      code: error.code,
-    }
-  }
-  return {
-    kind: 'server',
-    title: 'Something went wrong',
-    message: 'The analysis stopped unexpectedly. Try again; your file and details are kept.',
-    code: null,
-  }
+  const normalised = toAppError(error)
+  if (normalised.code === 'ABORTED') return null
+  return failureFromAppError(normalised)
 }
 
 /** "61 regions detected, 3 hotspots", or the designed no-debris wording. */

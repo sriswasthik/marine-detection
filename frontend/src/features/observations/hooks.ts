@@ -14,6 +14,10 @@ export const jobKeys = {
   detail: (jobId: string) => [...jobKeys.all, jobId] as const,
 }
 
+export const healthKeys = {
+  all: ['health'] as const,
+}
+
 export const JOB_POLL_INTERVAL_MS = 600
 
 export function useObservations() {
@@ -30,6 +34,16 @@ export function useObservation(id: string | null | undefined) {
     queryKey: observationKeys.detail(id ?? ''),
     queryFn: ({ signal }) => api.getObservation(id ?? '', { signal }),
     enabled: Boolean(id),
+  })
+}
+
+/** Whether the processing service answers, and which model it runs. */
+export function useHealth() {
+  const api = useObservationsApi()
+  return useQuery({
+    queryKey: healthKeys.all,
+    queryFn: ({ signal }) => api.health({ signal }),
+    staleTime: 60_000,
   })
 }
 

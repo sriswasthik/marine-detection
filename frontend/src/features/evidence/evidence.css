@@ -1,0 +1,19 @@
+/*
+ * Evidence viewer. The frame sets --mwi-overlay-opacity; it applies to everything the model drew
+ * (Leaflet's overlay pane), never to the imagery underneath.
+ */
+.mwi-evidence-frame .leaflet-overlay-pane {
+  opacity: var(--mwi-overlay-opacity, 1);
+}
+
+/* Segmentation view: the imagery steps back so the model output reads like a mask. */
+.mwi-evidence--mask .leaflet-tile-pane,
+.mwi-evidence--mask .leaflet-evidence-image-pane {
+  filter: grayscale(1) contrast(0.85) brightness(1.15);
+  opacity: 0.5;
+}
+
+/* Still pictures (thumbnails) pass every pointer event to the control around them. */
+.mwi-evidence--still {
+  pointer-events: none;
+}

@@ -254,6 +254,11 @@ describe('runReadiness', () => {
     expect(runReadiness({ ...base, capturedAtIso: null }).reason).toBe(
       'Enter when the image was captured.',
     )
+    expect(runReadiness({ ...base, online: false }).reason).toBe(
+      "You're offline. Reconnect to run detection.",
+    )
+    // Offline is reported last, so the form can be completed first.
+    expect(runReadiness({ ...base, region: '', online: false }).reason).toBe('Enter a region name.')
   })
 
   it('does not block on warnings or pending checks', () => {

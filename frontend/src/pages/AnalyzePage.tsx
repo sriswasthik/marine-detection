@@ -18,6 +18,7 @@ import { useElapsed } from '@/features/analyze/useElapsed'
 import { qualityChecks, runReadiness, validateBounds } from '@/features/analyze/validate'
 import type { Observation } from '@/features/observations/types'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { useOnlineStatus } from '@/hooks/useOnlineStatus'
 import { RESULT_AUTO_OPEN_MS } from '@/lib/config'
 import { fromDateTimeLocalValue } from '@/lib/datetime'
 import { ENV } from '@/lib/env'
@@ -36,6 +37,7 @@ export function AnalyzePage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [autoOpenCancelled, setAutoOpenCancelled] = useState(false)
   const scenes = useMemo(() => sampleScenes(), [])
+  const online = useOnlineStatus()
 
   const file = draft.file
   const boundsValidation = useMemo(() => validateBounds(draft.bounds), [draft.bounds])
@@ -59,6 +61,7 @@ export function AnalyzePage() {
     checks,
     region: draft.region,
     capturedAtIso,
+    online,
   })
 
   const chooseFile = (chosen: File) => {
@@ -240,7 +243,12 @@ export function AnalyzePage() {
               ) : null}
               {run.phase === 'failed' && run.failure.kind !== 'invalid' ? (
                 <div className="mt-6">
-                  <FailurePanel failure={run.failure} onRetry={runDetection} onEdit={reset} />
+                  <FailurePanel
+                    failure={run.failure}
+                    onRetry={runDetection}
+                    onEdit={reset}
+                    retryBlockedReason={readiness.ready ? null : readiness.reason}
+                  />
                 </div>
               ) : null}
             </div>

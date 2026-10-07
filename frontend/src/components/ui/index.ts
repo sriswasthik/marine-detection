@@ -15,6 +15,7 @@ export {
   type DropdownTriggerProps,
 } from './DropdownMenu'
 export { EmptyState, type EmptyStateProps } from './EmptyState'
+export { ErrorBoundary, type ErrorBoundaryProps } from './ErrorBoundary'
 export { ErrorState, type ErrorStateProps } from './ErrorState'
 export { Field, type FieldProps } from './Field'
 export { IconButton, type IconButtonProps } from './IconButton'
@@ -28,7 +29,16 @@ export {
 export { Popover, type PopoverProps, type PopoverTriggerProps } from './Popover'
 export { Select, type SelectOption, type SelectOptionGroup, type SelectProps } from './Select'
 export { SeverityBadge, SeveritySwatch, type SeverityBadgeProps } from './SeverityBadge'
-export { Skeleton, SkeletonText } from './Skeleton'
+export {
+  PageSkeleton,
+  Skeleton,
+  SkeletonCard,
+  SkeletonMap,
+  SkeletonMetricCards,
+  SkeletonPageHeader,
+  SkeletonTable,
+  SkeletonText,
+} from './Skeleton'
 export { RangeSlider, Slider, type RangeSliderProps, type SliderProps } from './Slider'
 export { Spinner } from './Spinner'
 export { Switch, type SwitchProps } from './Switch'

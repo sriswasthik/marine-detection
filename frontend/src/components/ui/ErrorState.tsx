@@ -1,12 +1,19 @@
 import { CircleAlert, RotateCcw } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
+import type { AppError } from '@/lib/errors/appError'
+import { ERROR_COPY } from '@/lib/errors/errorCopy'
 import { Button } from './Button'
 
 export interface ErrorStateProps {
+  /**
+   * The normalised error (see toAppError). Supplies the title, message, retry and reference;
+   * any of the props below override it.
+   */
+  error?: AppError
   title?: ReactNode
   /** What went wrong and what to do next. */
-  description: ReactNode
+  description?: ReactNode
   onRetry?: () => void
   retryLabel?: string
   /** Extra actions, for example a link back to the overview. */
@@ -18,8 +25,10 @@ export interface ErrorStateProps {
   headingLevel?: 1 | 2 | 3
 }
 
+/** Explains a failure and offers the next step. Never shows raw messages or stack traces. */
 export function ErrorState({
-  title = 'Something went wrong',
+  error,
+  title,
   description,
   onRetry,
   retryLabel = 'Try again',
@@ -30,6 +39,13 @@ export function ErrorState({
   headingLevel = 2,
 }: ErrorStateProps) {
   const Heading = `h${headingLevel}` as const
+  const fallback = ERROR_COPY.UNEXPECTED
+  const shownTitle = title ?? error?.title ?? fallback.title
+  const shownDescription = description ?? error?.message ?? fallback.message
+  const retry = onRetry ?? error?.retry
+  const reference =
+    details ??
+    (error ? `${error.code}${error.reference ? ` · ${error.reference}` : ''}` : undefined)
   return (
     <div
       role="alert"
@@ -45,19 +61,19 @@ export function ErrorState({
       >
         <CircleAlert className="size-5" />
       </span>
-      <Heading className="text-heading text-ink">{title}</Heading>
-      <p className="text-body text-ink-muted">{description}</p>
-      {onRetry || action ? (
+      <Heading className="text-heading text-ink">{shownTitle}</Heading>
+      <p className="text-body text-ink-muted">{shownDescription}</p>
+      {retry || action ? (
         <div className="mt-2 flex flex-wrap justify-center gap-2">
-          {onRetry ? (
-            <Button variant="secondary" iconStart={<RotateCcw aria-hidden />} onClick={onRetry}>
+          {retry ? (
+            <Button variant="secondary" iconStart={<RotateCcw aria-hidden />} onClick={retry}>
               {retryLabel}
             </Button>
           ) : null}
           {action}
         </div>
       ) : null}
-      {details ? <p className="mono-label mt-1 text-ink-muted">{details}</p> : null}
+      {reference ? <p className="mono-label mt-1 text-ink-muted">{reference}</p> : null}
     </div>
   )
 }

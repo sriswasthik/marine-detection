@@ -94,7 +94,8 @@ export interface Observation {
   /** Highest density level among grid cells with debris. Null when no debris was detected. */
   densityLevel: DensityLevel | null
   detections: Detection[]
-  modelMetrics: ModelMetrics
+  /** Evaluation figures for the model. Absent when the service has none to report. */
+  modelMetrics?: ModelMetrics
   warnings?: ObservationWarning[]
   cloudCoveragePercent?: number
   /** Ground sample distance in meters per pixel. */

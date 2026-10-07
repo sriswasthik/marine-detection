@@ -6,6 +6,7 @@ import { buttonStyles, Divider, Drawer, IconButton, Tooltip } from '@/components
 import { ObservationChip } from '@/features/observations/components/ObservationChip'
 import { ENV } from '@/lib/env'
 import { ModeChip } from './ModeChip'
+import { OfflineBanner } from './OfflineBanner'
 import { PrimaryNav, SheetNav } from './PrimaryNav'
 
 const ANALYZE_LABEL = 'Analyze new imagery'
@@ -64,6 +65,7 @@ export function TopBar() {
           />
         </div>
       </div>
+      <OfflineBanner />
 
       <Drawer open={menuOpen} onClose={() => setMenuOpen(false)} title="Menu">
         <div className="flex flex-col gap-5">

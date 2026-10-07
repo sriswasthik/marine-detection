@@ -1,4 +1,4 @@
-import type { Feature } from 'geojson'
+import type { Feature, FeatureCollection } from 'geojson'
 import type { Detection, DetectionGeometry, Observation } from '@/features/observations/types'
 
 export interface DetectionFeatureProperties {
@@ -43,4 +43,26 @@ export function detectionGeoJsonText(
   observation: Pick<Observation, 'id' | 'region' | 'source' | 'capturedAt'>,
 ): string {
   return JSON.stringify(detectionToFeature(detection, observation), null, 2)
+}
+
+/** Every detection of an observation as one GeoJSON FeatureCollection. */
+export function detectionsFeatureCollection(
+  observation: Pick<Observation, 'id' | 'region' | 'source' | 'capturedAt' | 'detections'>,
+): FeatureCollection<DetectionGeometry, DetectionFeatureProperties> {
+  return {
+    type: 'FeatureCollection',
+    features: observation.detections.map((detection) => detectionToFeature(detection, observation)),
+  }
+}
+
+export function detectionsGeoJsonText(
+  observation: Pick<Observation, 'id' | 'region' | 'source' | 'capturedAt' | 'detections'>,
+): string {
+  return JSON.stringify(detectionsFeatureCollection(observation), null, 2)
+}
+
+/** "obs-ennore-20261003-detections.geojson". */
+export function detectionsFileName(observationId: string): string {
+  const safe = observationId.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '')
+  return `${safe || 'observation'}-detections.geojson`
 }

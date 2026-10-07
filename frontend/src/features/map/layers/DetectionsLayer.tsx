@@ -96,6 +96,8 @@ export interface DetectionsLayerProps {
   /** Satellite basemap underneath: use the light outline style. */
   onImagery: boolean
   onSelect: (id: string) => void
+  /** Detection to emphasise from outside the map, for example a hovered table row. */
+  highlightedId?: string | null
 }
 
 /**
@@ -108,6 +110,7 @@ export const DetectionsLayer = memo(function DetectionsLayer({
   interactive,
   onImagery,
   onSelect,
+  highlightedId = null,
 }: DetectionsLayerProps) {
   const map = useMap()
   const [zoom, setZoom] = useState(() => map.getZoom())
@@ -136,6 +139,7 @@ export const DetectionsLayer = memo(function DetectionsLayer({
   const modeOf = (d: Detection) =>
     detectionRepresentation(extents.get(d.id) ?? 0, d.centroid.lat, zoom)
   const hovered = interactive ? detections.find((d) => d.id === hoveredId) : undefined
+  const emphasisedId = hoveredId ?? highlightedId
   const selected = detections.find((d) => d.id === selectedId)
 
   return (
@@ -146,7 +150,7 @@ export const DetectionsLayer = memo(function DetectionsLayer({
             key={detection.id}
             detection={detection}
             mode={modeOf(detection)}
-            state={detection.id === hoveredId ? hoveredState : idle}
+            state={detection.id === emphasisedId ? hoveredState : idle}
             interactive={interactive}
             onEnter={onEnter}
             onLeave={onLeave}
@@ -176,7 +180,7 @@ export const DetectionsLayer = memo(function DetectionsLayer({
             key={`selected-${selected.id}`}
             detection={selected}
             mode={modeOf(selected)}
-            state={{ selected: true, hovered: selected.id === hoveredId, onImagery }}
+            state={{ selected: true, hovered: selected.id === emphasisedId, onImagery }}
             interactive={interactive}
             front
             onEnter={onEnter}

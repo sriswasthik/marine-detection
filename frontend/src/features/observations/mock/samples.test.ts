@@ -139,8 +139,8 @@ describe.each(samples.map((o) => [o.id, o] as const))('sample %s', (_id, observa
   })
 
   it('labels model metrics as placeholders', () => {
-    expect(observation.modelMetrics.isPlaceholder).toBe(true)
-    expect(observation.modelMetrics.benchmark).toBe(
+    expect(observation.modelMetrics?.isPlaceholder).toBe(true)
+    expect(observation.modelMetrics?.benchmark).toBe(
       'Placeholder values, replace with project evaluation results',
     )
   })

@@ -100,3 +100,9 @@ export const PIPELINE_STEP_COPY: Readonly<Record<JobStep, { label: string; descr
 
 /** After a successful run, open the results on their own if the user does nothing. */
 export const RESULT_AUTO_OPEN_MS = 1000
+
+/** Time limit for reads and job polling. A request that takes longer fails with TIMEOUT. */
+export const REQUEST_TIMEOUT_MS = 20_000
+
+/** Time limit for an image upload. */
+export const UPLOAD_TIMEOUT_MS = 300_000

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Badge, SeverityBadge } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { formatCoveragePercent, formatDate, formatInteger } from '@/lib/format'
+import { hasApproximatePositions, isLowConfidenceResult } from '@/lib/warnings'
 import { SOURCE_LABELS, STATUS_LABELS, STATUS_TONES } from '../labels'
 import type { ObservationSummary } from '../types'
 import { SourceIcon } from './SourceIcon'
@@ -29,8 +30,21 @@ export function ObservationCard({ observation }: { observation: ObservationSumma
         <SourceIcon source={observation.source} className="size-4 shrink-0 text-ink-muted" />
         <span className="flex min-w-0 flex-col">
           <span className="truncate text-body font-medium text-ink">{observation.region}</span>
-          <span className="num text-caption text-ink-muted">
-            {formatDate(observation.capturedAt)} · {SOURCE_LABELS[observation.source]}
+          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="num text-caption text-ink-muted">
+              {formatDate(observation.capturedAt)} · {SOURCE_LABELS[observation.source]}
+            </span>
+            {/* Caveats travel with the result, here as on the map and the detail page. */}
+            {observation.detectionCount > 0 && isLowConfidenceResult(observation) ? (
+              <Badge tone="warning" className="h-5">
+                Low confidence
+              </Badge>
+            ) : null}
+            {hasApproximatePositions(observation) ? (
+              <Badge tone="warning" className="h-5">
+                Approximate positions
+              </Badge>
+            ) : null}
           </span>
         </span>
       </span>

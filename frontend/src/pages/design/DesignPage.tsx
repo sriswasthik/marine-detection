@@ -308,16 +308,18 @@ export function DesignPage() {
                 unit={heroAnalysis.hotspots.length === 1 ? 'hotspot' : 'hotspots'}
                 status={{ tone: 'danger', label: 'Action needed' }}
               />
-              <MetricCard
-                label="Model precision"
-                value={formatConfidence(hero.modelMetrics.precision)}
-                status={
-                  hero.modelMetrics.isPlaceholder
-                    ? { tone: 'warning', label: 'Sample values' }
-                    : undefined
-                }
-                footnote={hero.modelMetrics.benchmark}
-              />
+              {hero.modelMetrics ? (
+                <MetricCard
+                  label="Model precision"
+                  value={formatConfidence(hero.modelMetrics.precision)}
+                  status={
+                    hero.modelMetrics.isPlaceholder
+                      ? { tone: 'warning', label: 'Sample values' }
+                      : undefined
+                  }
+                  footnote={hero.modelMetrics.benchmark}
+                />
+              ) : null}
             </>
           ) : null}
           <MetricCard label="Loading" value="" loading />

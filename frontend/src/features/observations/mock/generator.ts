@@ -31,7 +31,6 @@ import {
   type Point,
   type Rect,
 } from '@/lib/polygon'
-import { slugify } from '@/lib/format'
 import type {
   Detection,
   GeoBounds,
@@ -327,7 +326,6 @@ export function generateObservation(spec: SceneSpec): Observation {
       ? round(detections.reduce((sum, d) => sum + d.confidence, 0) / detections.length, 3)
       : null
   const startedAt = addSeconds(spec.capturedAt, spec.processing.delaySeconds)
-  const slug = slugify(spec.name)
 
   return {
     id: spec.id,
@@ -335,9 +333,9 @@ export function generateObservation(spec: SceneSpec): Observation {
     source: spec.source,
     capturedAt: spec.capturedAt,
     region: spec.region,
-    imageUrl: `/samples/${slug}/image.png`,
-    previewUrl: `/samples/${slug}/preview.png`,
-    maskUrl: `/samples/${slug}/mask.png`,
+    // Sample scenes have no image files: the UI falls back to basemap imagery fitted to the bounds.
+    imageUrl: '',
+    previewUrl: '',
     bounds,
     crs: spec.crs,
     status: spec.status,

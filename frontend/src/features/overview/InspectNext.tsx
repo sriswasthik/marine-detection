@@ -1,15 +1,14 @@
 import { ChevronRight, CircleCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Banner, SeverityBadge } from '@/components/ui'
+import { SeverityBadge } from '@/components/ui'
 import { RankDot } from '@/features/map/monitoring/InspectionPriority'
 import type { Observation } from '@/features/observations/types'
 import { formatArea, formatCoordinates } from '@/lib/format'
 import type { Hotspot } from '@/lib/hotspots'
-import { describeWarnings } from '@/lib/warnings'
 
 const INSPECT_LIMIT = 3
 
-/** The top ranked hotspots, each opening the map with that hotspot selected, plus warnings. */
+/** The top ranked hotspots, each opening the map with that hotspot selected. */
 export function InspectNext({
   observation,
   hotspots,
@@ -18,7 +17,6 @@ export function InspectNext({
   hotspots: readonly Hotspot[]
 }) {
   const top = hotspots.slice(0, INSPECT_LIMIT)
-  const warnings = describeWarnings(observation)
   const mapPath = (hotspotId: string) =>
     `/map/${encodeURIComponent(observation.id)}?h=${encodeURIComponent(hotspotId)}`
 
@@ -73,18 +71,6 @@ export function InspectNext({
           </div>
         </div>
       )}
-
-      {warnings.length > 0 ? (
-        <Banner tone="warning" title="Read these results with care">
-          <ul className="mt-1 flex flex-col gap-1">
-            {warnings.map((warning) => (
-              <li key={warning.code}>
-                <span className="font-medium">{warning.title}.</span> {warning.detail}
-              </li>
-            ))}
-          </ul>
-        </Banner>
-      ) : null}
     </section>
   )
 }

@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { getSampleObservation, HERO_SAMPLE_ID } from '@/features/observations/mock/samples'
-import { detectionGeoJsonText, detectionToFeature } from './geojson'
+import {
+  detectionGeoJsonText,
+  detectionsFeatureCollection,
+  detectionsFileName,
+  detectionsGeoJsonText,
+  detectionToFeature,
+} from './geojson'
 import { shortId } from './format'
 
 describe('detection GeoJSON', () => {
@@ -31,5 +37,28 @@ describe('detection GeoJSON', () => {
     expect(shortId('obs-ennore-20261003-d012')).toBe('d012')
     expect(shortId('plain')).toBe('plain')
     expect(shortId('')).toBe('')
+  })
+})
+
+describe('detections FeatureCollection', () => {
+  const observation = getSampleObservation(HERO_SAMPLE_ID)
+  if (!observation) throw new Error('Hero sample missing')
+
+  it('contains every detection as a feature, in order', () => {
+    const collection = detectionsFeatureCollection(observation)
+    expect(collection.type).toBe('FeatureCollection')
+    expect(collection.features.map((f) => f.id)).toEqual(observation.detections.map((d) => d.id))
+    const parsed = JSON.parse(detectionsGeoJsonText(observation)) as { features: unknown[] }
+    expect(parsed.features).toHaveLength(observation.detections.length)
+  })
+
+  it('is a valid, empty collection when nothing was detected', () => {
+    expect(detectionsFeatureCollection({ ...observation, detections: [] }).features).toEqual([])
+  })
+
+  it('builds a safe file name', () => {
+    expect(detectionsFileName('obs-ennore-20261003')).toBe('obs-ennore-20261003-detections.geojson')
+    expect(detectionsFileName('a/b c')).toBe('a-b-c-detections.geojson')
+    expect(detectionsFileName('///')).toBe('observation-detections.geojson')
   })
 })

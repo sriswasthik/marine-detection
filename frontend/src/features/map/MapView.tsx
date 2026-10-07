@@ -1,5 +1,6 @@
 import 'leaflet/dist/leaflet.css'
 import './map.css'
+import './leafletPatches'
 import {
   latLngBounds,
   type FitBoundsOptions,
@@ -56,6 +57,15 @@ export interface MapViewProps {
   analysis?: ObservationAnalysis
   /** Hotspot to emphasise from outside the map (hovering a list row). */
   highlightedHotspotId?: string | null
+  /** Detection to emphasise from outside the map (hovering a table row). */
+  highlightedDetectionId?: string | null
+  /** Zoom with the mouse wheel. Off for maps inside a scrolling page, which use buttons instead. */
+  wheelZoom?: boolean
+  /**
+   * Zoom to a detection once the map is ready, and again whenever a new request arrives.
+   * `key` distinguishes repeated requests for the same detection.
+   */
+  focusRequest?: { detectionId: string; key: number } | null
   /** Run one smooth fit-to-detections animation after the map first loads. */
   introAnimation?: boolean
   /** Space kept around the observation when fitting, in pixels. Small previews use less. */
@@ -106,6 +116,9 @@ export function MapView({
   overlay,
   analysis: providedAnalysis,
   highlightedHotspotId = null,
+  highlightedDetectionId = null,
+  wheelZoom = true,
+  focusRequest = null,
   introAnimation = false,
   fitPadding = DEFAULT_FIT_PADDING,
   className,
@@ -148,6 +161,25 @@ export function MapView({
     return () => window.clearTimeout(timer)
   }, [map, introAnimation, detectionBounds, animate, FIT_PADDING])
 
+  const focusDetection = useCallback(
+    (id: string) => {
+      const detection = observation.detections.find((d) => d.id === id)
+      if (!map || !detection) return
+      const target = latLngBounds(boundsToLeaflet(geometryBounds(detection.geometry)))
+      const zoom = Math.min(map.getBoundsZoom(target.pad(4)), FOCUS_MAX_ZOOM)
+      if (animate) map.flyTo(target.getCenter(), zoom, { duration: 0.6 })
+      else map.setView(target.getCenter(), zoom)
+    },
+    [map, observation.detections, animate],
+  )
+
+  const focusDetectionId = focusRequest?.detectionId ?? null
+  const focusKey = focusRequest?.key ?? 0
+  useEffect(() => {
+    if (focusDetectionId) focusDetection(focusDetectionId)
+    // focusKey repeats a request for the same detection.
+  }, [focusDetection, focusDetectionId, focusKey])
+
   useImperativeHandle(
     ref,
     () => ({
@@ -157,14 +189,7 @@ export function MapView({
           animate,
         }),
       resetView: () => map?.fitBounds(homeBounds, { ...FIT_PADDING, animate }),
-      flyToDetection: (id) => {
-        const detection = observation.detections.find((d) => d.id === id)
-        if (!map || !detection) return
-        const target = latLngBounds(boundsToLeaflet(geometryBounds(detection.geometry)))
-        const zoom = Math.min(map.getBoundsZoom(target.pad(4)), FOCUS_MAX_ZOOM)
-        if (animate) map.flyTo(target.getCenter(), zoom, { duration: 0.6 })
-        else map.setView(target.getCenter(), zoom)
-      },
+      flyToDetection: focusDetection,
       flyToHotspot: (id) => {
         const hotspot = analysis.hotspots.find((h) => h.id === id)
         if (!map || !hotspot) return
@@ -176,15 +201,7 @@ export function MapView({
       zoomIn: () => map?.zoomIn(),
       zoomOut: () => map?.zoomOut(),
     }),
-    [
-      map,
-      observation.detections,
-      analysis.hotspots,
-      detectionBounds,
-      homeBounds,
-      animate,
-      FIT_PADDING,
-    ],
+    [map, focusDetection, analysis.hotspots, detectionBounds, homeBounds, animate, FIT_PADDING],
   )
 
   const onMapReady = useCallback(
@@ -208,7 +225,14 @@ export function MapView({
   }, [])
 
   return (
-    <div className={cn('relative isolate overflow-hidden bg-map-fallback', className)}>
+    // The basemap state class lives here: react-leaflet applies MapContainer's className only once.
+    <div
+      className={cn(
+        'relative isolate overflow-hidden bg-map-fallback',
+        basemapUnavailable && 'mwi-map--no-basemap',
+        className,
+      )}
+    >
       <MapContainer
         // A new observation gets a fresh map fitted to its own bounds.
         key={observation.id}
@@ -223,10 +247,10 @@ export function MapView({
         dragging={interactive}
         touchZoom={interactive}
         doubleClickZoom={interactive}
-        scrollWheelZoom={interactive}
+        scrollWheelZoom={interactive && wheelZoom}
         boxZoom={interactive}
         keyboard={interactive}
-        className={cn('mwi-map h-full w-full', basemapUnavailable && 'mwi-map--no-basemap')}
+        className="mwi-map h-full w-full"
       >
         <AttributionControl position="bottomright" prefix={false} />
         <BasemapLayer key={basemap} basemap={basemap} onAvailabilityChange={onAvailabilityChange} />
@@ -247,6 +271,7 @@ export function MapView({
             interactive={interactive}
             onImagery={onImagery}
             onSelect={onSelectDetection}
+            highlightedId={highlightedDetectionId}
           />
         ) : null}
         {visibleLayers.hotspots ? (

@@ -365,6 +365,8 @@ export function runReadiness(input: {
   checks: readonly QualityCheck[]
   region: string
   capturedAtIso: string | null
+  /** False while the device is offline. The form can still be filled in. */
+  online?: boolean
 }): Readiness {
   const block = (reason: string): Readiness => ({ ready: false, reason })
   if (!input.hasFile) return block('Choose an image or a sample scene to start.')
@@ -373,5 +375,6 @@ export function runReadiness(input: {
   if (failed) return block(`${failed.label}: ${failed.fix ?? failed.detail}`)
   if (input.region.trim() === '') return block('Enter a region name.')
   if (!input.capturedAtIso) return block('Enter when the image was captured.')
+  if (input.online === false) return block("You're offline. Reconnect to run detection.")
   return { ready: true, reason: null }
 }

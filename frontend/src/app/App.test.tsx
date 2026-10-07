@@ -46,8 +46,8 @@ describe('app shell', () => {
     ['/analyze', 'Analyze new imagery'],
     ['/map', 'Map'],
     [`/map/${SAMPLE_IDS.ennore}`, 'Map'],
-    [`/observations/${SAMPLE_IDS.ennore}`, 'Observation'],
-    [`/observations/${SAMPLE_IDS.ennore}/report`, 'Cleanup report'],
+    [`/observations/${SAMPLE_IDS.ennore}`, 'Ennore coast, Bay of Bengal'],
+    [`/observations/${SAMPLE_IDS.ennore}/report`, 'Ennore coast, Bay of Bengal'],
     ['/settings', 'Settings'],
     ['/compare', 'Compare'],
   ])('routes %s to its page', async (path, title) => {

@@ -1,5 +1,5 @@
 import { ArrowRight, CloudOff, RotateCcw, ServerCrash } from 'lucide-react'
-import { Button } from '@/components/ui'
+import { Banner, Button } from '@/components/ui'
 import { summaryText, type RunFailure, type RunSummary } from './runReducer'
 
 export function SuccessPanel({
@@ -14,6 +14,7 @@ export function SuccessPanel({
   onViewResults: () => void
   onAnalyzeAnother: () => void
 }) {
+  const notices = summary?.notices ?? []
   return (
     <div className="flex flex-col gap-4 border-t border-border pt-5">
       <div>
@@ -22,6 +23,12 @@ export function SuccessPanel({
           {autoOpening ? 'Opening the map in a moment.' : 'The results are ready on the map.'}
         </p>
       </div>
+      {/* Low confidence and approximate positions travel with the result, everywhere it shows. */}
+      {notices.map((notice) => (
+        <Banner key={notice.id} tone="warning" title={notice.title}>
+          {notice.message}
+        </Banner>
+      ))}
       <div className="flex flex-wrap gap-2">
         <Button variant="primary" iconEnd={<ArrowRight aria-hidden />} onClick={onViewResults}>
           View results
@@ -39,10 +46,13 @@ export function FailurePanel({
   failure,
   onRetry,
   onEdit,
+  retryBlockedReason = null,
 }: {
   failure: RunFailure
   onRetry: () => void
   onEdit: () => void
+  /** Why Retry cannot run right now, for example while offline. */
+  retryBlockedReason?: string | null
 }) {
   const Icon = failure.kind === 'network' ? CloudOff : ServerCrash
   return (
@@ -57,16 +67,30 @@ export function FailurePanel({
         <div>
           <p className="text-heading text-ink">{failure.title}</p>
           <p className="text-small text-ink-muted">{failure.message}</p>
+          <p className="text-small text-ink-muted">Your file and details are kept.</p>
           {failure.code ? <p className="mono-label mt-1 text-ink-muted">{failure.code}</p> : null}
         </div>
       </div>
-      <div className="flex flex-wrap gap-2">
-        <Button variant="primary" iconStart={<RotateCcw aria-hidden />} onClick={onRetry}>
-          Retry
-        </Button>
-        <Button variant="ghost" onClick={onEdit}>
-          Edit details
-        </Button>
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="primary"
+            iconStart={<RotateCcw aria-hidden />}
+            onClick={onRetry}
+            disabled={retryBlockedReason !== null}
+            aria-describedby={retryBlockedReason ? 'retry-reason' : undefined}
+          >
+            Retry
+          </Button>
+          <Button variant="ghost" onClick={onEdit}>
+            Edit details
+          </Button>
+        </div>
+        {retryBlockedReason ? (
+          <p id="retry-reason" className="text-small text-ink-muted">
+            {retryBlockedReason}
+          </p>
+        ) : null}
       </div>
     </div>
   )

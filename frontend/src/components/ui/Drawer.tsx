@@ -119,7 +119,9 @@ export function Drawer({
             isDesktop
               ? cn(
                   'right-0 bottom-0 w-drawer max-w-full border-l border-border',
-                  placement === 'below-topbar' ? 'top-[var(--spacing-topbar)]' : 'top-0',
+                  placement === 'below-topbar'
+                    ? 'top-[calc(var(--spacing-topbar)+var(--offline-bar-height,0px))]'
+                    : 'top-0',
                 )
               : 'inset-x-0 bottom-0 max-h-[85dvh] rounded-t-card border-t border-border',
             className,

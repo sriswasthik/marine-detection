@@ -21,6 +21,13 @@ const devRoutes: RouteObject[] = import.meta.env.DEV
           return { Component: DesignPage }
         },
       },
+      {
+        path: 'design/states',
+        lazy: async () => {
+          const { StatesPage } = await import('@/pages/design/StatesPage')
+          return { Component: StatesPage }
+        },
+      },
     ]
   : []
 
