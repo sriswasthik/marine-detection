@@ -2,15 +2,10 @@ import { Flag } from 'lucide-react'
 import { ConfidenceBadge, SeverityBadge } from '@/components/ui'
 import type { Detection } from '@/features/observations/types'
 import { DENSITY_LEVELS } from '@/lib/density'
-import {
-  formatArea,
-  formatConfidence,
-  formatCoordinates,
-  formatInteger,
-  shortId,
-} from '@/lib/format'
+import { formatConfidence, formatInteger, shortId } from '@/lib/format'
 import { HOTSPOT_LEVEL_WEIGHTS, PRIORITY_SCORE_RULE, type Hotspot } from '@/lib/hotspots'
 import { Fact, Section } from './DetectionDetails'
+import { useFormat } from '@/features/settings/settingsContext'
 
 export interface HotspotDetailsProps {
   hotspot: Hotspot
@@ -26,6 +21,7 @@ export function HotspotDetails({
   detections,
   onSelectDetection,
 }: HotspotDetailsProps) {
+  const fmt = useFormat()
   const members = detections
     .filter((d) => hotspot.detectionIds.includes(d.id))
     .sort((a, b) => b.areaM2 - a.areaM2)
@@ -59,7 +55,7 @@ export function HotspotDetails({
             </span>
           </Fact>
           <Fact label="Total area">
-            <span className="num">{formatArea(hotspot.totalAreaM2)}</span>
+            <span className="num">{fmt.area(hotspot.totalAreaM2)}</span>
           </Fact>
           <Fact label="Detections">
             <span className="num">{formatInteger(members.length)}</span>
@@ -68,7 +64,7 @@ export function HotspotDetails({
             <span className="num">{formatConfidence(hotspot.meanConfidence)}</span>
           </Fact>
           <Fact label="Centre">
-            <span className="mono-label">{formatCoordinates(hotspot.centroid)}</span>
+            <span className="mono-label">{fmt.coordinates(hotspot.centroid)}</span>
           </Fact>
         </dl>
       </Section>
@@ -96,7 +92,7 @@ export function HotspotDetails({
                 >
                   <span className="mono-label w-12 shrink-0 text-ink">{shortId(detection.id)}</span>
                   <SeverityBadge level={detection.densityLevel} variant="plain" />
-                  <span className="num ml-auto text-ink">{formatArea(detection.areaM2)}</span>
+                  <span className="num ml-auto text-ink">{fmt.area(detection.areaM2)}</span>
                   <ConfidenceBadge value={detection.confidence} showValue={false} />
                 </button>
               </li>

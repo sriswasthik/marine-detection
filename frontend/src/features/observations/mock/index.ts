@@ -30,6 +30,7 @@
  *   invalid    Fails at upload with recoverable error INVALID_IMAGE.
  *   modelfail  Fails during detection with recoverable error MODEL_ERROR.
  *   network    Every request rejects with ApiError NETWORK_ERROR (status null).
+ *   empty      The list holds only uploads made in this session, as on a fresh install.
  *
  * Timing
  * ------

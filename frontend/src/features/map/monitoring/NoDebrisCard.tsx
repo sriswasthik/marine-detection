@@ -1,13 +1,15 @@
 import { CircleCheck } from 'lucide-react'
 import { Badge } from '@/components/ui'
 import type { Observation } from '@/features/observations/types'
-import { formatArea, formatConfidence, formatDateTime } from '@/lib/format'
+import { formatConfidence, formatDateTime } from '@/lib/format'
+import { useFormat } from '@/features/settings/settingsContext'
 
 /**
  * The designed "No debris detected" state: what was scanned, when, and how much to trust it.
  * Shown over the map, with the footprint still visible around it.
  */
 export function NoDebrisCard({ observation }: { observation: Observation }) {
+  const fmt = useFormat()
   const metrics = observation.modelMetrics
   return (
     <section
@@ -27,7 +29,7 @@ export function NoDebrisCard({ observation }: { observation: Observation }) {
       <dl className="mt-4 flex flex-col gap-2 text-small">
         <div className="flex justify-between gap-4">
           <dt className="text-ink-muted">Area scanned</dt>
-          <dd className="num font-medium text-ink">{formatArea(observation.waterAreaM2)}</dd>
+          <dd className="num font-medium text-ink">{fmt.area(observation.waterAreaM2)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt className="text-ink-muted">Captured</dt>

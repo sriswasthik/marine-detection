@@ -14,7 +14,7 @@ import type { Detection, Observation } from '@/features/observations/types'
 import type { ObservationAnalysis } from '@/lib/analysis'
 import { cn } from '@/lib/cn'
 import type { EvidenceSource } from '@/lib/evidence'
-import { formatArea, formatConfidence, shortId } from '@/lib/format'
+import { formatConfidence, shortId } from '@/lib/format'
 import { EvidenceMap } from './EvidenceMap'
 import {
   EVIDENCE_MODE_DESCRIPTIONS,
@@ -23,6 +23,7 @@ import {
   type EvidenceMode,
 } from './modes'
 import { SwipeCompare } from './SwipeCompare'
+import { useFormat } from '@/features/settings/settingsContext'
 
 const MODE_OPTIONS = EVIDENCE_MODES.map((mode) => ({
   value: mode,
@@ -38,6 +39,7 @@ const GEOGRAPHIC_LAYERS = {
 
 /** Facts for the clicked detection, over the viewer. */
 function SelectionReadout({ detection, onClose }: { detection: Detection; onClose: () => void }) {
+  const fmt = useFormat()
   return (
     <div
       role="status"
@@ -55,7 +57,7 @@ function SelectionReadout({ detection, onClose }: { detection: Detection; onClos
         </div>
         <div className="flex gap-1">
           <dt className="text-ink-muted">Area</dt>
-          <dd className="num font-medium text-ink">{formatArea(detection.areaM2)}</dd>
+          <dd className="num font-medium text-ink">{fmt.area(detection.areaM2)}</dd>
         </div>
       </dl>
       <IconButton

@@ -3,8 +3,9 @@ import { useId, useState } from 'react'
 import { SeverityBadge, Tooltip } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { DENSITY_LEVELS } from '@/lib/density'
-import { formatArea, formatConfidence, formatCoordinates, formatInteger } from '@/lib/format'
+import { formatConfidence, formatInteger } from '@/lib/format'
 import { PRIORITY_SCORE_EXPLANATION, type Hotspot } from '@/lib/hotspots'
+import { useFormat } from '@/features/settings/settingsContext'
 
 /** Rank in a small circle with the level colour as its border, like the map marker. */
 export function RankDot({ hotspot }: { hotspot: Pick<Hotspot, 'rank' | 'level'> }) {
@@ -39,6 +40,7 @@ export function InspectionPriority({
   defaultOpen = true,
   className,
 }: InspectionPriorityProps) {
+  const fmt = useFormat()
   const [open, setOpen] = useState(defaultOpen)
   const bodyId = useId()
 
@@ -110,7 +112,7 @@ export function InspectionPriority({
                     <span className="sr-only">Hotspot {hotspot.rank}, </span>
                     <SeverityBadge level={hotspot.level} />
                     <span className="num ml-auto text-small font-medium text-ink">
-                      {formatArea(hotspot.totalAreaM2)}
+                      {fmt.area(hotspot.totalAreaM2)}
                     </span>
                   </span>
                   <span className="flex w-full items-center gap-2 pl-8 text-caption text-ink-muted">
@@ -119,7 +121,7 @@ export function InspectionPriority({
                     </span>
                     <span aria-hidden>·</span>
                     <span className="mono-label truncate">
-                      {formatCoordinates(hotspot.centroid, { digits: 4 })}
+                      {fmt.coordinates(hotspot.centroid, { digits: 4 })}
                     </span>
                   </span>
                 </button>

@@ -32,6 +32,32 @@ export function formatLength(meters: number | null | undefined): string {
 }
 
 export type AreaUnit = 'auto' | 'm2' | 'ha' | 'km2'
+export type CoordinateFormat = 'decimal' | 'dms'
+
+export interface DisplayPreferences {
+  areaUnit: AreaUnit
+  coordinateFormat: CoordinateFormat
+}
+
+export const DEFAULT_DISPLAY_PREFERENCES: DisplayPreferences = {
+  areaUnit: 'auto',
+  coordinateFormat: 'decimal',
+}
+
+/**
+ * The person's unit choices, used whenever a call does not pass its own. Set by the settings store
+ * (src/features/settings), so every figure on screen, in the report and in toasts follows the
+ * Settings page. Export files pass explicit units and are unaffected.
+ */
+let displayPreferences: DisplayPreferences = DEFAULT_DISPLAY_PREFERENCES
+
+export function setDisplayPreferences(next: DisplayPreferences): void {
+  displayPreferences = next
+}
+
+export function getDisplayPreferences(): DisplayPreferences {
+  return displayPreferences
+}
 
 const M2_PER_HA = 10_000
 const M2_PER_KM2 = 1_000_000
@@ -58,7 +84,7 @@ export function formatArea(
   options: { unit?: AreaUnit } = {},
 ): string {
   if (!isUsable(areaM2) || areaM2 < 0) return EMPTY_VALUE
-  const requested = options.unit ?? 'auto'
+  const requested = options.unit ?? displayPreferences.areaUnit
   const unit: Exclude<AreaUnit, 'auto'> =
     requested !== 'auto'
       ? requested
@@ -99,8 +125,6 @@ export function formatConfidence(confidence: number | null | undefined): string 
   return `${Math.round(clamped * 100)}%`
 }
 
-export type CoordinateFormat = 'decimal' | 'dms'
-
 function decimalPart(value: number, positive: string, negative: string, digits: number) {
   return `${Math.abs(value).toFixed(digits)}° ${value < 0 ? negative : positive}`
 }
@@ -123,13 +147,35 @@ function dmsPart(value: number, positive: string, negative: string) {
   }`
 }
 
+/** One latitude, "13.24020° N", or in DMS when that is the format setting. */
+export function formatLatitude(
+  lat: number | null | undefined,
+  options: { format?: CoordinateFormat; digits?: number } = {},
+): string {
+  if (!isUsable(lat)) return EMPTY_VALUE
+  return (options.format ?? displayPreferences.coordinateFormat) === 'dms'
+    ? dmsPart(lat, 'N', 'S')
+    : decimalPart(lat, 'N', 'S', options.digits ?? 5)
+}
+
+/** One longitude, "80.39571° E", or in DMS when that is the format setting. */
+export function formatLongitude(
+  lng: number | null | undefined,
+  options: { format?: CoordinateFormat; digits?: number } = {},
+): string {
+  if (!isUsable(lng)) return EMPTY_VALUE
+  return (options.format ?? displayPreferences.coordinateFormat) === 'dms'
+    ? dmsPart(lng, 'E', 'W')
+    : decimalPart(lng, 'E', 'W', options.digits ?? 5)
+}
+
 /** "13.22150° N, 80.36210° E" or, with format "dms", "13°13′17.4″ N, 80°21′43.6″ E". */
 export function formatCoordinates(
   point: LatLng | null | undefined,
   options: { format?: CoordinateFormat; digits?: number } = {},
 ): string {
   if (!point || !isUsable(point.lat) || !isUsable(point.lng)) return EMPTY_VALUE
-  if (options.format === 'dms') {
+  if ((options.format ?? displayPreferences.coordinateFormat) === 'dms') {
     return `${dmsPart(point.lat, 'N', 'S')}, ${dmsPart(point.lng, 'E', 'W')}`
   }
   const digits = options.digits ?? 5

@@ -13,7 +13,8 @@ import {
   type DetectionSort,
   type DetectionSortKey,
 } from '@/lib/detectionTable'
-import { formatArea, formatCoordinates, formatInteger, shortId } from '@/lib/format'
+import { formatInteger, shortId } from '@/lib/format'
+import { useFormat } from '@/features/settings/settingsContext'
 
 const COLUMNS: readonly { key: DetectionSortKey; label: string; numeric?: boolean }[] = [
   { key: 'id', label: 'ID' },
@@ -51,6 +52,7 @@ export function DetectionsTable({
   onHighlight,
   onFocus,
 }: DetectionsTableProps) {
+  const fmt = useFormat()
   const [sort, setSort] = useState<DetectionSort>(DEFAULT_DETECTION_SORT)
   const [expanded, setExpanded] = useState(0)
   const sorted = useMemo(() => sortDetections(detections, sort), [detections, sort])
@@ -142,13 +144,13 @@ export function DetectionsTable({
                     <SeverityBadge level={detection.densityLevel} variant="plain" />
                   </td>
                   <td className="num px-2 py-1.5 text-right text-ink">
-                    {formatArea(detection.areaM2)}
+                    {fmt.area(detection.areaM2)}
                   </td>
                   <td className="px-2 py-1.5">
                     <ConfidenceBadge value={detection.confidence} />
                   </td>
                   <td className="mono-label px-2 py-1.5 pr-6 whitespace-nowrap text-ink-muted">
-                    {formatCoordinates(detection.centroid)}
+                    {fmt.coordinates(detection.centroid)}
                   </td>
                 </tr>
               )

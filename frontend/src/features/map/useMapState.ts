@@ -1,9 +1,16 @@
 import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { DEFAULT_FILTERS, type MapFilters } from '@/lib/filters'
+import { useSettings } from '@/features/settings/settingsContext'
+import type { MapFilters } from '@/lib/filters'
 import type { BasemapId } from '@/lib/map/basemaps'
 import type { MapLayerId } from '@/lib/map/layers'
-import { parseMapSearch, serializeMapSearch, type MapUrlState } from '@/lib/mapUrlState'
+import {
+  baselineFilters,
+  parseMapSearch,
+  serializeMapSearch,
+  type MapDefaults,
+  type MapUrlState,
+} from '@/lib/mapUrlState'
 
 interface UpdateOptions {
   /** Replace the history entry instead of adding one (sliders, transient params). */
@@ -16,16 +23,29 @@ interface UpdateOptions {
  */
 export function useMapState() {
   const [params, setParams] = useSearchParams()
-  const state = useMemo(() => parseMapSearch(params), [params])
+  const settings = useSettings()
+  const defaults = useMemo<MapDefaults>(
+    () => ({
+      basemap: settings.defaultBasemap,
+      minConfidence: settings.defaultMinConfidence,
+      layers: settings.defaultLayers,
+    }),
+    [settings.defaultBasemap, settings.defaultMinConfidence, settings.defaultLayers],
+  )
+  const baseline = useMemo(() => baselineFilters(defaults), [defaults])
+  const state = useMemo(() => parseMapSearch(params, defaults), [params, defaults])
 
   const update = useCallback(
     (change: (current: MapUrlState) => MapUrlState, options: UpdateOptions = {}) => {
-      setParams((current) => serializeMapSearch(change(parseMapSearch(current))), {
-        replace: options.replace ?? false,
-        preventScrollReset: true,
-      })
+      setParams(
+        (current) => serializeMapSearch(change(parseMapSearch(current, defaults)), defaults),
+        {
+          replace: options.replace ?? false,
+          preventScrollReset: true,
+        },
+      )
     },
-    [setParams],
+    [setParams, defaults],
   )
 
   const setFilters = useCallback(
@@ -36,8 +56,8 @@ export function useMapState() {
   )
 
   const resetFilters = useCallback(
-    () => update((s) => ({ ...s, filters: DEFAULT_FILTERS, hotspotId: null })),
-    [update],
+    () => update((s) => ({ ...s, filters: baseline, hotspotId: null })),
+    [update, baseline],
   )
 
   const selectDetection = useCallback(
@@ -71,6 +91,10 @@ export function useMapState() {
   return {
     ...state,
     params,
+    /** The Settings defaults this map falls back to. */
+    defaults,
+    /** The filters Reset returns to. */
+    baseline,
     setFilters,
     resetFilters,
     selectDetection,

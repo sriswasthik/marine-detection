@@ -12,6 +12,8 @@ import {
   formatDateTime,
   formatDuration,
   formatInteger,
+  formatLatitude,
+  formatLongitude,
   type AreaUnit,
 } from './format'
 import { boundsAreaM2, boundsOfGeometries } from './geo'
@@ -36,7 +38,8 @@ export function evidenceMetrics(
     'debrisAreaM2' | 'waterAreaM2' | 'coveragePercent' | 'averageConfidence' | 'detections'
   >,
   hotspotCount: number,
-  unit: AreaUnit = 'auto',
+  /** Defaults to the person's area unit setting. */
+  unit?: AreaUnit,
 ): EvidenceMetric[] {
   const count = observation.detections.length
   return [
@@ -185,14 +188,12 @@ export function extentFacts(observation: Pick<Observation, 'bounds' | 'crs'>): {
   footprintArea: string
 } {
   const b = observation.bounds
-  const lat = (value: number) => `${Math.abs(value).toFixed(5)}° ${value < 0 ? 'S' : 'N'}`
-  const lng = (value: number) => `${Math.abs(value).toFixed(5)}° ${value < 0 ? 'W' : 'E'}`
   return {
     edges: [
-      { label: 'North', value: b ? lat(b.north) : EMPTY_VALUE, mono: true },
-      { label: 'South', value: b ? lat(b.south) : EMPTY_VALUE, mono: true },
-      { label: 'East', value: b ? lng(b.east) : EMPTY_VALUE, mono: true },
-      { label: 'West', value: b ? lng(b.west) : EMPTY_VALUE, mono: true },
+      { label: 'North', value: formatLatitude(b?.north), mono: true },
+      { label: 'South', value: formatLatitude(b?.south), mono: true },
+      { label: 'East', value: formatLongitude(b?.east), mono: true },
+      { label: 'West', value: formatLongitude(b?.west), mono: true },
     ],
     crs: observation.crs ?? 'Not available',
     footprintArea: b ? formatArea(boundsAreaM2(b), { unit: 'km2' }) : EMPTY_VALUE,

@@ -1,84 +1,117 @@
-import { Badge, Banner, ErrorBoundary, PageSkeleton, Skeleton, SkeletonText } from '@/components/ui'
-import { isMockMode } from '@/features/observations/api'
+import { useQueryClient } from '@tanstack/react-query'
+import { FileSearch, RefreshCcw } from 'lucide-react'
+import { useMemo } from 'react'
 import {
-  ObservationCard,
-  ObservationListHeader,
-} from '@/features/observations/components/ObservationCard'
+  Badge,
+  Banner,
+  Button,
+  EmptyState,
+  ErrorBoundary,
+  PageSkeleton,
+  SkeletonTable,
+} from '@/components/ui'
+import { isMockMode } from '@/features/observations/api'
 import { LoadError, NoObservations } from '@/features/observations/components/ObservationStates'
-import { useObservations } from '@/features/observations/hooks'
+import { observationKeys, useObservations } from '@/features/observations/hooks'
+import { ObservationFilters } from '@/features/observations/list/ObservationFilters'
+import { ObservationsTable } from '@/features/observations/list/ObservationsTable'
+import { useListQuery } from '@/features/observations/list/useListQuery'
+import { setMockScenario } from '@/features/observations/mock/scenario'
 import { formatInteger } from '@/lib/format'
+import { filterList, isFiltered, sortList } from '@/lib/observationList'
 import { PageContainer, PageHeader } from './PageHeader'
 
-/** Rows at the real row height, under the real column header. */
-function ObservationListSkeleton() {
+/** In mock mode, an empty list can be filled with the six sample scenes. */
+function LoadSamplesButton() {
+  const queryClient = useQueryClient()
   return (
-    <PageSkeleton label="Loading observations">
-      <div className="flex flex-col gap-3">
-        <Skeleton className="h-4 w-40" />
-        <div className="divide-y divide-border border-y border-border">
-          {Array.from({ length: 6 }, (_, i) => (
-            <div key={i} className="flex items-center gap-4 py-4">
-              <SkeletonText lines={2} className="max-w-sm flex-1" />
-              <Skeleton className="hidden h-6 w-24 md:block" />
-              <Skeleton className="hidden h-4 w-14 md:block" />
-              <Skeleton className="hidden h-4 w-10 md:block" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </PageSkeleton>
+    <Button
+      variant="secondary"
+      iconStart={<RefreshCcw aria-hidden />}
+      onClick={() => {
+        setMockScenario('success')
+        void queryClient.invalidateQueries({ queryKey: observationKeys.list() })
+      }}
+    >
+      Load sample scenes
+    </Button>
   )
 }
 
 /**
- * Every observation, newest first. Each row carries its caveats (low confidence, approximate
- * positions), its density or "No debris", and its status (processing, failed) as badges.
+ * Every observation in one quiet table: search, filters for source, status and density, sorting by
+ * every column. All of it lives in the URL, so a reload or a shared link shows the same list.
  */
 export function ObservationsPage() {
   const list = useObservations()
-  const observations = [...(list.data?.data ?? [])].sort((a, b) =>
-    b.capturedAt.localeCompare(a.capturedAt),
+  const { query, update, reset } = useListQuery()
+  const all = list.data?.data
+  const shown = useMemo(
+    () => (all ? sortList(filterList(all, query), query.sort, query.direction) : []),
+    [all, query],
   )
   const issues = list.data?.issues.length ?? 0
+  const mock = isMockMode()
+
+  let body
+  if (list.isPending) {
+    body = (
+      <PageSkeleton label="Loading observations" className="flex flex-col gap-4">
+        <SkeletonTable rows={6} columns={8} />
+      </PageSkeleton>
+    )
+  } else if (list.isError) {
+    body = <LoadError error={list.error} onRetry={() => void list.refetch()} />
+  } else if (!all || all.length === 0) {
+    body = (
+      <div className="flex flex-col items-center">
+        <NoObservations />
+        {mock ? <LoadSamplesButton /> : null}
+      </div>
+    )
+  } else {
+    body = (
+      <ErrorBoundary label="The observation list">
+        <div className="flex flex-col gap-4">
+          <ObservationFilters query={query} onChange={update} onReset={reset} />
+          {issues > 0 ? (
+            <Banner tone="warning" title="Partial data">
+              Some observations could not be read and are left out of this list.
+            </Banner>
+          ) : null}
+          <div className="flex items-center gap-2 text-small text-ink-muted" aria-live="polite">
+            <span>
+              {isFiltered(query)
+                ? `${formatInteger(shown.length)} of ${formatInteger(all.length)} observations`
+                : `${formatInteger(all.length)} ${all.length === 1 ? 'observation' : 'observations'}`}
+            </span>
+            {mock ? <Badge tone="warning">Sample data</Badge> : null}
+          </div>
+          {shown.length === 0 ? (
+            <EmptyState
+              icon={<FileSearch />}
+              headingLevel={2}
+              title="No observations match these filters"
+              description="Widen the search or turn off some filters to see more."
+              action={
+                <Button variant="secondary" onClick={reset}>
+                  Reset filters
+                </Button>
+              }
+            />
+          ) : (
+            <ObservationsTable observations={shown} query={query} onSort={(sort) => update(sort)} />
+          )}
+        </div>
+      </ErrorBoundary>
+    )
+  }
 
   return (
     <PageContainer>
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-6">
         <PageHeader title="Observations" description="Every processed image, newest first." />
-        {list.isPending ? (
-          <ObservationListSkeleton />
-        ) : list.isError ? (
-          <LoadError error={list.error} onRetry={() => void list.refetch()} />
-        ) : observations.length === 0 ? (
-          <NoObservations />
-        ) : (
-          <ErrorBoundary label="The observation list">
-            <section aria-labelledby="list-title" className="flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <h2 id="list-title" className="text-small text-ink-muted">
-                  {formatInteger(observations.length)}{' '}
-                  {observations.length === 1 ? 'observation' : 'observations'}
-                </h2>
-                {isMockMode() ? <Badge tone="warning">Sample data</Badge> : null}
-              </div>
-              {issues > 0 ? (
-                <Banner tone="warning" title="Partial data">
-                  Some observations could not be read and are left out of this list.
-                </Banner>
-              ) : null}
-              <div>
-                <ObservationListHeader />
-                <ul className="divide-y divide-border border-y border-border">
-                  {observations.map((observation) => (
-                    <li key={observation.id}>
-                      <ObservationCard observation={observation} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </section>
-          </ErrorBoundary>
-        )}
+        {body}
       </div>
     </PageContainer>
   )

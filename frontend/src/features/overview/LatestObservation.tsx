@@ -12,10 +12,12 @@ import { hasResult } from '@/features/observations/status'
 import { analyzeObservation, type ObservationAnalysis } from '@/lib/analysis'
 import { DENSITY_LEVELS } from '@/lib/density'
 import { ENV } from '@/lib/env'
-import { formatArea, formatDateTime } from '@/lib/format'
+import { formatDateTime } from '@/lib/format'
 import { observationKpis, type Kpi } from '@/lib/kpis'
 import type { VisibleLayers } from '@/lib/map/layers'
 import { InspectNext } from './InspectNext'
+import { useFormat } from '@/features/settings/settingsContext'
+import { useSettings } from '@/features/settings/settingsContext'
 
 const PREVIEW_LAYERS: VisibleLayers = {
   detections: true,
@@ -53,6 +55,8 @@ export function LatestObservation({
   /** Some detections failed validation and were dropped. */
   partialData?: boolean
 }) {
+  // The helpers below read the unit settings; subscribing re-renders on a change.
+  useSettings()
   const analysis = useMemo(() => analyzeObservation(observation), [observation])
   const kpis = observationKpis(observation, analysis.hotspots)
   const mapPath = `/map/${encodeURIComponent(observation.id)}`
@@ -110,6 +114,7 @@ function ObservationResult({
   mapPath: string
   noDebris: boolean
 }) {
+  const fmt = useFormat()
   return (
     <>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -146,7 +151,7 @@ function ObservationResult({
                 noDebris ? (
                   <p className="flex items-center gap-2 rounded-control border border-border bg-surface px-3 py-2 text-small text-ink shadow-subtle">
                     <CircleCheck aria-hidden className="size-4 text-success" />
-                    No debris detected in {formatArea(observation.waterAreaM2)} of water
+                    No debris detected in {fmt.area(observation.waterAreaM2)} of water
                   </p>
                 ) : null
               }

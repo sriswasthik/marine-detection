@@ -10,6 +10,7 @@ const OPTIONS: { value: MockScenario; label: string }[] = [
   { value: 'invalid', label: 'Invalid image' },
   { value: 'modelfail', label: 'Model failure' },
   { value: 'network', label: 'Network failure' },
+  { value: 'empty', label: 'No observations yet' },
 ]
 
 /** Quiet footer control for rehearsing every state. Only rendered in mock mode. */

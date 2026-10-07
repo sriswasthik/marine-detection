@@ -1,4 +1,6 @@
+import { getAppSettingsStore } from '@/features/settings/settingsStore'
 import { ENV, type AppEnv } from '@/lib/env'
+import type { DataSource } from '@/lib/settings'
 import { createHttpApi } from './httpApi'
 import { createMockApi } from './mockApi'
 import { withResilience } from './resilientApi'
@@ -11,8 +13,8 @@ export { createMockApi, type MockApiOptions } from './mockApi'
 export { withResilience, type ResilienceOptions } from './resilientApi'
 
 /**
- * Picks the mock or HTTP implementation from VITE_USE_MOCK, wrapped so that no call hangs:
- * offline requests fail at once and slow ones time out.
+ * Picks the mock or HTTP implementation, wrapped so that no call hangs: offline requests fail at
+ * once and slow ones time out.
  */
 export function createObservationsApi(
   env: Pick<AppEnv, 'useMock' | 'apiBaseUrl'> = ENV,
@@ -20,12 +22,31 @@ export function createObservationsApi(
   return withResilience(env.useMock ? createMockApi() : createHttpApi(env.apiBaseUrl))
 }
 
-let defaultApi: ObservationsApi | null = null
+let mockApi: ObservationsApi | null = null
+const httpApis = new Map<string, ObservationsApi>()
 
-/** App-wide instance, created on first use so the mock's state lives for the whole session. */
-export function getDefaultObservationsApi(): ObservationsApi {
-  defaultApi ??= createObservationsApi()
-  return defaultApi
+/**
+ * The API for a data source. The mock keeps one instance for the whole session, so simulated
+ * uploads survive switching to the live service and back.
+ */
+export function observationsApiFor(dataSource: DataSource, apiBaseUrl: string): ObservationsApi {
+  if (dataSource === 'mock') {
+    mockApi ??= createObservationsApi({ useMock: true, apiBaseUrl })
+    return mockApi
+  }
+  let api = httpApis.get(apiBaseUrl)
+  if (!api) {
+    api = createObservationsApi({ useMock: false, apiBaseUrl })
+    httpApis.set(apiBaseUrl, api)
+  }
+  return api
 }
 
-export const isMockMode = (): boolean => ENV.useMock
+/** The app-wide API for the data source chosen in Settings (or the environment default). */
+export function getDefaultObservationsApi(): ObservationsApi {
+  const { dataSource, apiBaseUrl } = getAppSettingsStore().get()
+  return observationsApiFor(dataSource, apiBaseUrl)
+}
+
+/** True while the app runs on sample data. Every screen labels it "Sample data". */
+export const isMockMode = (): boolean => getAppSettingsStore().get().dataSource === 'mock'

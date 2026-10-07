@@ -59,12 +59,18 @@ export function hasActiveFilters(filters: MapFilters): boolean {
   return activeFilterCount(filters) > 0
 }
 
-/** Number of filter dimensions that differ from the defaults (date range counts once). */
-export function activeFilterCount(filters: MapFilters): number {
+/**
+ * Number of filter dimensions that differ from the baseline (date range counts once). The baseline
+ * is "show everything" unless the person set a default minimum confidence in Settings.
+ */
+export function activeFilterCount(
+  filters: MapFilters,
+  baseline: Pick<MapFilters, 'minConfidence'> = DEFAULT_FILTERS,
+): number {
   return [
     filters.source !== 'all',
     filters.dateFrom !== null || filters.dateTo !== null,
-    filters.minConfidence > 0,
+    Math.round(filters.minConfidence * 100) !== Math.round(baseline.minConfidence * 100),
     !levelsAreAll(filters.levels),
     filters.region !== null,
   ].filter(Boolean).length

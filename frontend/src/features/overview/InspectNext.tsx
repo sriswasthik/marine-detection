@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { SeverityBadge } from '@/components/ui'
 import { RankDot } from '@/features/map/monitoring/InspectionPriority'
 import type { Observation } from '@/features/observations/types'
-import { formatArea, formatCoordinates } from '@/lib/format'
 import type { Hotspot } from '@/lib/hotspots'
+import { useFormat } from '@/features/settings/settingsContext'
 
 const INSPECT_LIMIT = 3
 
@@ -16,6 +16,7 @@ export function InspectNext({
   observation: Observation
   hotspots: readonly Hotspot[]
 }) {
+  const fmt = useFormat()
   const top = hotspots.slice(0, INSPECT_LIMIT)
   const mapPath = (hotspotId: string) =>
     `/map/${encodeURIComponent(observation.id)}?h=${encodeURIComponent(hotspotId)}`
@@ -43,11 +44,11 @@ export function InspectNext({
                     <span className="sr-only">Hotspot {hotspot.rank}, </span>
                     <SeverityBadge level={hotspot.level} />
                     <span className="num ml-auto text-small font-medium text-ink">
-                      {formatArea(hotspot.totalAreaM2)}
+                      {fmt.area(hotspot.totalAreaM2)}
                     </span>
                   </span>
                   <span className="mono-label truncate text-ink-muted">
-                    {formatCoordinates(hotspot.centroid, { digits: 4 })}
+                    {fmt.coordinates(hotspot.centroid, { digits: 4 })}
                   </span>
                 </span>
                 <ChevronRight

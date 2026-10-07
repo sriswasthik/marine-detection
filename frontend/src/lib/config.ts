@@ -48,6 +48,16 @@ export const MODEL_CARD = {
   version: '0.1.0',
   architecture: 'UNet++ semantic segmentation',
   trainingData: 'MARIDA (Sentinel-2)',
+  evaluationData: 'MARIDA test split (placeholder figures until the project evaluation is run)',
+  /** Where the model is known to struggle, from the problem statement. Shown on the model card. */
+  limitations: [
+    'Clouds and cloud shadow can hide debris, or be mistaken for it at their edges.',
+    'Sun-glint, the mirror-like reflection of the sun off the sea, can look like bright floating material.',
+    'Sea foam and whitecaps can be confused with debris, especially in rough water.',
+    'Floating algae such as Sargassum and other natural matter look similar to plastic in the image bands.',
+    'Turbid, sediment-laden water near river mouths lowers contrast, so confidence drops.',
+    'At 10 m per pixel, items smaller than a pixel are only seen when they gather in patches or windrows.',
+  ],
 } as const
 
 /**

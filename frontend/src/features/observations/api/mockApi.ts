@@ -137,7 +137,9 @@ export function createMockApi(options: MockApiOptions = {}): ObservationsApi {
   return {
     listObservations: ({ signal } = {}) =>
       respond(latency, signal, (): Validated<ObservationSummary[]> => {
-        const all = [...uploads, ...getSampleObservations()].map(toSummary)
+        // The "empty" scenario stands for a fresh install: only this session's uploads.
+        const samples = currentScenario() === 'empty' ? [] : getSampleObservations()
+        const all = [...uploads, ...samples].map(toSummary)
         const result = parseObservationList(all)
         if (result.status === 'invalid') throw invalidResponse(result.issues)
         return { data: result.data, issues: result.issues }

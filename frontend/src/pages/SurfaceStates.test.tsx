@@ -108,12 +108,9 @@ describe('error', { timeout: 20_000 }, () => {
     '%s explains the failure and offers a retry',
     async (_surface, path) => {
       renderAt(path, failingApi())
-      const [heading] = await screen.findAllByRole(
-        'heading',
-        { name: "Can't reach the processing service" },
-        OPTS,
-      )
-      const alert = heading?.closest('[role="alert"]')
+      // A page-level ErrorState names it in a heading; an inline banner (Settings) in its title.
+      const [title] = await screen.findAllByText("Can't reach the processing service", {}, OPTS)
+      const alert = title?.closest('[role="alert"]')
       if (!(alert instanceof HTMLElement)) throw new Error('no alert')
       expect(within(alert).getByRole('button', { name: 'Try again' })).toBeInTheDocument()
       expect(document.body.textContent).not.toMatch(/Something went wrong|Error:|at \w+ \(/)
@@ -127,9 +124,9 @@ describe('offline', { timeout: 20_000 }, () => {
     async (_surface, path) => {
       vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false)
       renderAt(path, withResilience(mock(), { isOnline: () => false }))
-      expect(
-        (await screen.findAllByRole('heading', { name: "You're offline" }, OPTS)).length,
-      ).toBeGreaterThan(0)
+      // The error itself (heading or banner title) and the quiet bar both say so.
+      const alerts = await screen.findAllByRole('alert', {}, OPTS)
+      expect(alerts.some((alert) => alert.textContent?.includes("You're offline"))).toBe(true)
       // The quiet bar under the top bar says so too.
       expect(screen.getByText(/New requests will fail until you reconnect/)).toBeInTheDocument()
     },

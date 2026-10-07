@@ -11,15 +11,10 @@ import { gridCellSizeForResolution } from '@/lib/config'
 import { DENSITY_LEVELS } from '@/lib/density'
 import { densityShares, densitySummaryText, evidenceMetrics } from '@/lib/evidence'
 import { methodAndCaveats, REPORT_TOP_HOTSPOTS, reportAttributions } from '@/lib/export/report'
-import {
-  formatArea,
-  formatConfidence,
-  formatCoordinates,
-  formatDateTime,
-  formatInteger,
-} from '@/lib/format'
+import { formatConfidence, formatDateTime, formatInteger } from '@/lib/format'
 import type { BasemapId } from '@/lib/map/basemaps'
 import { observationNotices } from '@/lib/warnings'
+import { useFormat } from '@/features/settings/settingsContext'
 
 const REPORT_LAYERS = { detections: true, density: false, hotspots: true, footprint: true } as const
 
@@ -68,6 +63,7 @@ export function ReportSheet({
   appName,
   onMapReady,
 }: ReportSheetProps) {
+  const fmt = useFormat()
   const analysis = useMemo(() => analyzeObservation(observation), [observation])
   const metrics = evidenceMetrics(observation, analysis.hotspots.length)
   const notices = observationNotices(observation, { partialData })
@@ -113,7 +109,7 @@ export function ReportSheet({
           <CircleCheck aria-hidden className="size-4 shrink-0 text-success" />
           <span>
             <span className="font-medium">No debris detected.</span> The model checked{' '}
-            {formatArea(observation.waterAreaM2)} of water; no cleanup is needed for this area.
+            {fmt.area(observation.waterAreaM2)} of water; no cleanup is needed for this area.
           </span>
         </p>
       ) : null}
@@ -195,7 +191,7 @@ export function ReportSheet({
                   <td className="py-1 pr-2">
                     <SeverityBadge level={hotspot.level} variant="plain" />
                   </td>
-                  <td className="num py-1 pr-2 text-right">{formatArea(hotspot.totalAreaM2)}</td>
+                  <td className="num py-1 pr-2 text-right">{fmt.area(hotspot.totalAreaM2)}</td>
                   <td className="num py-1 pr-2 text-right">
                     {formatInteger(hotspot.detectionIds.length)}
                   </td>
@@ -203,7 +199,7 @@ export function ReportSheet({
                     {formatConfidence(hotspot.meanConfidence)}
                   </td>
                   <td className="mono-label py-1 whitespace-nowrap">
-                    {formatCoordinates(hotspot.centroid)}
+                    {fmt.coordinates(hotspot.centroid)}
                   </td>
                 </tr>
               ))}

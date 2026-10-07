@@ -1,11 +1,12 @@
 import { Badge, Tooltip } from '@/components/ui'
-import { ENV } from '@/lib/env'
+import { useSettings } from '@/features/settings/settingsContext'
 
 /** Says where the figures come from. Sample data is always labelled. */
 export function ModeChip() {
-  if (!ENV.useMock) {
+  const { dataSource, apiBaseUrl } = useSettings()
+  if (dataSource === 'live') {
     return (
-      <Tooltip content={`Results come from the analysis service at ${ENV.apiBaseUrl}.`} align="end">
+      <Tooltip content={`Results come from the analysis service at ${apiBaseUrl}.`} align="end">
         <Badge tone="success" dot tabIndex={0}>
           Live data
         </Badge>

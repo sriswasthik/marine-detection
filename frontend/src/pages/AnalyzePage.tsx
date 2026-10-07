@@ -19,9 +19,9 @@ import { qualityChecks, runReadiness, validateBounds } from '@/features/analyze/
 import type { Observation } from '@/features/observations/types'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useOnlineStatus } from '@/hooks/useOnlineStatus'
+import { useSettings } from '@/features/settings/settingsContext'
 import { RESULT_AUTO_OPEN_MS } from '@/lib/config'
 import { fromDateTimeLocalValue } from '@/lib/datetime'
-import { ENV } from '@/lib/env'
 import { PageContainer, PageHeader } from './PageHeader'
 
 /**
@@ -38,6 +38,7 @@ export function AnalyzePage() {
   const [autoOpenCancelled, setAutoOpenCancelled] = useState(false)
   const scenes = useMemo(() => sampleScenes(), [])
   const online = useOnlineStatus()
+  const sampleData = useSettings().dataSource === 'mock'
 
   const file = draft.file
   const boundsValidation = useMemo(() => validateBounds(draft.bounds), [draft.bounds])
@@ -255,7 +256,7 @@ export function AnalyzePage() {
           </div>
         )}
 
-        {ENV.useMock ? (
+        {sampleData ? (
           <footer className="border-t border-border pt-4">
             <DemoScenarioSelect />
           </footer>

@@ -24,6 +24,8 @@ export interface FilterBarProps {
   /** `replace` is set for continuous changes (the slider) so history is not flooded. */
   onFiltersChange: (patch: Partial<MapFilters>, options?: { replace?: boolean }) => void
   onReset: () => void
+  /** The filters Reset returns to (the Settings default minimum confidence). */
+  baseline: MapFilters
 }
 
 const SOURCE_OPTIONS: { value: SourceFilter; label: string }[] = [
@@ -33,8 +35,15 @@ const SOURCE_OPTIONS: { value: SourceFilter; label: string }[] = [
 ]
 
 function Controls({ layout, ...props }: FilterBarProps & { layout: 'row' | 'stack' }) {
-  const { observations, observationId, onObservationChange, filters, onFiltersChange, onReset } =
-    props
+  const {
+    observations,
+    observationId,
+    onObservationChange,
+    filters,
+    onFiltersChange,
+    onReset,
+    baseline,
+  } = props
   const stacked = layout === 'stack'
 
   const observationGroups = useMemo(() => {
@@ -50,7 +59,7 @@ function Controls({ layout, ...props }: FilterBarProps & { layout: 'row' | 'stac
   }, [observations, observationId, filters])
 
   const regions = useMemo(() => regionGroups(observations), [observations])
-  const active = activeFilterCount(filters) > 0
+  const active = activeFilterCount(filters, baseline) > 0
 
   return (
     <div
@@ -123,7 +132,7 @@ function Controls({ layout, ...props }: FilterBarProps & { layout: 'row' | 'stac
  */
 export function FilterBar(props: FilterBarProps) {
   const wide = useMediaQuery('(min-width: 1100px)')
-  const count = activeFilterCount(props.filters)
+  const count = activeFilterCount(props.filters, props.baseline)
 
   if (wide) {
     return (

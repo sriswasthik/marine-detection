@@ -8,6 +8,7 @@ export const MOCK_SCENARIOS = [
   'invalid',
   'modelfail',
   'network',
+  'empty',
 ] as const
 export type MockScenario = (typeof MOCK_SCENARIOS)[number]
 

@@ -1,12 +1,13 @@
 import { control, type LatLng as LeafletLatLng, type Map as LeafletMap } from 'leaflet'
 import { useEffect, useRef, useState } from 'react'
-import { formatCoordinates } from '@/lib/format'
+import { useFormat } from '@/features/settings/settingsContext'
 
 /**
  * Bottom-right readout: Leaflet's metric scale bar and the coordinates under the cursor,
  * or the map centre when there is no cursor (touch screens, keyboard panning).
  */
 export function ReadoutStrip({ map }: { map: LeafletMap }) {
+  const fmt = useFormat()
   const scaleSlot = useRef<HTMLDivElement | null>(null)
   const [point, setPoint] = useState(() => map.getCenter())
   const [fromCursor, setFromCursor] = useState(false)
@@ -62,7 +63,7 @@ export function ReadoutStrip({ map }: { map: LeafletMap }) {
       <span aria-hidden className="hidden h-3.5 w-px bg-border sm:block" />
       <span className="mono-label hidden whitespace-nowrap text-ink sm:inline">
         <span className="sr-only">{fromCursor ? 'Cursor position' : 'Map centre'}: </span>
-        {formatCoordinates({ lat: point.lat, lng: point.lng })}
+        {fmt.coordinates({ lat: point.lat, lng: point.lng })}
       </span>
     </div>
   )

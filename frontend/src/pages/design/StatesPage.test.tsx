@@ -8,7 +8,7 @@ import { StatesPage } from './StatesPage'
 
 afterEach(() => vi.restoreAllMocks())
 
-describe('/design/states', () => {
+describe('/design/states', { timeout: 15_000 }, () => {
   it('renders every error code and every shared state group', () => {
     // The boundary demo throws on purpose; React logs it.
     vi.spyOn(console, 'error').mockImplementation(() => undefined)

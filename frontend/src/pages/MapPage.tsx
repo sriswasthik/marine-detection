@@ -115,12 +115,15 @@ export function MapPage() {
   )
 
   const changeObservation = (nextId: string) => {
-    const search = serializeMapSearch({
-      ...mapState,
-      detectionId: null,
-      hotspotId: null,
-      fresh: false,
-    }).toString()
+    const search = serializeMapSearch(
+      {
+        ...mapState,
+        detectionId: null,
+        hotspotId: null,
+        fresh: false,
+      },
+      mapState.defaults,
+    ).toString()
     navigate(`/map/${encodeURIComponent(nextId)}${search ? `?${search}` : ''}`)
   }
 
@@ -190,6 +193,7 @@ export function MapPage() {
                 filters={mapState.filters}
                 onFiltersChange={mapState.setFilters}
                 onReset={mapState.resetFilters}
+                baseline={mapState.baseline}
               />
             </div>
             <div className="pointer-events-auto flex max-w-full flex-wrap items-center gap-2">

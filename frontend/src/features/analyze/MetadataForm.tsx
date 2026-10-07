@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Button, SegmentedControl, TextInput } from '@/components/ui'
 import type { ObservationSource } from '@/features/observations/types'
-import { formatCoordinates } from '@/lib/format'
 import type { AnalyzeDraft } from './draft'
 import { useAnalyzeDraft } from './draftContext'
 import type { BoundsInput, BoundsValidation } from './validate'
+import { useFormat } from '@/features/settings/settingsContext'
 
 const SOURCE_OPTIONS: { value: ObservationSource; label: string }[] = [
   { value: 'satellite', label: 'Satellite (Sentinel-2)' },
@@ -71,6 +71,7 @@ export function MetadataForm({
   /** The file has no usable embedded georeferencing. */
   boundsRequired: boolean
 }) {
+  const fmt = useFormat()
   const { dispatch } = useAnalyzeDraft()
   const [editBounds, setEditBounds] = useState(false)
   const embedded = !boundsRequired && draft.boundsOrigin === 'file' ? boundsValidation.bounds : null
@@ -112,8 +113,8 @@ export function MetadataForm({
             <span className="text-small font-medium text-ink">Geographic bounds</span>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="mono-label text-ink-muted">
-                {formatCoordinates({ lat: embedded.north, lng: embedded.east }, { digits: 4 })} to{' '}
-                {formatCoordinates({ lat: embedded.south, lng: embedded.west }, { digits: 4 })}
+                {fmt.coordinates({ lat: embedded.north, lng: embedded.east }, { digits: 4 })} to{' '}
+                {fmt.coordinates({ lat: embedded.south, lng: embedded.west }, { digits: 4 })}
               </span>
               <Button variant="ghost" size="sm" onClick={() => setEditBounds(true)}>
                 Edit

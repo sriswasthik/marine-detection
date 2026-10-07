@@ -12,6 +12,7 @@ import { detectionFeature, toGeoJsonText } from '@/lib/export/geojson'
 import { confidenceBand, CONFIDENCE_BAND_MEANINGS } from '@/lib/stats'
 import { TraceView } from './TraceView'
 import { useCopy } from './useCopy'
+import { useFormat } from '@/features/settings/settingsContext'
 
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -56,6 +57,7 @@ export interface DetectionDetailsProps {
 
 /** Detection facts, traceability and geometry, in the order an inspector needs them. */
 export function DetectionDetails({ detection, observation, onShowOnMap }: DetectionDetailsProps) {
+  const fmt = useFormat()
   const copy = useCopy()
   const band = confidenceBand(detection.confidence)
   const box = geometryBounds(detection.geometry)
@@ -86,7 +88,10 @@ export function DetectionDetails({ detection, observation, onShowOnMap }: Detect
           </Fact>
           <Fact label="Centroid">
             <span className="flex flex-col gap-0.5">
-              <CopyValue value={formatCoordinates(detection.centroid)} what="Coordinates" />
+              <CopyValue
+                value={formatCoordinates(detection.centroid, { format: 'decimal' })}
+                what="Coordinates"
+              />
               <CopyValue
                 value={formatCoordinates(detection.centroid, { format: 'dms' })}
                 what="DMS coordinates"
@@ -127,11 +132,11 @@ export function DetectionDetails({ detection, observation, onShowOnMap }: Detect
             <span className="flex flex-col gap-0.5">
               <span className="mono-label">
                 <span className="sr-only">North-east corner: </span>
-                {formatCoordinates({ lat: box.north, lng: box.east })}
+                {fmt.coordinates({ lat: box.north, lng: box.east })}
               </span>
               <span className="mono-label">
                 <span className="sr-only">South-west corner: </span>
-                {formatCoordinates({ lat: box.south, lng: box.west })}
+                {fmt.coordinates({ lat: box.south, lng: box.west })}
               </span>
             </span>
           </Fact>

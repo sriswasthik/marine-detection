@@ -1,7 +1,7 @@
 import { MetricCard, SegmentedControl } from '@/components/ui'
 import type { Observation } from '@/features/observations/types'
-import { AREA_UNIT_LABELS, AREA_UNITS } from '@/features/settings/preferences'
-import { usePreferences } from '@/features/settings/usePreferences'
+import { useSettings, useUpdateSettings } from '@/features/settings/settingsContext'
+import { AREA_UNIT_LABELS, AREA_UNITS } from '@/lib/settings'
 import { evidenceMetrics } from '@/lib/evidence'
 
 const UNIT_OPTIONS = AREA_UNITS.map((unit) => ({ value: unit, label: AREA_UNIT_LABELS[unit] }))
@@ -14,7 +14,8 @@ export function EvidenceMetrics({
   observation: Observation
   hotspotCount: number
 }) {
-  const [preferences, setPreferences] = usePreferences()
+  const preferences = useSettings()
+  const setPreferences = useUpdateSettings()
   const metrics = evidenceMetrics(observation, hotspotCount, preferences.areaUnit)
   return (
     <section aria-labelledby="metrics-title" className="flex flex-col gap-3">

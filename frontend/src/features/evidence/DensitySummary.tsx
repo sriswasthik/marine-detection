@@ -4,10 +4,11 @@ import { Card, SeverityBadge, SeveritySwatch } from '@/components/ui'
 import type { Observation } from '@/features/observations/types'
 import { cn } from '@/lib/cn'
 import { densityShares, densitySummaryText, type DensityShareSegment } from '@/lib/evidence'
-import { formatArea, formatConfidence, formatInteger } from '@/lib/format'
+import { formatConfidence, formatInteger } from '@/lib/format'
 import type { Hotspot } from '@/lib/hotspots'
 import { DEFAULT_MAP_URL_STATE, serializeMapSearch } from '@/lib/mapUrlState'
 import type { LevelBreakdown } from '@/lib/stats'
+import { useFormat } from '@/features/settings/settingsContext'
 
 /** Shown in the table; the rest are one click away on the map. */
 const MAX_HOTSPOT_ROWS = 5
@@ -21,6 +22,7 @@ const SEGMENT_CLASSES = {
 
 /** One thin bar: the share of debris area per density level, with a labelled legend. */
 export function DensityShareBar({ segments }: { segments: DensityShareSegment[] }) {
+  const fmt = useFormat()
   const withDebris = segments.filter((s) => s.percent > 0)
   return (
     <div className="flex flex-col gap-2.5">
@@ -52,7 +54,7 @@ export function DensityShareBar({ segments }: { segments: DensityShareSegment[] 
             </dt>
             <dd className="num text-small text-ink">
               <span className="font-medium">{segment.percentLabel}</span>
-              <span className="text-ink-muted"> · {formatArea(segment.areaM2)}</span>
+              <span className="text-ink-muted"> · {fmt.area(segment.areaM2)}</span>
             </dd>
           </div>
         ))}
@@ -67,6 +69,7 @@ function hotspotMapPath(observationId: string, hotspotId: string): string {
 }
 
 function HotspotTable({ observationId, hotspots }: { observationId: string; hotspots: Hotspot[] }) {
+  const fmt = useFormat()
   if (hotspots.length === 0) {
     return (
       <p className="text-small text-ink-muted">
@@ -110,7 +113,7 @@ function HotspotTable({ observationId, hotspots }: { observationId: string; hots
                   <SeverityBadge level={hotspot.level} variant="plain" />
                 </td>
                 <td className="num py-1.5 pr-3 text-right text-ink">
-                  {formatArea(hotspot.totalAreaM2)}
+                  {fmt.area(hotspot.totalAreaM2)}
                 </td>
                 <td className="num py-1.5 pr-3 text-right text-ink">
                   {formatInteger(hotspot.detectionIds.length)}

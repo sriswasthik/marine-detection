@@ -4,7 +4,7 @@ import { memo, useCallback, useMemo, useState } from 'react'
 import { CircleMarker, Polygon, useMap, useMapEvent } from 'react-leaflet'
 import type { Detection } from '@/features/observations/types'
 import { DENSITY_LEVELS } from '@/lib/density'
-import { formatArea, formatConfidence } from '@/lib/format'
+import { formatConfidence } from '@/lib/format'
 import { geometryToLeaflet, latLngToTuple } from '@/lib/geo'
 import {
   detectionPointRadius,
@@ -18,6 +18,7 @@ import {
   type DetectionRepresentation,
 } from '@/lib/map/representation'
 import { HoverTooltip } from './HoverTooltip'
+import { useFormat } from '@/features/settings/settingsContext'
 
 interface ShapeProps {
   detection: Detection
@@ -112,6 +113,7 @@ export const DetectionsLayer = memo(function DetectionsLayer({
   onSelect,
   highlightedId = null,
 }: DetectionsLayerProps) {
+  const fmt = useFormat()
   const map = useMap()
   const [zoom, setZoom] = useState(() => map.getZoom())
   const [hoveredId, setHoveredId] = useState<string | null>(null)
@@ -193,7 +195,7 @@ export const DetectionsLayer = memo(function DetectionsLayer({
         <HoverTooltip position={latLngToTuple(hovered.centroid)}>
           <div className="mwi-tooltip__row">
             <span className="mwi-tooltip__title">{DENSITY_LEVELS[hovered.densityLevel].label}</span>
-            <span className="mwi-tooltip__muted">{formatArea(hovered.areaM2)}</span>
+            <span className="mwi-tooltip__muted">{fmt.area(hovered.areaM2)}</span>
           </div>
           <div className="mwi-tooltip__row">
             <span className="mwi-tooltip__muted">Confidence</span>

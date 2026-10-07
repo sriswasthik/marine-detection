@@ -7,6 +7,7 @@ import type { ObservationAnalysis } from '@/lib/analysis'
 import { cn } from '@/lib/cn'
 import { extentFacts, provenanceRows, type FactRow } from '@/lib/evidence'
 import { formatConfidence } from '@/lib/format'
+import { useSettings } from '@/features/settings/settingsContext'
 
 const EXTENT_LAYERS = {
   detections: true,
@@ -46,6 +47,8 @@ export function ExtentCard({
   observation: Observation
   analysis: ObservationAnalysis
 }) {
+  // The helpers below read the unit settings; subscribing re-renders on a change.
+  useSettings()
   const facts = extentFacts(observation)
   return (
     <Card title="Geographic extent" headingLevel={2}>
