@@ -8,6 +8,7 @@ import {
   formatDate,
   formatDateTime,
   formatDuration,
+  formatElapsed,
   formatInteger,
   slugify,
 } from './format'
@@ -137,6 +138,14 @@ describe('dates and durations', () => {
     expect(formatDuration(3_840_000)).toBe('1 h 04 min')
     expect(formatDuration(null)).toBe(EMPTY_VALUE)
     expect(formatDuration(-5)).toBe(EMPTY_VALUE)
+  })
+
+  it('formats a running clock in whole seconds', () => {
+    expect(formatElapsed(0)).toBe('0 s')
+    expect(formatElapsed(999)).toBe('0 s')
+    expect(formatElapsed(12_900)).toBe('12 s')
+    expect(formatElapsed(125_400)).toBe('2 min 05 s')
+    expect(formatElapsed(null)).toBe(EMPTY_VALUE)
   })
 })
 

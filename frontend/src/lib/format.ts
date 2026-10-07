@@ -201,6 +201,14 @@ export function formatDuration(ms: number | null | undefined): string {
   return `${hours} h ${String(minutes).padStart(2, '0')} min`
 }
 
+/** A running clock in whole seconds: "0 s", "12 s", "2 min 05 s". */
+export function formatElapsed(ms: number | null | undefined): string {
+  if (!isUsable(ms) || ms < 0) return EMPTY_VALUE
+  const totalSeconds = Math.floor(ms / 1000)
+  if (totalSeconds < 60) return `${totalSeconds} s`
+  return formatDuration(totalSeconds * 1000)
+}
+
 /** Last segment of an id, for compact display: "obs-ennore-20261003-d012" becomes "d012". */
 export function shortId(id: string): string {
   const parts = id.split('-').filter(Boolean)

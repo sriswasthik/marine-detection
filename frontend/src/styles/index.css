@@ -24,6 +24,16 @@
   }
 }
 
+/* Thin indeterminate progress bar for active processing steps. */
+@keyframes indeterminate {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
 @layer base {
   :root {
     color-scheme: light;

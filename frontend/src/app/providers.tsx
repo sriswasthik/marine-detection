@@ -2,6 +2,7 @@ import { QueryClientProvider, type QueryClient } from '@tanstack/react-query'
 import { MotionConfig } from 'framer-motion'
 import { useState, type ReactNode } from 'react'
 import { ToastProvider } from '@/components/ui/toast/ToastProvider'
+import { AnalyzeDraftProvider } from '@/features/analyze/AnalyzeDraftProvider'
 import { ObservationsApiProvider } from '@/features/observations/api/ObservationsApiProvider'
 import { CurrentObservationProvider } from '@/features/observations/CurrentObservationProvider'
 import type { ObservationsApi } from '@/features/observations/api/types'
@@ -23,7 +24,9 @@ export function AppProviders({ children, api, queryClient }: AppProvidersProps) 
         {/* Honour the OS "reduce motion" setting for every animation. */}
         <MotionConfig reducedMotion="user">
           <CurrentObservationProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <AnalyzeDraftProvider>
+              <ToastProvider>{children}</ToastProvider>
+            </AnalyzeDraftProvider>
           </CurrentObservationProvider>
         </MotionConfig>
       </ObservationsApiProvider>

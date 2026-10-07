@@ -1,3 +1,4 @@
+import type { JobStep } from '@/features/observations/api/types'
 import type { ModelMetrics } from '@/features/observations/types'
 
 /**
@@ -73,3 +74,29 @@ export const ACCEPTED_TYPES = {
 } as const satisfies Record<string, readonly string[]>
 
 export const ACCEPTED_EXTENSIONS: readonly string[] = Object.values(ACCEPTED_TYPES).flat()
+
+/** Smallest image side accepted for analysis, in pixels. */
+export const MIN_IMAGE_PX = 128
+
+/** Resolution bands for the quality check, meters per pixel. Coarser images miss small debris. */
+export const RESOLUTION_LIMITS_M = {
+  /** At or below: fine for floating debris (Sentinel-2 is 10 m). */
+  good: 10,
+  /** Above good and up to this: usable with a warning. Beyond it: too coarse to analyse. */
+  usable: 60,
+} as const
+
+/** Step names and one-line descriptions for the processing stepper. */
+export const PIPELINE_STEP_COPY: Readonly<Record<JobStep, { label: string; description: string }>> =
+  {
+    upload: { label: 'Upload', description: 'Sending the image to the processing service' },
+    preprocess: {
+      label: 'Preprocess',
+      description: 'Normalising bands and masking cloud and sun-glint',
+    },
+    detect: { label: 'Detect', description: `Running ${MODEL_CARD.name}` },
+    map: { label: 'Map', description: 'Converting pixel regions to geographic polygons' },
+  }
+
+/** After a successful run, open the results on their own if the user does nothing. */
+export const RESULT_AUTO_OPEN_MS = 1000
