@@ -16,6 +16,7 @@ export function MapPreview({
   basemap = DEFAULT_BASEMAP,
   visibleLayers = PREVIEW_VISIBLE_LAYERS,
   overlay,
+  onBasemapLoad,
   className,
 }: {
   observation: Observation
@@ -24,6 +25,8 @@ export function MapPreview({
   basemap?: BasemapId
   visibleLayers?: VisibleLayers
   overlay?: ReactNode
+  /** Called when the basemap tiles in view have finished loading. */
+  onBasemapLoad?: () => void
   className?: string
 }) {
   return (
@@ -35,6 +38,7 @@ export function MapPreview({
       interactive={false}
       fitPadding={16}
       overlay={overlay}
+      onBasemapLoad={onBasemapLoad}
       className={cn('rounded-card border border-border', className)}
     />
   )

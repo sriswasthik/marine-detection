@@ -1,9 +1,8 @@
-import { Download } from 'lucide-react'
-import { Button, ConfidenceBadge, Drawer, SeverityBadge } from '@/components/ui'
+import { ConfidenceBadge, Drawer, SeverityBadge } from '@/components/ui'
+import type { ExportSource } from '@/features/export/exportFiles'
+import { ExportMenu } from '@/features/export/ExportMenu'
 import type { Detection, Observation } from '@/features/observations/types'
-import { downloadTextFile } from '@/lib/download'
 import { shortId } from '@/lib/format'
-import { detectionGeoJsonText } from '@/lib/geojson'
 import type { Hotspot } from '@/lib/hotspots'
 import { DetectionDetails } from './DetectionDetails'
 import { HotspotDetails } from './HotspotDetails'
@@ -18,6 +17,8 @@ export interface DetectionDrawerProps {
   onClose: () => void
   onSelectDetection: (id: string) => void
   onShowDetectionOnMap: (id: string) => void
+  /** What the Export menu exports: the map's filtered detections and their analysis. */
+  exportSource: ExportSource
 }
 
 /**
@@ -33,6 +34,7 @@ export function DetectionDrawer({
   onClose,
   onSelectDetection,
   onShowDetectionOnMap,
+  exportSource,
 }: DetectionDrawerProps) {
   const open = Boolean(detection ?? hotspot)
 
@@ -60,21 +62,14 @@ export function DetectionDrawer({
       title={title}
       description={observation.name ?? observation.region}
       footer={
-        detection ? (
-          <Button
-            variant="secondary"
+        detection || hotspot ? (
+          <ExportMenu
+            source={exportSource}
+            detection={detection}
+            align="end"
+            side="top"
             size="sm"
-            iconStart={<Download aria-hidden />}
-            onClick={() =>
-              downloadTextFile(
-                `${detection.id}.geojson`,
-                detectionGeoJsonText(detection, observation),
-                'application/geo+json',
-              )
-            }
-          >
-            Export this detection (GeoJSON)
-          </Button>
+          />
         ) : null
       }
     >

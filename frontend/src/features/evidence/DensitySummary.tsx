@@ -19,7 +19,8 @@ const SEGMENT_CLASSES = {
   critical: 'bg-critical',
 } as const
 
-function ShareBar({ segments }: { segments: DensityShareSegment[] }) {
+/** One thin bar: the share of debris area per density level, with a labelled legend. */
+export function DensityShareBar({ segments }: { segments: DensityShareSegment[] }) {
   const withDebris = segments.filter((s) => s.percent > 0)
   return (
     <div className="flex flex-col gap-2.5">
@@ -170,7 +171,7 @@ export function DensitySummary({
             {densitySummaryText(level, observation.detections.length)}
           </p>
         </div>
-        <ShareBar segments={densityShares(byLevel)} />
+        <DensityShareBar segments={densityShares(byLevel)} />
         <div className="flex flex-col gap-2">
           <h3 className="text-small font-medium text-ink">Hotspots by priority</h3>
           <HotspotTable observationId={observation.id} hotspots={hotspots} />

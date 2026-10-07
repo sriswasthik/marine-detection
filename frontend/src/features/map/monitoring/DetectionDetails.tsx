@@ -8,7 +8,7 @@ import type { Detection, Observation } from '@/features/observations/types'
 import { DENSITY_LEVELS } from '@/lib/density'
 import { formatArea, formatCoordinates, formatDateTime, formatInteger } from '@/lib/format'
 import { countVertices, geometryBounds } from '@/lib/geo'
-import { detectionGeoJsonText } from '@/lib/geojson'
+import { detectionFeature, toGeoJsonText } from '@/lib/export/geojson'
 import { confidenceBand, CONFIDENCE_BAND_MEANINGS } from '@/lib/stats'
 import { TraceView } from './TraceView'
 import { useCopy } from './useCopy'
@@ -141,7 +141,9 @@ export function DetectionDetails({ detection, observation, onShowOnMap }: Detect
           variant="secondary"
           iconStart={<Copy aria-hidden />}
           className="self-start"
-          onClick={() => void copy(detectionGeoJsonText(detection, observation), 'GeoJSON')}
+          onClick={() =>
+            void copy(toGeoJsonText(detectionFeature(detection, observation)), 'GeoJSON')
+          }
         >
           Copy GeoJSON
         </Button>

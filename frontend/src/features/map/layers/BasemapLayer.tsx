@@ -11,6 +11,8 @@ interface BasemapLayerProps {
   basemap: BasemapId
   /** Called when availability changes, not on every tile. */
   onAvailabilityChange: (basemap: BasemapId, available: boolean) => void
+  /** Called when every tile in view has finished, loaded or failed (Leaflet's `load`). */
+  onLoad?: () => void
 }
 
 /**
@@ -20,6 +22,7 @@ interface BasemapLayerProps {
 export const BasemapLayer = memo(function BasemapLayer({
   basemap,
   onAvailabilityChange,
+  onLoad,
 }: BasemapLayerProps) {
   const config = BASEMAPS[basemap]
   const state = useRef(INITIAL_TILE_FAILURE_STATE)
@@ -42,6 +45,7 @@ export const BasemapLayer = memo(function BasemapLayer({
       eventHandlers={{
         tileerror: () => record({ type: 'tileerror' }),
         tileload: () => record({ type: 'tileload' }),
+        load: () => onLoad?.(),
       }}
     />
   )

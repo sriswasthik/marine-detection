@@ -88,7 +88,15 @@ function ObservationDetail({
 
   return (
     <div className="flex flex-col gap-6">
-      <ObservationHeader observation={observation} />
+      <ObservationHeader
+        observation={observation}
+        exportSource={{
+          observation,
+          detections: observation.detections,
+          analysis,
+          filters: null,
+        }}
+      />
       <ObservationNotices observation={observation} partialData={partialData} />
 
       <div ref={viewerRef} className="scroll-mt-20">

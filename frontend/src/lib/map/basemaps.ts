@@ -5,6 +5,8 @@ export interface BasemapConfig {
   label: string
   url: string
   attribution: string
+  /** Full credit for printed reports, where there is room to name every source. */
+  credit: string
   subdomains?: string
   /** Highest zoom the provider serves; Leaflet upscales tiles beyond it. */
   maxNativeZoom: number
@@ -20,6 +22,7 @@ export const CARTO_POSITRON: BasemapConfig = {
   label: 'Light',
   url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
   attribution: '© OpenStreetMap contributors © CARTO',
+  credit: 'CARTO Positron: © OpenStreetMap contributors, © CARTO',
   subdomains: 'abcd',
   maxNativeZoom: 20,
 }
@@ -31,6 +34,8 @@ export const BASEMAPS: Readonly<Record<BasemapId, BasemapConfig>> = {
     label: 'Light',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
     attribution: 'Tiles © Esri',
+    credit:
+      'Esri World Light Gray Canvas: Esri, HERE, Garmin, © OpenStreetMap contributors and the GIS user community',
     maxNativeZoom: 16,
   },
   satellite: {
@@ -38,6 +43,7 @@ export const BASEMAPS: Readonly<Record<BasemapId, BasemapConfig>> = {
     label: 'Satellite',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     attribution: 'Tiles © Esri',
+    credit: 'Esri World Imagery: Esri, Maxar, Earthstar Geographics and the GIS user community',
     maxNativeZoom: 19,
   },
 }

@@ -59,6 +59,8 @@ export interface MapViewProps {
   highlightedHotspotId?: string | null
   /** Detection to emphasise from outside the map (hovering a table row). */
   highlightedDetectionId?: string | null
+  /** Called each time every basemap tile in view has finished loading (or failed). */
+  onBasemapLoad?: () => void
   /** Zoom with the mouse wheel. Off for maps inside a scrolling page, which use buttons instead. */
   wheelZoom?: boolean
   /**
@@ -118,6 +120,7 @@ export function MapView({
   highlightedHotspotId = null,
   highlightedDetectionId = null,
   wheelZoom = true,
+  onBasemapLoad,
   focusRequest = null,
   introAnimation = false,
   fitPadding = DEFAULT_FIT_PADDING,
@@ -253,7 +256,12 @@ export function MapView({
         className="mwi-map h-full w-full"
       >
         <AttributionControl position="bottomright" prefix={false} />
-        <BasemapLayer key={basemap} basemap={basemap} onAvailabilityChange={onAvailabilityChange} />
+        <BasemapLayer
+          key={basemap}
+          basemap={basemap}
+          onAvailabilityChange={onAvailabilityChange}
+          onLoad={onBasemapLoad}
+        />
         {visibleLayers.footprint && observation.bounds ? (
           <FootprintLayer
             bounds={observation.bounds}

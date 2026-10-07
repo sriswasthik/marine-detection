@@ -66,7 +66,7 @@ export function TraceView({
   return (
     <div className="flex flex-col gap-3">
       {/* Decorative still image; the facts it shows are in the drawer as text. */}
-      <div aria-hidden className="overflow-hidden rounded-control border border-border">
+      <div aria-hidden className="isolate overflow-hidden rounded-control border border-border">
         <MapContainer
           key={detection.id}
           bounds={bounds}

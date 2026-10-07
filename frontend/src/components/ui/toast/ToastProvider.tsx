@@ -107,7 +107,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <section
         aria-label="Notifications"
-        className="pointer-events-none fixed inset-x-4 bottom-4 z-[60] sm:left-auto sm:w-[360px]"
+        className="pointer-events-none fixed inset-x-4 bottom-4 z-[60] sm:left-auto sm:w-[360px] print:hidden"
       >
         <ol aria-live="polite" aria-relevant="additions text" className="flex flex-col gap-2">
           <AnimatePresence initial={false}>

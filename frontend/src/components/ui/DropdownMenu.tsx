@@ -21,6 +21,8 @@ export interface DropdownMenuItem {
   checked?: boolean
   disabled?: boolean
   shortcut?: string
+  /** A short note on the right, such as a file type. */
+  aside?: string
   tone?: 'default' | 'danger'
   onSelect: () => void
 }
@@ -45,6 +47,8 @@ export interface DropdownMenuProps {
   trigger: (props: DropdownTriggerProps) => ReactNode
   items: readonly DropdownMenuEntry[]
   align?: 'start' | 'end'
+  /** Open below the trigger (default) or above it, for triggers near the bottom of the screen. */
+  side?: 'bottom' | 'top'
   className?: string
   menuClassName?: string
 }
@@ -60,6 +64,7 @@ export function DropdownMenu({
   trigger,
   items,
   align = 'start',
+  side = 'bottom',
   className,
   menuClassName,
 }: DropdownMenuProps) {
@@ -181,7 +186,8 @@ export function DropdownMenu({
           aria-labelledby={triggerId}
           onKeyDown={onMenuKeyDown}
           className={cn(
-            'absolute top-full z-50 mt-1.5 max-h-[min(24rem,70dvh)] min-w-52 overflow-y-auto rounded-card border border-border bg-surface p-1 shadow-popover',
+            'absolute z-50 max-h-[min(24rem,70dvh)] min-w-52 overflow-y-auto rounded-card border border-border bg-surface p-1 shadow-popover',
+            side === 'top' ? 'bottom-full mb-1.5' : 'top-full mt-1.5',
             'animate-[tooltip-in_120ms_var(--ease-out)]',
             align === 'end' ? 'right-0' : 'left-0',
             menuClassName,
@@ -238,6 +244,11 @@ export function DropdownMenu({
                 </span>
                 {entry.shortcut ? (
                   <span className="mt-0.5 text-caption text-ink-muted">{entry.shortcut}</span>
+                ) : null}
+                {entry.aside ? (
+                  <span className="mono-label mt-0.5 rounded-badge border border-border px-1.5 text-ink-muted">
+                    {entry.aside}
+                  </span>
                 ) : null}
                 {radio ? (
                   <Check

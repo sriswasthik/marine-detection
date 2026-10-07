@@ -1,0 +1,56 @@
+/*
+ * One-page A4 report. On screen it is a sheet of paper at real size; in print the app chrome
+ * disappears and the sheet fills the page edge to edge (its own padding is the margin).
+ */
+.mwi-report-sheet {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 12mm 13mm;
+  background: var(--color-surface);
+}
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  /* Severity fills, swatches and the share bar keep their colours on paper. */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .mwi-report-screen-only {
+    display: none !important;
+  }
+
+  .mwi-report-page {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  .mwi-report-sheet {
+    margin: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    height: 297mm;
+    overflow: hidden;
+  }
+
+  .mwi-report-block {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Leaflet's attribution control is replaced by the printed attributions. */
+  .mwi-report-sheet .leaflet-control-container {
+    display: none;
+  }
+}

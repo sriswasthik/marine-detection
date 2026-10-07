@@ -1,34 +1,26 @@
-import { ChevronDown, ChevronRight, Download, Map as MapIcon } from 'lucide-react'
+import { ChevronRight, Map as MapIcon } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Badge, buttonStyles, DropdownMenu, useToast } from '@/components/ui'
+import { Badge, buttonStyles } from '@/components/ui'
+import type { ExportSource } from '@/features/export/exportFiles'
+import { ExportMenu } from '@/features/export/ExportMenu'
 import { isMockMode } from '@/features/observations/api'
 import { SourceIcon } from '@/features/observations/components/SourceIcon'
 import { SOURCE_LABELS, STATUS_LABELS, STATUS_TONES } from '@/features/observations/labels'
 import type { Observation } from '@/features/observations/types'
-import { downloadTextFile } from '@/lib/download'
 import { formatDateTime } from '@/lib/format'
-import { detectionsFileName, detectionsGeoJsonText } from '@/lib/geojson'
-
-/** Downloads the detections as GeoJSON. The export module replaces this in a later task. */
-function exportGeoJson(observation: Observation) {
-  downloadTextFile(
-    detectionsFileName(observation.id),
-    detectionsGeoJsonText(observation),
-    'application/geo+json',
-  )
-}
 
 export function ObservationHeader({
   observation,
   actions = true,
+  exportSource,
 }: {
   observation: Observation
+  /** What the Export menu exports. Without it the menu is left out. */
+  exportSource?: ExportSource
   /** Off for failed and unfinished observations: there is nothing to open or export. */
   actions?: boolean
 }) {
-  const toast = useToast()
   const mapPath = `/map/${encodeURIComponent(observation.id)}`
-  const count = observation.detections.length
 
   return (
     <header className="flex flex-col gap-3">
@@ -75,35 +67,7 @@ export function ObservationHeader({
               <MapIcon aria-hidden />
               Open on map
             </Link>
-            <DropdownMenu
-              align="end"
-              menuClassName="w-72"
-              items={[
-                {
-                  id: 'geojson',
-                  label: 'Detections as GeoJSON',
-                  description:
-                    count > 0
-                      ? 'Outlines with area, confidence and density level, for GIS tools.'
-                      : 'An empty collection: nothing was detected.',
-                  icon: <Download aria-hidden />,
-                  onSelect: () => {
-                    exportGeoJson(observation)
-                    toast.show({
-                      title: 'GeoJSON downloaded',
-                      description: detectionsFileName(observation.id),
-                      tone: 'success',
-                    })
-                  },
-                },
-              ]}
-              trigger={(props) => (
-                <button type="button" {...props} className={buttonStyles({ variant: 'secondary' })}>
-                  Export
-                  <ChevronDown aria-hidden />
-                </button>
-              )}
-            />
+            {exportSource ? <ExportMenu source={exportSource} /> : null}
           </div>
         ) : null}
       </div>

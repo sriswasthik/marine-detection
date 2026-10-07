@@ -1,6 +1,6 @@
-/** Saves text as a file in the browser. Side effect only; not unit tested. */
-export function downloadTextFile(filename: string, text: string, mimeType: string): void {
-  const url = URL.createObjectURL(new Blob([text], { type: mimeType }))
+/** Saves text as a file in the browser. Side effect only; the content comes from tested builders. */
+export function downloadFile(filename: string, text: string, mimeType: string): void {
+  const url = URL.createObjectURL(new Blob([text], { type: `${mimeType};charset=utf-8` }))
   const link = document.createElement('a')
   link.href = url
   link.download = filename

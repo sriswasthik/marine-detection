@@ -21,6 +21,8 @@ export const APP_ERROR_CODES = [
   'SERVER',
   'SERVICE_UNAVAILABLE',
   'NOT_IMPLEMENTED',
+  'EXPORT_FAILED',
+  'CLIPBOARD_BLOCKED',
   'UNEXPECTED',
 ] as const
 
@@ -118,6 +120,17 @@ export const ERROR_COPY: Readonly<Record<AppErrorCode, ErrorCopy>> = {
     title: 'Not available from the live service yet',
     message:
       'The connected service does not support this yet. Switch to sample data (VITE_USE_MOCK=true) or update the service.',
+    recoverable: false,
+  },
+  EXPORT_FAILED: {
+    title: 'The export could not be created',
+    message:
+      'Nothing was downloaded. Try again; if it keeps failing, reload the page and export again.',
+    recoverable: true,
+  },
+  CLIPBOARD_BLOCKED: {
+    title: 'The link could not be copied',
+    message: 'The browser blocked clipboard access. Copy the address from the address bar instead.',
     recoverable: false,
   },
   UNEXPECTED: {

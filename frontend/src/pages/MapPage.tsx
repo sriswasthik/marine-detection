@@ -23,15 +23,19 @@ import {
   ObservationNotFound,
   ObservationStatusState,
 } from '@/features/observations/components/ObservationStates'
+import type { ExportSource } from '@/features/export/exportFiles'
+import { ExportMenu } from '@/features/export/ExportMenu'
 import { useObservation, useObservations } from '@/features/observations/hooks'
 import { hasResult, isNotFound } from '@/features/observations/status'
+import type { Observation } from '@/features/observations/types'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { analyzeObservation } from '@/lib/analysis'
+import { analyzeObservation, type ObservationAnalysis } from '@/lib/analysis'
 import { cn } from '@/lib/cn'
 import { gridCellSizeForResolution } from '@/lib/config'
 import { applyFilters, hasActiveFilters } from '@/lib/filters'
 import { formatInteger } from '@/lib/format'
+import { describeFilters } from '@/lib/export/scope'
 import { serializeMapSearch } from '@/lib/mapUrlState'
 import type { NoticeId } from '@/lib/warnings'
 
@@ -72,6 +76,14 @@ export function MapPage() {
     [filtered],
   )
   const shownDetections = filtered?.observation.detections ?? []
+  // Exports follow the active filters; the summary still describes the whole observation.
+  const filterDescription = describeFilters(mapState.filters)
+  const exportSource = (full: Observation, shownAnalysis: ObservationAnalysis): ExportSource => ({
+    observation: full,
+    detections: shownDetections,
+    analysis: shownAnalysis,
+    filters: filterDescription,
+  })
   const selectedDetection = shownDetections.find((d) => d.id === mapState.detectionId) ?? null
   const selectedHotspot = analysis?.hotspots.find((h) => h.id === mapState.hotspotId) ?? null
   const drawerOpen = Boolean(selectedDetection ?? selectedHotspot)
@@ -180,7 +192,7 @@ export function MapPage() {
                 onReset={mapState.resetFilters}
               />
             </div>
-            <div className="pointer-events-auto max-w-full">
+            <div className="pointer-events-auto flex max-w-full flex-wrap items-center gap-2">
               <ResultStrip
                 shown={filtered.shownCount}
                 total={filtered.totalCount}
@@ -189,6 +201,7 @@ export function MapPage() {
                 filtered={hasActiveFilters(mapState.filters)}
                 onReset={mapState.resetFilters}
               />
+              <ExportMenu source={exportSource(observation, analysis)} align="start" size="sm" />
             </div>
             <ObservationNotices
               observation={observation}
@@ -234,6 +247,7 @@ export function MapPage() {
               mapRef.current?.flyToDetection(detectionId)
             }}
             onShowDetectionOnMap={(detectionId) => mapRef.current?.flyToDetection(detectionId)}
+            exportSource={exportSource(observation, analysis)}
           />
         </>
       ) : query.isError && isNotFound(query.error) ? (
