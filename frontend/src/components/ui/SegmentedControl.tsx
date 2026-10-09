@@ -74,7 +74,7 @@ export function SegmentedControl<T extends string>({
       role="radiogroup"
       aria-label={label}
       className={cn(
-        'inline-flex max-w-full overflow-hidden rounded-control border border-hairline',
+        'inline-flex max-w-full overflow-hidden rounded-control border border-rule',
         className,
       )}
     >
@@ -99,11 +99,12 @@ export function SegmentedControl<T extends string>({
               'transition-colors duration-[120ms] ease-out [&_svg]:size-4 [&_svg]:shrink-0',
               'disabled:cursor-not-allowed disabled:opacity-50',
               // Inside the 1px frame: 32px and 36px overall, like buttons; 40px on phones.
+              // Inside the 1px frame: 32px and 36px overall, like buttons; 40px on phones.
               size === 'sm' ? 'h-[30px] px-3 text-small' : 'h-[34px] px-3 text-body',
               'max-sm:h-[38px]',
               checked
-                ? 'bg-accent-wash text-accent-ink'
-                : 'text-ink-2 hover:bg-ink/5 hover:text-ink',
+                ? 'bg-sheet text-tar shadow-[inset_0_-2px_0_var(--color-ink)]'
+                : 'text-ink-2 hover:bg-sheet hover:text-ink',
             )}
           >
             {option.icon}

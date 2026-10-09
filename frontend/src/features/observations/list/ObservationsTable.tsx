@@ -20,7 +20,7 @@ const COLUMNS: readonly {
 }[] = [
   { key: 'region', label: 'Region', className: 'min-w-56' },
   // Every current scene is satellite imagery: the column gives way first on narrower screens.
-  { key: 'source', label: 'Source', className: 'hidden xl:table-cell' },
+  { key: 'source', label: 'Source', className: 'hidden 2xl:table-cell' },
   { key: 'captured', label: 'Captured' },
   { key: 'status', label: 'Status' },
   { key: 'density', label: 'Density' },
@@ -172,7 +172,7 @@ export function ObservationsTable({
                 <td className="border-b border-hairline py-2 pr-3">
                   <span className="flex min-w-0 items-start gap-3 transition-transform duration-[120ms] ease-out group-hover:translate-x-[2px]">
                     <ObservationGlyphById id={o.id} size={24} />
-                    <span className="flex min-w-0 flex-col gap-1">
+                    <span className="flex max-w-[18rem] min-w-0 flex-col gap-1">
                       <Link
                         to={detailPath(o.id)}
                         tabIndex={-1}
@@ -200,7 +200,7 @@ export function ObservationsTable({
                     </span>
                   </span>
                 </td>
-                <td className="hidden border-b border-hairline px-3 py-2 text-ink-2 xl:table-cell">
+                <td className="hidden border-b border-hairline px-3 py-2 text-ink-2 2xl:table-cell">
                   <span className="inline-flex items-center gap-2">
                     <SourceIcon source={o.source} className="size-4" />
                     {SOURCE_LABELS[o.source]}

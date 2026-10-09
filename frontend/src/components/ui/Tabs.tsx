@@ -83,7 +83,7 @@ export function Tabs<T extends string>({
               className={cn(
                 'relative inline-flex h-10 shrink-0 items-center gap-2 border-b-2 text-small font-medium whitespace-nowrap',
                 'transition-colors duration-[120ms] ease-out disabled:cursor-not-allowed disabled:opacity-50',
-                selected ? 'border-ink text-ink' : 'border-transparent text-ink-2 hover:text-ink',
+                selected ? 'border-ink text-tar' : 'border-transparent text-ink-2 hover:text-ink',
               )}
             >
               {item.label}

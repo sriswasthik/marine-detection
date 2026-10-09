@@ -27,7 +27,10 @@ describe('app shell', { timeout: 15_000 }, () => {
     expect(
       await screen.findByRole(
         'heading',
-        { level: 1, name: 'Detect marine debris and understand exactly where it is.' },
+        {
+          level: 1,
+          name: 'See floating marine debris from orbit, and know where to clean up first.',
+        },
         LAZY,
       ),
     ).toBeInTheDocument()

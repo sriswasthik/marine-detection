@@ -9,14 +9,17 @@ export type TagTone = 'neutral' | 'accent' | 'success' | 'warning' | 'danger'
 
 /** Static class names per tone so Tailwind can see them. */
 const TONES: Record<TagTone, { tag: string; swatch: string }> = {
-  neutral: { tag: 'border-hairline bg-transparent text-ink', swatch: 'bg-ink-2' },
-  accent: { tag: 'border-transparent bg-accent-wash text-accent-ink', swatch: 'bg-accent' },
-  success: { tag: 'border-transparent bg-success-soft text-ink', swatch: 'bg-success' },
-  warning: { tag: 'border-transparent bg-warning-soft text-ink', swatch: 'bg-warning' },
-  danger: { tag: 'border-transparent bg-danger-soft text-ink', swatch: 'bg-danger' },
+  neutral: { tag: 'border-hairline text-ink', swatch: 'bg-ink-2' },
+  accent: { tag: 'border-transparent text-accent-ink', swatch: 'bg-accent-ink' },
+  success: { tag: 'border-transparent text-ink', swatch: 'bg-success' },
+  warning: { tag: 'border-warning/40 text-ink', swatch: 'bg-warning' },
+  danger: { tag: 'border-transparent text-ink', swatch: 'bg-danger' },
 }
 
-/** A squared label: 20px tall, 2px radius, 8px swatch, then the text. Never a pill. */
+/**
+ * A label, not a chip: an 8px square swatch, then the text. No fill. Warnings (sample data, low
+ * confidence) keep a hairline frame so they stay findable in a busy row.
+ */
 export const TAG_BASE =
   'inline-flex h-5 shrink-0 items-center gap-2 rounded-tag border text-small leading-none font-medium whitespace-nowrap'
 
@@ -46,11 +49,11 @@ export function Tag({ tone = 'neutral', swatch, icon, className, children, ...re
 }
 
 /** Static class names per level. Colours come from the tokens. */
-const LEVEL_CLASSES: Record<DensityLevel, { soft: string; swatch: string }> = {
-  low: { soft: 'bg-low-soft', swatch: 'bg-low border-low-stroke' },
-  moderate: { soft: 'bg-moderate-soft', swatch: 'bg-moderate border-moderate-stroke' },
-  high: { soft: 'bg-high-soft', swatch: 'bg-high border-high-stroke' },
-  critical: { soft: 'bg-critical-soft', swatch: 'bg-critical border-critical-stroke' },
+const LEVEL_CLASSES: Record<DensityLevel, { swatch: string }> = {
+  low: { swatch: 'bg-low border-low-stroke' },
+  moderate: { swatch: 'bg-moderate border-moderate-stroke' },
+  high: { swatch: 'bg-high border-high-stroke' },
+  critical: { swatch: 'bg-critical border-critical-stroke' },
 }
 
 /** An 8px square of the level's fill with its stroke. Decorative: always next to the label. */
@@ -85,7 +88,8 @@ export function SeverityTag({
       className={cn(
         TAG_BASE,
         'border-transparent text-ink',
-        variant === 'soft' && cn('px-2', LEVEL_CLASSES[level].soft),
+        // On paper every tag is a swatch and a word: the soft tint is gone, `soft` keeps the inset.
+        variant === 'soft' && 'px-2',
         className,
       )}
       data-level={level}
@@ -101,7 +105,7 @@ export function SeverityTag({
 const BAND_STYLES: Record<ConfidenceBand, { filled: number; bar: string; tag: string }> = {
   high: { filled: 3, bar: 'fill-ink', tag: 'border-hairline' },
   medium: { filled: 2, bar: 'fill-ink-2', tag: 'border-hairline' },
-  low: { filled: 1, bar: 'fill-warning', tag: 'border-transparent bg-warning-soft' },
+  low: { filled: 1, bar: 'fill-warning', tag: 'border-warning/40' },
 }
 
 const BAR_HEIGHTS = [4, 8, 12] as const

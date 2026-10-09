@@ -103,9 +103,9 @@ describe('getDetectionStyle', () => {
     expect(isLowConfidence(LOW_CONFIDENCE)).toBe(true)
   })
 
-  it('draws a white, unfilled halo under selections', () => {
+  it('draws a white, unfilled casing under selections', () => {
     expect(getSelectionHaloStyle()).toMatchObject({
-      color: MAP_COLORS.halo,
+      color: MAP_COLORS.casing,
       fill: false,
       fillOpacity: 0,
     })

@@ -26,7 +26,7 @@
   margin: 0 !important;
   padding: 0 4px;
   border-top-left-radius: var(--radius-tag);
-  background: rgba(251, 251, 249, 0.92);
+  background: rgba(255, 255, 255, 0.9);
   color: var(--color-ink-2);
   font-size: var(--text-label);
   line-height: 16px;
@@ -40,8 +40,8 @@
 .mwi-map .leaflet-tooltip.mwi-tooltip {
   padding: 8px;
   border: 1px solid var(--color-hairline);
-  border-radius: var(--radius-panel);
-  background: var(--color-sheet);
+  border-radius: 0;
+  background: var(--color-raised);
   color: var(--color-ink);
   box-shadow: var(--shadow-popover);
   font-size: var(--text-small);
@@ -121,7 +121,7 @@
   min-width: 14px;
   padding: 0 2px;
   border: 1px solid var(--color-rule);
-  background: var(--color-sheet);
+  background: var(--color-raised);
   color: var(--color-tar);
   font-family: var(--font-mono);
   font-size: var(--text-label);
@@ -198,8 +198,8 @@
   display: inline-block;
   padding: 0 4px;
   border-radius: var(--radius-tag);
-  background: rgba(251, 251, 249, 0.92);
-  color: var(--color-accent-ink);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--color-ink);
   font-family: var(--font-mono);
   font-size: var(--text-label);
   font-weight: 500;
@@ -301,4 +301,9 @@
   font-family: var(--font-sans);
   font-weight: var(--font-weight-medium);
   color: var(--color-ink);
+}
+
+.mwi-map .leaflet-bar {
+  border: 1px solid var(--color-rule);
+  border-radius: 0;
 }

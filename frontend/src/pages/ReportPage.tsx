@@ -38,7 +38,7 @@ function ReportSkeleton() {
   return (
     <PageSkeleton label="Loading report" className="mx-auto flex flex-col gap-4">
       <Skeleton className="h-8 w-80" />
-      <div className="mwi-report-sheet flex flex-col gap-4 border border-hairline">
+      <div className="mwi-report-sheet theme-paper flex flex-col gap-4 border border-hairline">
         <SkeletonPageHeader />
         <SkeletonMap controls={false} className="h-[74mm]" />
         <SkeletonFigures count={6} className="grid grid-cols-3 gap-3" />

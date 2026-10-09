@@ -1,55 +1,40 @@
-import {
-  Crosshair,
-  Flag,
-  Image,
-  LayoutGrid,
-  Map as MapIcon,
-  ScanSearch,
-  SlidersHorizontal,
-  type LucideIcon,
-} from 'lucide-react'
 import { cn } from '@/lib/cn'
 
-const STEPS: readonly { label: string; Icon: LucideIcon; description: string }[] = [
-  { label: 'Image', Icon: Image, description: '11-band Sentinel-2 image' },
-  { label: 'Preprocess', Icon: SlidersHorizontal, description: 'Bands, masks, water only' },
-  { label: 'Detect', Icon: ScanSearch, description: 'U-Net segmentation' },
-  { label: 'Geolocate', Icon: Crosshair, description: 'Pixels to coordinates' },
-  { label: 'Analyze', Icon: LayoutGrid, description: 'Area, density, hotspots' },
-  { label: 'Map', Icon: MapIcon, description: 'Regions on the map' },
-  { label: 'Act', Icon: Flag, description: 'Where to inspect next' },
+const STEPS: readonly { label: string; description: string }[] = [
+  { label: 'Image', description: '11-band Sentinel-2 image' },
+  { label: 'Preprocess', description: 'Bands, masks, water only' },
+  { label: 'Detect', description: 'U-Net segmentation' },
+  { label: 'Geolocate', description: 'Pixels to coordinates' },
+  { label: 'Analyze', description: 'Area, density, hotspots' },
+  { label: 'Map', description: 'Regions on the map' },
+  { label: 'Act', description: 'Where to inspect next' },
 ]
 
-/** A quiet legend of the system, from image to action. Static; not an animation. */
+/**
+ * How it works, as one ruled line from image to action: numbered steps, no icons, no boxes. The
+ * last step, Act, is in ink: it is where the product ends up.
+ */
 export function PipelineStrip({ className }: { className?: string }) {
   return (
     <ol
       aria-label="How it works"
-      className={cn('grid grid-cols-4 gap-x-2 gap-y-5 sm:flex sm:items-start', className)}
+      className={cn(
+        'grid grid-cols-2 gap-x-6 gap-y-4 border-y border-hairline py-4 sm:grid-cols-4 lg:grid-cols-7',
+        className,
+      )}
     >
-      {STEPS.map(({ label, Icon, description }, index) => (
-        <li key={label} className="relative flex min-w-0 flex-1 flex-col items-center text-center">
-          {index < STEPS.length - 1 ? (
-            <span
-              aria-hidden
-              className="absolute top-4 right-[calc(-50%+1.25rem)] left-[calc(50%+1.25rem)] hidden h-px bg-rule sm:block"
-            />
-          ) : null}
-          <span
-            aria-hidden
-            className={cn(
-              'flex size-8 items-center justify-center border bg-paper [&_svg]:size-4',
-              index === STEPS.length - 1
-                ? 'border-accent-ink text-accent-ink'
-                : 'border-rule text-ink-2',
-            )}
-          >
-            <Icon strokeWidth={1.75} />
-          </span>
-          <span className="mt-2 text-small font-medium text-ink">{label}</span>
-          <span className="mt-1 hidden text-small text-ink-2 lg:block">{description}</span>
-        </li>
-      ))}
+      {STEPS.map(({ label, description }, index) => {
+        const last = index === STEPS.length - 1
+        return (
+          <li key={label} className="flex min-w-0 flex-col gap-1">
+            <span className="data text-ink-2">{String(index + 1).padStart(2, '0')}</span>
+            <span className={cn('text-small font-medium', last ? 'text-accent-ink' : 'text-tar')}>
+              {label}
+            </span>
+            <span className="text-small text-ink-2">{description}</span>
+          </li>
+        )
+      })}
     </ol>
   )
 }

@@ -86,7 +86,7 @@ export function Tooltip({
         role="tooltip"
         hidden={!open}
         className={cn(
-          'pointer-events-none absolute z-50 w-max max-w-64 rounded-panel border border-hairline bg-sheet px-3 py-2',
+          'pointer-events-none absolute z-50 w-max max-w-64 border border-hairline bg-raised px-3 py-2',
           'text-left text-small font-normal tracking-normal whitespace-normal text-ink normal-case shadow-popover',
           'animate-[tooltip-in_120ms_var(--ease-out)]',
           SIDE[side],

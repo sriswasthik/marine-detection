@@ -16,7 +16,7 @@ export function PageHeader({
   return (
     <header className="flex flex-col gap-2">
       {meta ? <p className="data text-ink-2">{meta}</p> : null}
-      <h1 className="text-page text-ink">{title}</h1>
+      <h1 className="display text-page text-tar">{title}</h1>
       <p className="max-w-[68ch] text-lead text-ink-2">{description}</p>
     </header>
   )

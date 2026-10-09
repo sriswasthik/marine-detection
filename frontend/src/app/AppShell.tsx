@@ -16,7 +16,7 @@ function SkipLink() {
   return (
     <a
       href="#main"
-      className="sr-only rounded-control bg-white px-3 py-2 text-small font-medium text-ink shadow-popover focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[70]"
+      className="sr-only rounded-control bg-raised px-3 py-2 text-small font-medium text-ink shadow-popover focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[70]"
     >
       Skip to content
     </a>

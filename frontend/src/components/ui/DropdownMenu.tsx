@@ -186,7 +186,7 @@ export function DropdownMenu({
           aria-labelledby={triggerId}
           onKeyDown={onMenuKeyDown}
           className={cn(
-            'absolute z-50 max-h-[min(24rem,70dvh)] min-w-52 overflow-y-auto rounded-panel border border-hairline bg-white py-1 shadow-popover',
+            'absolute z-50 max-h-[min(24rem,70dvh)] min-w-52 overflow-y-auto rounded-panel border border-hairline bg-raised py-1 shadow-popover',
             side === 'top' ? 'bottom-full mb-2' : 'top-full mt-2',
             'animate-[tooltip-in_120ms_var(--ease-out)]',
             align === 'end' ? 'right-0' : 'left-0',

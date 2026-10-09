@@ -515,8 +515,14 @@ const ATTRIBUTIONS: readonly { name: string; detail: string }[] = [
     name: 'MARIDA',
     detail: 'Marine Debris Archive, the labelled Sentinel-2 dataset the model is trained on.',
   },
-  { name: 'OpenStreetMap', detail: '© OpenStreetMap contributors, in the light basemap.' },
-  { name: 'Esri', detail: 'World Light Gray Canvas and World Imagery basemaps.' },
+  {
+    name: 'OpenStreetMap',
+    detail: '© OpenStreetMap contributors, in the light basemap.',
+  },
+  {
+    name: 'Esri',
+    detail: 'World Light Gray Canvas and World Imagery basemaps.',
+  },
   {
     name: 'CARTO',
     detail: 'Positron basemap, supported when an API key is configured (not used by default).',

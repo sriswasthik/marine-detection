@@ -120,7 +120,7 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
         aria-modal="true"
         aria-labelledby={titleId}
         onKeyDown={onKeyDown}
-        className="relative flex max-h-[70dvh] w-full max-w-xl flex-col rounded-panel border border-hairline bg-white shadow-popover"
+        className="relative flex max-h-[70dvh] w-full max-w-xl flex-col rounded-panel border border-hairline bg-raised shadow-popover"
       >
         <h2 id={titleId} className="sr-only">
           Command palette

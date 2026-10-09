@@ -125,16 +125,16 @@ export function Drawer({
           exit={{ opacity: 0, ...offset }}
           transition={{ duration: 0.2, ease: EASE }}
           className={cn(
-            'fixed z-50 flex flex-col rounded-none bg-white shadow-popover focus:outline-none',
+            'fixed z-50 flex flex-col bg-raised shadow-popover focus:outline-none',
             isDesktop
               ? cn(
-                  'right-0 bottom-0 w-drawer max-w-full border-l border-hairline',
+                  'right-0 bottom-0 w-drawer max-w-full border-l border-rule',
                   placement === 'below-topbar'
                     ? 'top-[calc(var(--spacing-topbar)+var(--offline-bar-height,0px))]'
                     : 'top-0',
                 )
               : cn(
-                  'inset-x-0 bottom-0 border-t border-hairline',
+                  'inset-x-0 bottom-0 border-t border-rule',
                   expanded ? 'max-h-[85dvh]' : 'max-h-[50dvh]',
                 ),
             className,

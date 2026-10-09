@@ -1,8 +1,8 @@
 import { cn } from '@/lib/cn'
 
 /**
- * Underlined input styles: no box and no fill, a hairline underline that darkens on hover and
- * turns danger when invalid. Focus draws the standard 2px accent outline.
+ * A white field with a rule border that darkens on hover and turns danger when invalid. Focus
+ * draws the standard 2px Ultramarine outline.
  */
 export function inputStyles({
   invalid = false,
@@ -17,7 +17,7 @@ export function inputStyles({
   className?: string
 } = {}): string {
   return cn(
-    'w-full rounded-none border-0 border-b bg-transparent px-0 text-ink placeholder:text-ink-2',
+    'w-full rounded-control border bg-raised px-3 text-ink placeholder:text-ink-2',
     'transition-colors duration-[120ms] ease-out hover:border-ink',
     'disabled:cursor-not-allowed disabled:text-ink-2 disabled:hover:border-rule',
     size === 'sm' ? 'h-8' : 'h-9',

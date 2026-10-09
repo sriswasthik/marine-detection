@@ -12,7 +12,7 @@ import { usePrimaryAction } from './primaryAction'
 import { PrimaryNav } from './PrimaryNav'
 
 /**
- * 52px on Concrete with a hairline underneath: the logomark and the A.W.A.R.E. wordmark (the full
+ * 56px of paper with a hairline underneath: the logomark and the A.W.A.R.E. wordmark (the full
  * name only on the Overview from 1440px), the sections as plain text, then the view's one primary
  * action and the palette hint. Under 900px the sections move to the bottom tab bar. Where the
  * figures come from ("Sample data") is labelled on each page's content.
@@ -34,7 +34,7 @@ export function TopBar() {
         >
           <Logomark />
           <span className="flex items-baseline gap-3">
-            <span className="text-small font-semibold tracking-[0.08em] text-tar">
+            <span className="text-body font-semibold tracking-[0.12em] text-tar">
               {ENV.appName}
             </span>
             {onOverview ? (
@@ -65,7 +65,7 @@ export function TopBar() {
             aria-label="Open the command palette"
             aria-keyshortcuts="Control+K Meta+K"
             className={cn(
-              'hidden h-8 items-center gap-2 rounded-control px-2 text-ink-2 hover:bg-ink/5 hover:text-ink nav:inline-flex',
+              'hidden h-8 items-center gap-2 rounded-control px-2 text-ink-2 hover:bg-sheet hover:text-ink nav:inline-flex',
             )}
           >
             <Search aria-hidden className="size-4" />

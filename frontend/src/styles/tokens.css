@@ -1,11 +1,12 @@
 /*
- * Design tokens: the survey chart (docs/DESIGN_SYSTEM.md) in the A.W.A.R.E. palette. The single
- * source for colour, type, radius, shadow and motion. Change them here, never inline in components.
- * src/styles/tokens.test.ts checks text contrast; src/lib/density.test.ts checks that the
- * severity colours match src/lib/density.ts.
+ * Design tokens: "Survey sheet" (CLAUDE.md). Warm paper, ink type, one ultramarine for links and
+ * focus, and a severity ramp that is the only colour in the data. Light only, no gradients, no
+ * glows. The single source for colour, type, radius, shadow and motion: change them here, never
+ * inline in components. src/styles/tokens.test.ts checks text contrast; src/lib/density.test.ts
+ * checks that the severity colours match src/lib/density.ts.
  *
- * `static` emits every token as a CSS variable, used or not, so plain CSS (map.css) and
- * JavaScript can rely on var(--token) at runtime.
+ * `static` emits every token as a CSS variable, used or not, so plain CSS (map.css), the WebGL
+ * scenes and JavaScript can rely on var(--token) at runtime.
  */
 @theme static {
   /* Only project tokens exist: Tailwind's default palette, type sizes, radii and shadows are gone. */
@@ -19,38 +20,35 @@
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  /*
-   * The A.W.A.R.E. palette (the project deck): Concrete ground, Tar Black and Graphite ink,
-   * Signal Yellow kept for the logomark. Light mode only, so the deck's dark-slide text colours
-   * (Stone #C4C1B9, Fog Grey #9A9A92) are not used.
-   */
+  /* Surfaces */
+  --color-paper: #f7f6f2; /* The page */
+  --color-sheet: #efede7; /* Docked panels, plates, quiet fills */
+  --color-raised: #ffffff; /* Floating: the drawer, dialogs, popovers, inputs */
+  --color-hairline: #e2dfd7;
+  --color-rule: #c2beb3;
 
-  /* Surfaces and ink */
-  --color-paper: #e7e4dc; /* Concrete: the page */
-  --color-sheet: #f1efe9; /* Docked panels, map plates, tooltips */
-  --color-hairline: #d2cec4;
-  --color-rule: #ada89c;
-  --color-tar: #15171a; /* Tar Black: the logomark, labels on yellow, focus rings, map marks */
-  --color-ink: #3a3b3d; /* Graphite: body text, titles, figures */
-  /* Slate Grey: secondary text. All small text (under 18px) is ink-2 or darker. */
-  --color-ink-2: #5a5a55;
-  /* Large or decorative only: under 4.5:1 on Concrete. */
-  --color-ink-3: #78756c;
+  /* Ink */
+  --color-tar: #0b1520; /* Headlines, the wordmark, map selection marks */
+  --color-ink: #1c2530; /* Body text and figures */
+  /* Secondary text. All small text (under 18px) is ink-2 or darker. */
+  --color-ink-2: #565e68;
+  /* Large or decorative only: under 4.5:1 on paper. */
+  --color-ink-3: #868b91;
 
   /*
-   * Accent: the one primary action is Tar Black with white text (17.9:1). Accent text, links and
-   * active states are Olive Ink; selections sit on a neutral wash. No yellow here: it sits next
-   * to the Low severity fill.
+   * The primary action is the only solid ink block on a page: ink fill, white label. Links,
+   * active states and focus are Ultramarine, so the call to action never shares its colour.
    */
-  --color-accent: #15171a;
-  --color-accent-hover: #3a3b3d;
-  --color-accent-ink: #3b3420;
-  --color-accent-wash: #dcd8cd;
+  --color-accent: #0b1520;
+  --color-accent-hover: #26313d;
+  --color-on-accent: #ffffff;
+  --color-accent-ink: #2235c9;
+  --color-accent-wash: #e7e9f6;
 
-  /* Signal Yellow: the brand colour, used only in the logomark (1.3:1 on Concrete). */
-  --color-signal: #f4c51d;
+  /* The logomark's detection square. */
+  --color-signal: #2235c9;
 
-  /* Severity ramp. Always with a text label; text on a tint is ink, never the stroke colour. */
+  /* Severity ramp. Always with a text label; Low and Moderate fills are light, under 3:1. */
   --color-low: #e8cf7a;
   --color-low-stroke: #b8993a;
   --color-low-soft: #faf3d9;
@@ -64,21 +62,25 @@
   --color-critical-stroke: #5c1824;
   --color-critical-soft: #ebd3d7;
 
-  /* Status, darkened from the earlier set so text keeps 4.5:1 on Concrete. info is Olive Ink. */
+  /* Status. info is accent-ink. */
   --color-success: #2e6343;
   --color-success-soft: #ebf3ee;
   --color-warning: #7f510c;
   --color-warning-soft: #fbf3e3;
   --color-danger: #963826;
   --color-danger-soft: #fbeae6;
-  --color-info: #3b3420;
-  --color-info-soft: #dcd8cd;
+  --color-info: #2235c9;
+  --color-info-soft: #e7e9f6;
 
   /* Map: flat neutral behind the basemap, shown when tiles cannot load. */
-  --color-map-fallback: #dcd8ce;
+  --color-map-fallback: #e4e2dc;
 
-  /* Type: Instrument Sans for the interface, Geist Mono for data. Self-hosted (src/main.tsx). */
-  --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /*
+   * Type: Instrument Serif for display (page titles and the hero only), Geist for the interface,
+   * Geist Mono for data. Self-hosted (src/main.tsx).
+   */
+  --font-display: 'Instrument Serif', ui-serif, Georgia, serif;
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Three weights only. */
@@ -89,36 +91,36 @@
   /* Eight sizes, no others. */
   --text-label: 0.6875rem;
   --text-label--line-height: 1rem;
-  --text-label--letter-spacing: 0.06em;
+  --text-label--letter-spacing: 0.08em;
   --text-label--font-weight: 500;
   --text-mono: 0.75rem;
   --text-mono--line-height: 1rem;
   --text-small: 0.8125rem;
   --text-small--line-height: 1.25rem;
   --text-body: 0.875rem;
-  --text-body--line-height: 1.25rem;
+  --text-body--line-height: 1.375rem;
   --text-lead: 1rem;
-  --text-lead--line-height: 1.5rem;
+  --text-lead--line-height: 1.625rem;
   --text-title: 1.375rem;
   --text-title--line-height: 1.75rem;
   --text-title--letter-spacing: -0.01em;
   --text-title--font-weight: 500;
-  --text-page: 2rem;
-  --text-page--line-height: 2.5rem;
-  --text-page--letter-spacing: -0.015em;
-  --text-page--font-weight: 500;
+  --text-page: 2.5rem;
+  --text-page--line-height: 2.75rem;
+  --text-page--letter-spacing: -0.01em;
+  --text-page--font-weight: 400;
   --text-figure: 3.5rem;
   --text-figure--line-height: 3.5rem;
   --text-figure--letter-spacing: -0.02em;
   --text-figure--font-weight: 500;
 
-  /* Shape: no pills, not even the switch. */
-  --radius-tag: 2px;
-  --radius-panel: 2px;
-  --radius-control: 4px;
+  /* Shape: square. 2px on controls only, so they do not look sharp-edged on screen. */
+  --radius-tag: 0px;
+  --radius-panel: 0px;
+  --radius-control: 2px;
 
-  /* Elevation: none, or this. For dialogs, popovers, menus, tooltips, toasts and the drawer. */
-  --shadow-popover: 0 6px 20px rgba(21, 23, 26, 0.12);
+  /* Elevation: none, or this, for things that float (popovers, menus, dialogs, the drawer). */
+  --shadow-popover: 0 8px 24px rgba(11, 21, 32, 0.1);
 
   /* Motion: one curve. Overriding --ease-out makes Tailwind's ease-out use it everywhere. */
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -128,7 +130,7 @@
   --duration-reveal: 400ms;
 
   /* Layout */
-  --spacing-topbar: 52px;
+  --spacing-topbar: 56px;
   /* Phones and tablets: the bottom tab bar under 900px. */
   --spacing-tabbar: 56px;
   /* Side drawer width; map controls step aside by this much when it is open. */

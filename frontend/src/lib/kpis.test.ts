@@ -3,7 +3,7 @@ import { getSampleObservation, SAMPLE_IDS } from '@/features/observations/mock/s
 import type { Observation } from '@/features/observations/types'
 import { analyzeObservation } from './analysis'
 import { formatArea, formatConfidence, formatCoveragePercent } from './format'
-import { observationKpis } from './kpis'
+import { fleetSummary, observationKpis } from './kpis'
 
 function sample(id: string): Observation {
   const found = getSampleObservation(id)
@@ -56,5 +56,27 @@ describe('observationKpis', () => {
     const map = byId(observationKpis(one, []))
     expect(map.debrisArea?.footnote).toBe('1 detection')
     expect(map.confidence?.footnote).toMatch(/^\d+ below 60%$/)
+  })
+})
+
+describe('fleetSummary', () => {
+  it('adds up every observation on record', () => {
+    expect(
+      fleetSummary([
+        { detectionCount: 60, debrisAreaM2: 12_000 },
+        { detectionCount: 0, debrisAreaM2: 0 },
+        { detectionCount: 4, debrisAreaM2: 800 },
+      ]),
+    ).toEqual({ observations: 3, detections: 64, withDebris: 2, debrisAreaM2: 12_800 })
+  })
+
+  it('is all zeros for no observations, and ignores bad figures', () => {
+    expect(fleetSummary([])).toEqual({
+      observations: 0,
+      detections: 0,
+      withDebris: 0,
+      debrisAreaM2: 0,
+    })
+    expect(fleetSummary([{ detectionCount: -2, debrisAreaM2: Number.NaN }]).debrisAreaM2).toBe(0)
   })
 })

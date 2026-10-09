@@ -45,9 +45,9 @@ export function Checkbox({
           aria-describedby={descriptionId}
           aria-checked={indeterminate ? 'mixed' : undefined}
           className={cn(
-            'peer size-4 cursor-pointer appearance-none rounded-tag border border-rule bg-white',
+            'peer size-4 cursor-pointer appearance-none border border-rule bg-raised',
             'transition-colors duration-[120ms] ease-out hover:border-ink',
-            'checked:border-ink checked:bg-ink indeterminate:border-ink indeterminate:bg-ink',
+            'checked:border-accent checked:bg-accent indeterminate:border-accent indeterminate:bg-accent',
             'disabled:cursor-not-allowed disabled:opacity-50',
           )}
           {...rest}
@@ -55,12 +55,12 @@ export function Checkbox({
         <Check
           aria-hidden
           strokeWidth={3}
-          className="pointer-events-none absolute inset-0 m-auto size-3 text-white opacity-0 peer-checked:opacity-100 peer-indeterminate:opacity-0"
+          className="pointer-events-none absolute inset-0 m-auto size-3 text-on-accent opacity-0 peer-checked:opacity-100 peer-indeterminate:opacity-0"
         />
         <Minus
           aria-hidden
           strokeWidth={3}
-          className="pointer-events-none absolute inset-0 m-auto size-3 text-white opacity-0 peer-indeterminate:opacity-100"
+          className="pointer-events-none absolute inset-0 m-auto size-3 text-on-accent opacity-0 peer-indeterminate:opacity-100"
         />
       </label>
       <span className="flex min-w-0 flex-col">

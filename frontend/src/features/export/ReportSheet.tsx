@@ -74,7 +74,7 @@ export function ReportSheet({
   return (
     <article
       aria-label={`Report for ${observation.region}`}
-      className="mwi-report-sheet flex flex-col gap-4 border border-hairline text-ink"
+      className="mwi-report-sheet theme-paper flex flex-col gap-4 border border-hairline text-ink"
     >
       <header className="mwi-report-block flex items-start justify-between gap-4 border-b border-hairline pb-3">
         <div className="flex min-w-0 flex-col gap-1">

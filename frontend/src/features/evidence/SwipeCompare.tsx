@@ -117,7 +117,7 @@ export function SwipeCompare({
           aria-valuenow={shown}
           aria-valuetext={`${formatInteger(shown)}% ${beforeLabel.toLowerCase()}, ${formatInteger(100 - shown)}% ${afterLabel.toLowerCase()}`}
           onKeyDown={onKeyDown}
-          className="absolute top-1/2 left-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-control border border-ink bg-white text-ink outline-none focus-visible:ring-2 focus-visible:ring-tar focus-visible:ring-offset-2"
+          className="absolute top-1/2 left-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-control border border-ink bg-raised text-ink outline-none focus-visible:ring-2 focus-visible:ring-tar focus-visible:ring-offset-2"
         >
           <ChevronsLeftRight aria-hidden className="size-4" />
         </div>

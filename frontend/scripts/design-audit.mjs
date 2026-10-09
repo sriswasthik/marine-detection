@@ -28,11 +28,14 @@ export const VIEWPORTS = [
 export const TARGETS = {
   fontSizes: 8,
   fontWeights: 3,
-  fontFamilies: 2,
+  // Instrument Serif (display), Geist (interface), Geist Mono (data).
+  fontFamilies: 3,
   offGridSpacing: 0,
   pills: 0,
+  // Segmented controls and the drawer frame things; nothing else is boxed.
   cards: 0,
   gradients: 0,
+  // The popover shadow only.
   shadows: 2,
   primaryButtons: 1,
   contrastFailures: 0,
@@ -63,8 +66,12 @@ function parseArgs(argv) {
  * Definitions are written out so the numbers can be checked by hand.
  */
 function measure({ mobile }) {
-  // The primary fill: Tar Black, plus the earlier yellow and teal fills for the baselines.
+  // The primary fill: ink (and its hover), plus earlier fills for the baselines.
   const ACCENT = new Set([
+    'rgb(11, 21, 32)',
+    'rgb(38, 49, 61)',
+    'rgb(45, 226, 196)',
+    'rgb(116, 242, 220)',
     'rgb(21, 23, 26)',
     'rgb(244, 197, 29)',
     'rgb(224, 180, 20)',
@@ -301,7 +308,10 @@ function measure({ mobile }) {
           .split(/\s+/)
           .map(px)
         const target = (lengths[2] ?? 0) > 0 ? shadows : rings
-        target.set(layer, (target.get(layer) ?? 0) + 1)
+        // A glow (no offset) in a level's colour is one shadow whatever the colour: count its shape.
+        const glow = lengths[0] === 0 && lengths[1] === 0 && !/inset/.test(layer)
+        const key = glow ? `glow ${lengths[2]}px ${lengths[3] ?? 0}px` : layer
+        target.set(key, (target.get(key) ?? 0) + 1)
       }
     }
     if (/gradient\(/.test(style.backgroundImage)) gradientElements++
@@ -320,7 +330,8 @@ function measure({ mobile }) {
 
   // 7. Filled accent buttons visible in the first viewport.
   const primary = all.filter((el) => {
-    if (!el.matches('button, a, [role="button"]')) return false
+    // A checked switch is lit in the accent too, but it is a setting, not an action.
+    if (!el.matches('button, a, [role="button"]') || el.matches('[role="switch"]')) return false
     const rect = el.getBoundingClientRect()
     return (
       rect.top < innerHeight && rect.bottom > 0 && ACCENT.has(getComputedStyle(el).backgroundColor)

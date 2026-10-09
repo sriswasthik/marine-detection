@@ -8,3 +8,9 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+/** Natural Earth land polygons as TopoJSON (world-atlas), typed at the one place that reads it. */
+declare module 'world-atlas/land-110m.json' {
+  const topology: unknown
+  export default topology
+}

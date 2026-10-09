@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { NextStep } from '@/app/shell/NextStep'
 import { useClaimPrimaryAction } from '@/app/shell/primaryAction'
-import { Banner, Button, useToast } from '@/components/ui'
+import { Banner, Button, buttonStyles, useToast } from '@/components/ui'
 import { DemoScenarioSelect } from '@/features/analyze/DemoScenarioSelect'
 import { useAnalyzeDraft } from '@/features/analyze/draftContext'
 import { FilePanel } from '@/features/analyze/FilePanel'
@@ -18,6 +18,7 @@ import { SampleScenes } from '@/features/analyze/SampleScenes'
 import { sampleScenes, sampleSelection } from '@/features/analyze/samples'
 import { UploadDropzone } from '@/features/analyze/UploadDropzone'
 import { useAnalysisRun } from '@/features/analyze/useAnalysisRun'
+import { SpectralStack } from '@/features/scene3d/SpectralStack'
 import { useElapsed } from '@/features/analyze/useElapsed'
 import { fileKind, qualityChecks, runReadiness, validateBounds } from '@/features/analyze/validate'
 import type { Observation } from '@/features/observations/types'
@@ -184,7 +185,21 @@ export function AnalyzePage() {
                     <QualityCheck checks={checks} />
                   </>
                 ) : (
-                  <UploadDropzone onFile={chooseFile} />
+                  <>
+                    <UploadDropzone onFile={chooseFile} />
+                    {sampleData && scenes[0] ? (
+                      <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-small text-ink-2">
+                        No Sentinel-2 file at hand?
+                        <button
+                          type="button"
+                          onClick={() => scenes[0] && chooseSample(scenes[0])}
+                          className={buttonStyles({ variant: 'tertiary', size: 'sm' })}
+                        >
+                          Load a sample scene
+                        </button>
+                      </p>
+                    ) : null}
+                  </>
                 )}
               </div>
 
@@ -225,44 +240,51 @@ export function AnalyzePage() {
           </>
         ) : (
           <div className="flex flex-col gap-16">
-            <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
+            <div className="flex w-full flex-col gap-6">
               {file ? (
                 <p className="text-small text-ink-2">
                   <span className="font-medium text-ink">{file.facts.name}</span>
                   {draft.region.trim() ? ` · ${draft.region.trim()}` : null}
                 </p>
               ) : null}
-              <div className="border border-rule bg-sheet p-6">
-                {/* After success the outcome leads, so its action is on the first screen. */}
-                {run.phase === 'succeeded' ? (
-                  <div className="mb-6">
-                    <SuccessPanel
-                      summary={run.summary}
-                      onViewResults={openResults}
-                      onAnalyzeAnother={() => {
-                        reset()
-                        dispatch({ type: 'reset', now: new Date() })
-                      }}
-                    />
-                  </div>
-                ) : null}
-                <ProcessingStepper
+              <div className="grid gap-8 border-y border-ink py-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+                <SpectralStack
                   statuses={stepStatuses(run)}
                   uploadPercent={run.phase === 'running' ? run.uploadPercent : null}
-                  elapsedMs={elapsed}
-                  onCancel={run.phase === 'running' ? cancelRun : undefined}
-                  failureNote={run.phase === 'failed' ? 'Stopped at this step' : undefined}
+                  className="max-lg:order-last"
                 />
-                {run.phase === 'failed' && run.failure.kind !== 'invalid' ? (
-                  <div className="mt-6">
-                    <FailurePanel
-                      failure={run.failure}
-                      onRetry={runDetection}
-                      onEdit={reset}
-                      retryBlockedReason={readiness.ready ? null : readiness.reason}
-                    />
-                  </div>
-                ) : null}
+                <div className="flex min-w-0 flex-col">
+                  {/* After success the outcome leads, so its action is on the first screen. */}
+                  {run.phase === 'succeeded' ? (
+                    <div className="mb-6">
+                      <SuccessPanel
+                        summary={run.summary}
+                        onViewResults={openResults}
+                        onAnalyzeAnother={() => {
+                          reset()
+                          dispatch({ type: 'reset', now: new Date() })
+                        }}
+                      />
+                    </div>
+                  ) : null}
+                  <ProcessingStepper
+                    statuses={stepStatuses(run)}
+                    uploadPercent={run.phase === 'running' ? run.uploadPercent : null}
+                    elapsedMs={elapsed}
+                    onCancel={run.phase === 'running' ? cancelRun : undefined}
+                    failureNote={run.phase === 'failed' ? 'Stopped at this step' : undefined}
+                  />
+                  {run.phase === 'failed' && run.failure.kind !== 'invalid' ? (
+                    <div className="mt-6">
+                      <FailurePanel
+                        failure={run.failure}
+                        onRetry={runDetection}
+                        onEdit={reset}
+                        retryBlockedReason={readiness.ready ? null : readiness.reason}
+                      />
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </div>
             {observationId ? <AnalysisReport observationId={observationId} /> : null}

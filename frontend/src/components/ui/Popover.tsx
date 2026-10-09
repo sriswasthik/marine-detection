@@ -110,7 +110,7 @@ export function Popover({
           tabIndex={-1}
           onKeyDown={onKeyDown}
           className={cn(
-            'absolute z-50 rounded-panel border border-hairline bg-white p-4 shadow-popover focus:outline-none',
+            'absolute z-50 rounded-panel border border-hairline bg-raised p-4 shadow-popover focus:outline-none',
             side === 'top' ? 'bottom-full mb-2' : 'top-full mt-2',
             'animate-[tooltip-in_120ms_var(--ease-out)]',
             align === 'end' ? 'right-0' : 'left-0',

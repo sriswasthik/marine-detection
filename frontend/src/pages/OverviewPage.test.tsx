@@ -61,7 +61,7 @@ describe('Overview page', { timeout: 15_000 }, () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: 'Detect marine debris and understand exactly where it is.',
+        name: 'See floating marine debris from orbit, and know where to clean up first.',
       }),
     ).toBeInTheDocument()
     expect(screen.getByRole('list', { name: 'How it works' }).children).toHaveLength(7)

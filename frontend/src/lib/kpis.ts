@@ -1,4 +1,4 @@
-import type { Observation } from '@/features/observations/types'
+import type { Observation, ObservationSummary } from '@/features/observations/types'
 import { CONFIDENCE_THRESHOLDS } from './config'
 import { DENSITY_LEVELS, maxDensityLevel } from './density'
 import {
@@ -79,4 +79,30 @@ export function observationKpis(
           : `${formatInteger(lowConfidence)} below ${formatConfidence(CONFIDENCE_THRESHOLDS.low)}`,
     },
   ]
+}
+
+export interface FleetSummary {
+  observations: number
+  /** Possible debris regions across every observation. */
+  detections: number
+  /** Observations where the model found possible debris. */
+  withDebris: number
+  /** Total debris area across every observation, square meters. */
+  debrisAreaM2: number
+}
+
+/** Figures across all observations on record, for the Overview hero. */
+export function fleetSummary(
+  observations: readonly Pick<ObservationSummary, 'detectionCount' | 'debrisAreaM2'>[],
+): FleetSummary {
+  let detections = 0
+  let withDebris = 0
+  let debrisAreaM2 = 0
+  for (const observation of observations) {
+    const count = Math.max(0, observation.detectionCount)
+    detections += count
+    if (count > 0) withDebris += 1
+    if (Number.isFinite(observation.debrisAreaM2)) debrisAreaM2 += observation.debrisAreaM2
+  }
+  return { observations: observations.length, detections, withDebris, debrisAreaM2 }
 }

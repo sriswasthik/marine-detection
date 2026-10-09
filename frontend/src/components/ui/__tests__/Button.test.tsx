@@ -15,10 +15,12 @@ describe('Button', () => {
     }
   })
 
-  it('draws the secondary as a 1px ink outline with no fill', () => {
+  it('draws the secondary as a 1px ink outline whose fill wipes in on hover', () => {
     const classes = buttonStyles({ variant: 'secondary' }).split(' ')
-    expect(classes).toEqual(expect.arrayContaining(['border', 'border-ink', 'text-ink']))
-    expect(classes.some((c) => c.startsWith('bg-') && !c.startsWith('bg-hairline'))).toBe(false)
+    expect(classes).toEqual(
+      expect.arrayContaining(['border', 'border-ink', 'text-ink', 'hover:before:scale-x-100']),
+    )
+    expect(classes.some((c) => /^bg-/.test(c))).toBe(false)
   })
 
   it('draws the tertiary as an accent text link with a trailing arrow and no padding', () => {

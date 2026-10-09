@@ -78,7 +78,7 @@ export function Dialog({ open, onClose, title, description, children, className 
           exit={{ opacity: reduceMotion ? 1 : 0 }}
           transition={{ duration: 0.16, ease: [0.2, 0.7, 0.2, 1] }}
         >
-          <div aria-hidden className="absolute inset-0" onClick={onClose} />
+          <div aria-hidden className="absolute inset-0 bg-tar/10" onClick={onClose} />
           <div
             ref={panelRef}
             role="dialog"
@@ -88,7 +88,7 @@ export function Dialog({ open, onClose, title, description, children, className 
             tabIndex={-1}
             onKeyDown={trapTab}
             className={cn(
-              'relative flex max-h-[calc(100dvh-2rem)] w-full max-w-md flex-col rounded-panel border border-hairline bg-white shadow-popover focus:outline-none',
+              'relative flex max-h-[calc(100dvh-2rem)] w-full max-w-md flex-col rounded-panel border border-hairline bg-raised shadow-popover focus:outline-none',
               className,
             )}
           >

@@ -4,9 +4,9 @@ import { cn } from '@/lib/cn'
 import { DENSITY_LEVELS } from '@/lib/density'
 import { isEmptyGlyph, observationGlyph, type GlyphGrid } from '@/lib/glyph'
 
-const PAPER = '#E7E4DC'
-const HAIRLINE = '#ADA89C'
-const INK_3 = '#78756C'
+const PAPER = '#F7F6F2'
+const HAIRLINE = '#C2BEB3'
+const INK_3 = '#868B91'
 
 export interface ObservationGlyphProps {
   /** The observation with its detections. Null (still loading) draws the empty frame. */

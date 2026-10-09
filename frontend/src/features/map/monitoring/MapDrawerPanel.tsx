@@ -69,7 +69,7 @@ export function MapDrawerPanel({
       animate={{ opacity: 1, x: 0, y: 0 }}
       transition={{ duration: 0.2, ease: EASE }}
       className={cn(
-        'flex min-h-0 flex-col bg-white focus:outline-none',
+        'flex min-h-0 flex-col bg-raised focus:outline-none',
         layout === 'side'
           ? 'h-full w-[360px] border-l border-hairline'
           : 'max-h-[45dvh] w-full border-t border-rule',

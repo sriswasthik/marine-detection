@@ -16,6 +16,7 @@ import {
 } from '@/features/evidence/ObservationFacts'
 import { ObservationHeader } from '@/features/evidence/ObservationHeader'
 import { ExportMenu } from '@/features/export/ExportMenu'
+import { DensityRelief } from '@/features/scene3d/DensityRelief'
 import { TraceabilityStrip } from '@/features/evidence/TraceabilityStrip'
 import { isMockMode } from '@/features/observations/api'
 import { ObservationNotices } from '@/features/observations/components/ObservationNotices'
@@ -135,6 +136,12 @@ function ObservationDetail({
       <ErrorBoundary label="The measurements">
         <EvidenceMetrics observation={observation} hotspotCount={analysis.hotspots.length} />
       </ErrorBoundary>
+
+      {hasDebris ? (
+        <ErrorBoundary label="The density relief">
+          <DensityRelief observation={observation} analysis={analysis} />
+        </ErrorBoundary>
+      ) : null}
 
       <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-6">
         <div className="flex min-w-0 flex-col gap-12">

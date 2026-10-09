@@ -1,12 +1,13 @@
 import { cn } from '@/lib/cn'
 
-/** The sea surface: a swell running edge to edge, crest at the centre. */
-const WATERLINE = 'M0 15.75c2 0 2-2 4-2s2 2 4 2s2-2 4-2s2 2 4 2s2-2 4-2s2 2 4 2'
+/** The sea surface: a swell running across the mark. */
+const WATERLINE =
+  'M3 17c1.5 0 1.5-1.5 3-1.5s1.5 1.5 3 1.5s1.5-1.5 3-1.5s1.5 1.5 3 1.5s1.5-1.5 3-1.5s1.5 1.5 3 1.5'
 
 /**
- * A.W.A.R.E.: a Tar Black square with a Signal Yellow waterline and one square riding its crest,
- * the shape of one detection on the chart. Waste found on the sea surface. Square corners, no glow.
- * Decorative by default; pass a title when it stands alone.
+ * A.W.A.R.E.: a flat ink square, two survey arcs over the swell and one detection at their centre.
+ * Waste found on the sea surface. One colour, no gradient. Decorative by default; pass a title
+ * when it stands alone.
  */
 export function Logomark({
   className,
@@ -29,10 +30,22 @@ export function Logomark({
       aria-hidden={title ? undefined : true}
     >
       <rect width="24" height="24" className="fill-tar" />
-      <rect x="9.5" y="7" width="5" height="6" className="fill-signal" />
-      {/* A Tar band under the swell cuts the square's foot, so it floats in the water. */}
-      <path d={WATERLINE} fill="none" className="stroke-tar" strokeWidth="3.5" />
-      <path d={WATERLINE} fill="none" className="stroke-signal" strokeWidth="1.5" />
+      <path
+        d="M4.5 12.5a7.5 7.5 0 0 1 15 0"
+        fill="none"
+        stroke="#fff"
+        strokeOpacity="0.35"
+        strokeWidth="1.2"
+      />
+      <path
+        d="M8.25 12.5a3.75 3.75 0 0 1 7.5 0"
+        fill="none"
+        stroke="#fff"
+        strokeOpacity="0.7"
+        strokeWidth="1.2"
+      />
+      <rect x="10.75" y="10.25" width="2.5" height="2.5" fill="#fff" />
+      <path d={WATERLINE} fill="none" stroke="#fff" strokeWidth="1.4" />
     </svg>
   )
 }

@@ -146,12 +146,8 @@ const ClusterMarker = memo(function ClusterMarker({
     () =>
       divIcon({
         className: 'mwi-cluster',
-        // Low and Moderate fills are light: Tar Black on them; white on High and Critical.
-        html: `<span style="--level-color:${DENSITY_LEVELS[cluster.level].color};--cluster-ink:${
-          cluster.level === 'low' || cluster.level === 'moderate'
-            ? 'var(--color-tar)'
-            : 'var(--color-white)'
-        }">${cluster.count}</span>`,
+        // The count's ink per level comes from the theme (index.css --cluster-ink-*).
+        html: `<span style="--level-color:${DENSITY_LEVELS[cluster.level].color};--cluster-ink:var(--cluster-ink-${cluster.level})">${cluster.count}</span>`,
         iconSize: [18, 18],
         iconAnchor: [9, 9],
       }),

@@ -10,7 +10,7 @@ export function RankDot({ hotspot }: { hotspot: Pick<Hotspot, 'rank' | 'level'> 
   return (
     <span
       aria-hidden
-      className="data inline-flex size-6 shrink-0 items-center justify-center border-[1.5px] bg-white font-medium text-ink"
+      className="data inline-flex size-6 shrink-0 items-center justify-center border-[1.5px] bg-raised font-medium text-ink"
       style={{ borderColor: DENSITY_LEVELS[hotspot.level].stroke }}
     >
       {hotspot.rank}
@@ -103,7 +103,7 @@ export function InspectNextLedger({
                   <span
                     className={cn(
                       'data inline-flex h-5 min-w-5 items-center justify-center px-1',
-                      first ? 'bg-tar text-white' : 'border border-rule text-ink',
+                      first ? 'bg-tar text-paper' : 'border border-rule text-ink',
                     )}
                   >
                     {hotspot.rank}

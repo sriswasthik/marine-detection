@@ -16,9 +16,9 @@ export function PrimaryNav({ className }: { className?: string }) {
               className={({ isActive }) =>
                 cn(
                   'relative flex items-center text-body transition-colors duration-[120ms] ease-out',
-                  'after:absolute after:inset-x-0 after:bottom-0 after:h-0.5',
+                  'after:absolute after:inset-x-0 after:-bottom-px after:h-0.5',
                   isActive
-                    ? 'font-medium text-ink after:bg-ink'
+                    ? 'font-medium text-tar after:bg-ink'
                     : 'text-ink-2 after:bg-transparent hover:text-ink',
                 )
               }
@@ -41,7 +41,7 @@ export function BottomTabBar({ onMore, moreOpen }: { onMore: () => void; moreOpe
     cn(
       'relative flex h-full flex-1 flex-col items-center justify-center gap-1 text-label tracking-normal',
       'before:absolute before:inset-x-3 before:top-0 before:h-0.5',
-      active ? 'font-medium text-ink before:bg-ink' : 'text-ink-2 before:bg-transparent',
+      active ? 'font-medium text-tar before:bg-ink' : 'text-ink-2 before:bg-transparent',
     )
   return (
     <nav

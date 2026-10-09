@@ -28,10 +28,8 @@ function Chip({
       aria-pressed={on}
       onClick={onClick}
       className={cn(
-        'inline-flex h-7 items-center gap-2 rounded-tag border px-2 text-small font-medium transition-colors duration-[120ms] ease-out max-sm:h-10 max-sm:px-3',
-        on
-          ? 'border-accent-ink bg-accent-wash text-accent-ink'
-          : 'border-hairline text-ink-2 hover:border-rule hover:text-ink',
+        'inline-flex h-7 items-center gap-2 border-b-2 px-1 text-small font-medium transition-colors duration-[120ms] ease-out max-sm:h-10',
+        on ? 'border-ink text-tar' : 'border-transparent text-ink-2 hover:text-ink',
       )}
     >
       {children}

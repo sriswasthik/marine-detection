@@ -70,10 +70,13 @@ export const MAP_MAX_ZOOM = 22
  * They mirror src/styles/tokens.css; a test keeps them equal.
  */
 export const MAP_COLORS = {
-  /** Tar Black: selections, the footprint and hotspot selection rings, over a white halo. */
-  mark: '#15171A',
-  /** Slate Grey: quiet lines such as the image footprint. */
-  muted: '#5A5A55',
+  /** Tar: selections and hotspot selection rings, over a white casing. */
+  mark: '#0B1520',
+  /** Secondary ink: quiet lines such as the image footprint. */
+  muted: '#565E68',
+  /** Outlines over satellite imagery. */
   halo: '#FFFFFF',
-  fallback: '#DCD8CE',
+  /** The white casing under a selected detection, so the ink mark reads on any ground. */
+  casing: '#FFFFFF',
+  fallback: '#E4E2DC',
 } as const

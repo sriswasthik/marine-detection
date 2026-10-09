@@ -13,7 +13,10 @@ export interface SwitchProps {
   id?: string
 }
 
-/** On/off setting that applies immediately. A squared track with a square thumb. */
+/**
+ * On/off setting that applies immediately. A square track with a square thumb that slides across;
+ * on, the track is ink. After anonithrax's square toggle on uiverse.io (MIT).
+ */
 export function Switch({
   label,
   description,
@@ -40,16 +43,17 @@ export function Switch({
         disabled={disabled}
         onClick={() => onCheckedChange(!checked)}
         className={cn(
-          'hit-area relative inline-flex h-4 w-7 shrink-0 cursor-pointer items-center rounded-tag border',
-          'transition-colors duration-[120ms] ease-out disabled:cursor-not-allowed disabled:opacity-50',
+          'hit-area relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center border',
+          'transition-colors duration-[160ms] ease-out',
+          'disabled:cursor-not-allowed disabled:opacity-50',
           checked ? 'border-ink bg-ink' : 'border-rule bg-hairline',
         )}
       >
         <span
           aria-hidden
           className={cn(
-            'absolute top-px left-px size-3 rounded-[1px] bg-white transition-transform duration-[120ms] ease-out',
-            checked ? 'translate-x-3' : 'border border-rule',
+            'absolute top-0.5 left-0.5 size-3.5 bg-white transition-transform duration-[160ms] ease-out',
+            checked ? 'translate-x-4' : 'shadow-[0_0_0_1px_var(--color-rule)]',
           )}
         />
       </button>

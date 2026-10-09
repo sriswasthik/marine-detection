@@ -11,6 +11,7 @@ import {
 } from '@/features/overview/OverviewSkeleton'
 import { RecentObservations } from '@/features/overview/RecentObservations'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { useSettings } from '@/features/settings/settingsContext'
 
 /**
  * Overview: what was detected, where, how severe, and what to inspect next.
@@ -23,12 +24,15 @@ export function OverviewPage() {
   const currentId = useCurrentObservationId(observations)
   const detail = useObservation(currentId)
   const latestId = observations?.[0]?.id ?? null
+  const sampleData = useSettings().dataSource === 'mock'
 
   return (
-    <div className="mx-auto flex w-full max-w-page flex-col gap-12 px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-      <IntroBand latestMapPath={currentId ? `/map/${encodeURIComponent(currentId)}` : null} />
-
-      <div className="h-px bg-rule" aria-hidden />
+    <div className="mx-auto flex w-full max-w-page flex-col gap-16 px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+      <IntroBand
+        latestMapPath={currentId ? `/map/${encodeURIComponent(currentId)}` : null}
+        observations={observations}
+        sampleData={sampleData}
+      />
 
       {list.isPending ? (
         <PageSkeleton label="Loading observations" className="flex flex-col gap-14">

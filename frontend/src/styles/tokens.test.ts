@@ -23,20 +23,22 @@ function token(name: string): string {
 
 /** [text, background, where it is used]. Every pair must reach AA for normal text. */
 const TEXT_PAIRS: readonly (readonly [string, string, string])[] = [
-  ['ink', 'paper', 'Graphite body text on Concrete'],
+  ['ink', 'paper', 'body text on paper'],
   ['ink', 'sheet', 'body text on docked panels and map plates'],
-  ['ink', 'white', 'text in inputs, the drawer and dialogs'],
-  ['tar', 'paper', 'the wordmark'],
-  ['ink-2', 'paper', 'Slate Grey secondary and small text on the page'],
+  ['ink', 'raised', 'text in inputs, the drawer and dialogs'],
+  ['tar', 'paper', 'the wordmark and headlines'],
+  ['accent-ink', 'sheet', 'links on docked panels'],
+  ['ink-2', 'paper', 'secondary and small text on the page'],
   ['ink-2', 'sheet', 'secondary text on panels and tooltips'],
-  ['ink-2', 'white', 'secondary text in the drawer and dialogs'],
-  ['accent-ink', 'paper', 'Olive Ink links and tertiary actions'],
-  ['accent-ink', 'white', 'links in the drawer and dialogs'],
+  ['ink-2', 'raised', 'secondary text in the drawer and dialogs'],
+  ['accent-ink', 'paper', 'links and tertiary actions'],
+  ['accent-ink', 'raised', 'links in the drawer and dialogs'],
   ['accent-ink', 'accent-wash', 'selected segment and accent tag'],
   ['ink', 'accent-wash', 'selected ledger row'],
-  ['white', 'accent', 'primary button label'],
-  ['white', 'accent-hover', 'primary button label on hover'],
-  ['white', 'ink', 'done step and checked box'],
+  ['on-accent', 'accent', 'primary button label'],
+  ['on-accent', 'accent-hover', 'primary button label on hover'],
+  ['white', 'ink', 'done step, checked box, secondary button on hover'],
+  ['paper', 'tar', 'the first-ranked hotspot plate'],
   ['success', 'paper', 'success text and saved notes'],
   ['warning', 'paper', 'warning text'],
   ['danger', 'paper', 'danger text and quiet danger button'],
@@ -45,6 +47,10 @@ const TEXT_PAIRS: readonly (readonly [string, string, string])[] = [
   ['ink', 'warning-soft', 'warning tag and low confidence tag'],
   ['ink', 'danger-soft', 'danger tag'],
   ...DENSITY_LEVEL_IDS.map((level) => ['ink', `${level}-soft`, `${level} severity tag`] as const),
+  ['tar', 'low', 'Low cluster count'],
+  ['tar', 'moderate', 'Moderate cluster count'],
+  ['white', 'high', 'High cluster count'],
+  ['white', 'critical', 'Critical cluster count'],
 ]
 
 describe('design token contrast', () => {
@@ -59,36 +65,23 @@ describe('design token contrast', () => {
     )
   })
 
-  it('keeps ink-3 for large or decorative text only: it fails small text on Concrete', () => {
+  it('keeps ink-3 for large or decorative text only: it fails small text on paper', () => {
     const ratio = contrastRatio(token('ink-3'), token('paper'))
     expect(ratio).toBeLessThan(AA_TEXT)
     expect(ratio).toBeGreaterThanOrEqual(3)
   })
 
-  it('keeps Signal Yellow out of the interface: it is the logomark colour only', () => {
-    // 1.3:1 on Concrete, and next to the Low severity fill: never an action, text or line.
-    expect(contrastRatio(token('signal'), token('paper'))).toBeLessThan(3)
-    expect(token('accent')).not.toBe(token('signal'))
-    expect(token('accent-wash')).not.toBe(token('low-soft'))
+  it('keeps the call to action apart from links: ink fill, Ultramarine links', () => {
+    expect(token('accent')).not.toBe(token('accent-ink'))
+    expect(contrastRatio(token('accent'), token('paper'))).toBeGreaterThan(15)
   })
 
-  it('uses the deck palette', () => {
-    expect(token('paper')).toBe('#e7e4dc')
-    expect(token('tar')).toBe('#15171a')
-    expect(token('ink')).toBe('#3a3b3d')
-    expect(token('ink-2')).toBe('#5a5a55')
-    expect(token('accent')).toBe('#15171a')
-    expect(token('signal')).toBe('#f4c51d')
-    expect(token('accent-ink')).toBe('#3b3420')
-  })
-
-  it('matches the measured values in docs/DESIGN_SYSTEM.md', () => {
-    const on = (text: string, background: string) =>
-      Math.round(contrastRatio(token(text), token(background)) * 100) / 100
-    expect(on('ink', 'paper')).toBeCloseTo(8.83, 1)
-    expect(on('ink-2', 'paper')).toBeCloseTo(5.46, 1)
-    expect(on('accent-ink', 'paper')).toBeCloseTo(9.73, 1)
-    expect(on('white', 'accent')).toBeCloseTo(17.96, 1)
+  it('uses the Survey sheet palette', () => {
+    expect(token('paper')).toBe('#f7f6f2')
+    expect(token('raised')).toBe('#ffffff')
+    expect(token('ink')).toBe('#1c2530')
+    expect(token('accent')).toBe('#0b1520')
+    expect(token('accent-ink')).toBe('#2235c9')
   })
 
   it('has no old token names left', () => {

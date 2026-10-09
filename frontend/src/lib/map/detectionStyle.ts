@@ -43,7 +43,7 @@ export function isLowConfidence(confidence: number): boolean {
 /**
  * Detection style. Fill and stroke come from the density level. Confidence below the low
  * threshold gets a dashed stroke and lower opacity, in every state, so confidence stays readable.
- * Hover thickens the stroke. Selection swaps the stroke to the Tar Black mark; a white halo is
+ * Hover thickens the stroke. Selection swaps the stroke to the tar mark; a white casing is
  * drawn underneath with getSelectionHaloStyle. Over imagery the outline is white and the fill
  * stronger, so levels stay readable on dark water.
  */
@@ -79,13 +79,13 @@ export function getDetectionStyle(
   }
 }
 
-/** White halo under a selected detection so the dark outline reads on any basemap or imagery. */
+/** White casing under a selected detection so the ink outline reads on any basemap or imagery. */
 export function getSelectionHaloStyle(): PathStyle {
   return {
-    color: MAP_COLORS.halo,
+    color: MAP_COLORS.casing,
     weight: SELECTION_HALO_WEIGHT,
     opacity: 1,
-    fillColor: MAP_COLORS.halo,
+    fillColor: MAP_COLORS.casing,
     fillOpacity: 0,
     dashArray: undefined,
     fill: false,
