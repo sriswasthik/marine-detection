@@ -24,6 +24,8 @@ export interface SettingsStore {
   persistent: () => boolean
   /** How the settings were loaded: defaults, current, migrated or corrupt. */
   loadStatus: () => ReadResult['status']
+  /** True only where the environment turns the mock on (VITE_USE_MOCK); otherwise live only. */
+  sampleDataAllowed: () => boolean
 }
 
 function browserStorage(): SettingsStorage | null {
@@ -110,6 +112,7 @@ export function createSettingsStore(
     },
     persistent: () => persistent,
     loadStatus: () => loaded.status,
+    sampleDataAllowed: () => defaults.dataSource === 'mock',
   }
 }
 

@@ -38,21 +38,16 @@ describe('retry rules', () => {
 })
 
 describe('api factory', () => {
-  it('chooses the implementation from the environment', async () => {
+  it('chooses the implementation from the environment', () => {
+    // The resilience wrapper hides the implementation; the HTTP client is checked directly in
+    // httpApi.test.ts. Here: the mock never carries a base URL.
     const http = createObservationsApi({ useMock: false, apiBaseUrl: 'http://api.test' })
-    await expect(http.listObservations()).rejects.toMatchObject({
-      code: 'NOT_IMPLEMENTED',
-      status: 501,
-    })
+    expect(typeof http.listObservations).toBe('function')
     const mock = createObservationsApi({ useMock: true, apiBaseUrl: 'http://api.test' })
     expect(mock).not.toHaveProperty('baseUrl')
   })
 
-  it('stubs every HTTP method with a clear message', async () => {
-    const api = createHttpApi('http://api.test')
-    expect(api.baseUrl).toBe('http://api.test')
-    await expect(api.getObservation('x')).rejects.toThrow(/VITE_USE_MOCK=true/)
-    await expect(api.getJob('x')).rejects.toBeInstanceOf(ApiError)
-    await expect(api.health()).rejects.toBeInstanceOf(ApiError)
+  it('exposes the base URL without a trailing slash', () => {
+    expect(createHttpApi('http://api.test/').baseUrl).toBe('http://api.test')
   })
 })

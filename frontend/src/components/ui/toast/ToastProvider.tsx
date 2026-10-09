@@ -11,11 +11,11 @@ import {
   type ToastTone,
 } from './toastContext'
 
-const TONE_ICONS: Record<ToastTone, { Icon: typeof Info; className: string }> = {
-  info: { Icon: Info, className: 'text-accent' },
-  success: { Icon: CircleCheck, className: 'text-success' },
-  warning: { Icon: TriangleAlert, className: 'text-warning' },
-  danger: { Icon: CircleAlert, className: 'text-danger' },
+const TONE_ICONS: Record<ToastTone, { Icon: typeof Info; className: string; rule: string }> = {
+  info: { Icon: Info, className: 'text-accent-ink', rule: 'border-l-accent-ink' },
+  success: { Icon: CircleCheck, className: 'text-success', rule: 'border-l-success' },
+  warning: { Icon: TriangleAlert, className: 'text-warning', rule: 'border-l-warning' },
+  danger: { Icon: CircleAlert, className: 'text-danger', rule: 'border-l-danger' },
 }
 
 function ToastItem({ toast, onDismiss }: { toast: ToastRecord; onDismiss: (id: string) => void }) {
@@ -33,26 +33,29 @@ function ToastItem({ toast, onDismiss }: { toast: ToastRecord; onDismiss: (id: s
     }
   }, [paused, toast.duration, toast.id, onDismiss])
 
-  const { Icon, className } = TONE_ICONS[toast.tone]
+  const { Icon, className, rule } = TONE_ICONS[toast.tone]
   return (
     <motion.li
       layout="position"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.16, ease: [0.2, 0.7, 0.2, 1] }}
       onPointerEnter={() => setPaused(true)}
       onPointerLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      className="pointer-events-auto flex items-start gap-3 rounded-card border border-border bg-surface p-3 pr-2 shadow-popover"
+      className={cn(
+        'pointer-events-auto flex items-start gap-3 border border-l-2 border-hairline bg-sheet py-3 pr-2 pl-4 shadow-popover',
+        rule,
+      )}
     >
-      <Icon aria-hidden className={cn('mt-0.5 size-4 shrink-0', className)} />
+      <span className="flex h-5 shrink-0 items-center">
+        <Icon aria-hidden className={cn('size-4', className)} />
+      </span>
       <div className="min-w-0 flex-1">
         <p className="text-small font-medium text-ink">{toast.title}</p>
-        {toast.description ? (
-          <p className="text-small text-ink-muted">{toast.description}</p>
-        ) : null}
+        {toast.description ? <p className="text-small text-ink-2">{toast.description}</p> : null}
         {toast.action ? (
           <button
             type="button"
@@ -60,7 +63,7 @@ function ToastItem({ toast, onDismiss }: { toast: ToastRecord; onDismiss: (id: s
               toast.action?.onClick()
               onDismiss(toast.id)
             }}
-            className="mt-1.5 rounded-control text-small font-medium text-accent hover:text-accent-hover hover:underline"
+            className="mt-2 text-small font-medium text-accent-ink underline-offset-4 hover:text-tar hover:underline"
           >
             {toast.action.label}
           </button>
@@ -70,7 +73,7 @@ function ToastItem({ toast, onDismiss }: { toast: ToastRecord; onDismiss: (id: s
         type="button"
         onClick={() => onDismiss(toast.id)}
         aria-label="Dismiss notification"
-        className="inline-flex size-6 shrink-0 items-center justify-center rounded-control text-ink-muted hover:bg-ink/5 hover:text-ink"
+        className="inline-flex size-6 shrink-0 items-center justify-center rounded-control text-ink-2 hover:bg-ink/5 hover:text-ink"
       >
         <X aria-hidden className="size-4" />
       </button>

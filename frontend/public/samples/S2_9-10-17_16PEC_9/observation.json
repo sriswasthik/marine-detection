@@ -1,0 +1,1403 @@
+{
+ "id": "S2_9-10-17_16PEC_9",
+ "name": "La Ceiba patch 9",
+ "source": "satellite",
+ "capturedAt": "2017-10-09T12:00:00.000Z",
+ "region": "La Ceiba (16PEC)",
+ "imageUrl": "/samples/S2_9-10-17_16PEC_9/preview.png",
+ "previewUrl": "/samples/S2_9-10-17_16PEC_9/preview.png",
+ "maskUrl": "/samples/S2_9-10-17_16PEC_9/classes.png",
+ "bounds": {
+  "north": 16.0281567,
+  "south": 16.00499,
+  "east": -86.7782697,
+  "west": -86.8022229
+ },
+ "crs": "EPSG:32616",
+ "status": "completed",
+ "debrisAreaM2": 7700.0,
+ "waterAreaM2": 6553600.0,
+ "waterAreaDefinition": "Water surface = every valid pixel the model did not classify as Clouds (class 6). MARIDA has no land class, so any land in the scene is counted as water.",
+ "coveragePercent": 0.117493,
+ "averageConfidence": 0.3253,
+ "densityLevel": "low",
+ "detections": [
+  {
+   "id": "S2_9-10-17_16PEC_9-d001",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7955632,
+       16.0280601
+      ],
+      [
+       -86.7955633,
+       16.0279697
+      ],
+      [
+       -86.7949089,
+       16.027969
+      ],
+      [
+       -86.7949088,
+       16.0280594
+      ],
+      [
+       -86.7955632,
+       16.0280601
+      ]
+     ]
+    ]
+   },
+   "areaM2": 700.0,
+   "confidence": 0.3257,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280145,
+    "lng": -86.7952361
+   },
+   "sourcePixelCount": 7
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d002",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7801394,
+       16.0280448
+      ],
+      [
+       -86.7801395,
+       16.0279544
+      ],
+      [
+       -86.7795786,
+       16.0279538
+      ],
+      [
+       -86.7795785,
+       16.0280442
+      ],
+      [
+       -86.7801394,
+       16.0280448
+      ]
+     ]
+    ]
+   },
+   "areaM2": 600.0,
+   "confidence": 0.3152,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0279993,
+    "lng": -86.779859
+   },
+   "sourcePixelCount": 6
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d003",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7993958,
+       16.0280637
+      ],
+      [
+       -86.7993959,
+       16.0279733
+      ],
+      [
+       -86.799022,
+       16.0279729
+      ],
+      [
+       -86.7990219,
+       16.0280633
+      ],
+      [
+       -86.7993958,
+       16.0280637
+      ]
+     ]
+    ]
+   },
+   "areaM2": 400.0,
+   "confidence": 0.3097,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280183,
+    "lng": -86.7992089
+   },
+   "sourcePixelCount": 4
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d004",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7978067,
+       16.0280622
+      ],
+      [
+       -86.7978067,
+       16.0279718
+      ],
+      [
+       -86.7974328,
+       16.0279714
+      ],
+      [
+       -86.7974327,
+       16.0280618
+      ],
+      [
+       -86.7978067,
+       16.0280622
+      ]
+     ]
+    ]
+   },
+   "areaM2": 400.0,
+   "confidence": 0.3075,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280168,
+    "lng": -86.7976197
+   },
+   "sourcePixelCount": 4
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d005",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7946284,
+       16.0280592
+      ],
+      [
+       -86.7946285,
+       16.0279688
+      ],
+      [
+       -86.7942546,
+       16.0279684
+      ],
+      [
+       -86.7942545,
+       16.0280588
+      ],
+      [
+       -86.7946284,
+       16.0280592
+      ]
+     ]
+    ]
+   },
+   "areaM2": 400.0,
+   "confidence": 0.3352,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280138,
+    "lng": -86.7944415
+   },
+   "sourcePixelCount": 4
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d006",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7917306,
+       16.0280564
+      ],
+      [
+       -86.7917307,
+       16.027966
+      ],
+      [
+       -86.7913568,
+       16.0279656
+      ],
+      [
+       -86.7913567,
+       16.028056
+      ],
+      [
+       -86.7917306,
+       16.0280564
+      ]
+     ]
+    ]
+   },
+   "areaM2": 400.0,
+   "confidence": 0.3355,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.028011,
+    "lng": -86.7915437
+   },
+   "sourcePixelCount": 4
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d007",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7877111,
+       16.0280524
+      ],
+      [
+       -86.7877112,
+       16.027962
+      ],
+      [
+       -86.7873372,
+       16.0279617
+      ],
+      [
+       -86.7873371,
+       16.0280521
+      ],
+      [
+       -86.7877111,
+       16.0280524
+      ]
+     ]
+    ]
+   },
+   "areaM2": 400.0,
+   "confidence": 0.3307,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.028007,
+    "lng": -86.7875242
+   },
+   "sourcePixelCount": 4
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d008",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.800424,
+       16.0280646
+      ],
+      [
+       -86.8004241,
+       16.0279742
+      ],
+      [
+       -86.8001437,
+       16.027974
+      ],
+      [
+       -86.8001436,
+       16.0280644
+      ],
+      [
+       -86.800424,
+       16.0280646
+      ]
+     ]
+    ]
+   },
+   "areaM2": 300.0,
+   "confidence": 0.3403,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280193,
+    "lng": -86.8002839
+   },
+   "sourcePixelCount": 3
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d009",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7936936,
+       16.0280583
+      ],
+      [
+       -86.7936937,
+       16.0279679
+      ],
+      [
+       -86.7934133,
+       16.0279676
+      ],
+      [
+       -86.7934132,
+       16.028058
+      ],
+      [
+       -86.7936936,
+       16.0280583
+      ]
+     ]
+    ]
+   },
+   "areaM2": 300.0,
+   "confidence": 0.297,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280129,
+    "lng": -86.7935535
+   },
+   "sourcePixelCount": 3
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d010",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7925719,
+       16.0280572
+      ],
+      [
+       -86.792572,
+       16.0279668
+      ],
+      [
+       -86.7922916,
+       16.0279665
+      ],
+      [
+       -86.7922915,
+       16.0280569
+      ],
+      [
+       -86.7925719,
+       16.0280572
+      ]
+     ]
+    ]
+   },
+   "areaM2": 300.0,
+   "confidence": 0.3207,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280118,
+    "lng": -86.7924317
+   },
+   "sourcePixelCount": 3
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d011",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7862154,
+       16.0280509
+      ],
+      [
+       -86.7862155,
+       16.0279605
+      ],
+      [
+       -86.7859351,
+       16.0279603
+      ],
+      [
+       -86.785935,
+       16.0280507
+      ],
+      [
+       -86.7862154,
+       16.0280509
+      ]
+     ]
+    ]
+   },
+   "areaM2": 300.0,
+   "confidence": 0.346,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280056,
+    "lng": -86.7860752
+   },
+   "sourcePixelCount": 3
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d012",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7854676,
+       16.0280502
+      ],
+      [
+       -86.7854677,
+       16.0279598
+      ],
+      [
+       -86.7851873,
+       16.0279595
+      ],
+      [
+       -86.7851872,
+       16.0280499
+      ],
+      [
+       -86.7854676,
+       16.0280502
+      ]
+     ]
+    ]
+   },
+   "areaM2": 300.0,
+   "confidence": 0.3701,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280049,
+    "lng": -86.7853274
+   },
+   "sourcePixelCount": 3
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d013",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7843459,
+       16.0280491
+      ],
+      [
+       -86.784346,
+       16.0279587
+      ],
+      [
+       -86.7840655,
+       16.0279584
+      ],
+      [
+       -86.7840654,
+       16.0280488
+      ],
+      [
+       -86.7843459,
+       16.0280491
+      ]
+     ]
+    ]
+   },
+   "areaM2": 300.0,
+   "confidence": 0.3222,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280037,
+    "lng": -86.7842057
+   },
+   "sourcePixelCount": 3
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d014",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.781635,
+       16.0280463
+      ],
+      [
+       -86.7816351,
+       16.0279559
+      ],
+      [
+       -86.7813547,
+       16.0279556
+      ],
+      [
+       -86.7813546,
+       16.028046
+      ],
+      [
+       -86.781635,
+       16.0280463
+      ]
+     ]
+    ]
+   },
+   "areaM2": 300.0,
+   "confidence": 0.3355,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.028001,
+    "lng": -86.7814948
+   },
+   "sourcePixelCount": 3
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d015",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7810741,
+       16.0280458
+      ],
+      [
+       -86.7810742,
+       16.0279554
+      ],
+      [
+       -86.7807938,
+       16.0279551
+      ],
+      [
+       -86.7807937,
+       16.0280455
+      ],
+      [
+       -86.7810741,
+       16.0280458
+      ]
+     ]
+    ]
+   },
+   "areaM2": 300.0,
+   "confidence": 0.3633,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280004,
+    "lng": -86.780934
+   },
+   "sourcePixelCount": 3
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d016",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.8008914,
+       16.0280651
+      ],
+      [
+       -86.8008915,
+       16.0279747
+      ],
+      [
+       -86.8007046,
+       16.0279745
+      ],
+      [
+       -86.8007045,
+       16.0280649
+      ],
+      [
+       -86.8008914,
+       16.0280651
+      ]
+     ]
+    ]
+   },
+   "areaM2": 200.0,
+   "confidence": 0.2989,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280198,
+    "lng": -86.800798
+   },
+   "sourcePixelCount": 2
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d017",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7960306,
+       16.0280605
+      ],
+      [
+       -86.7960307,
+       16.0279701
+      ],
+      [
+       -86.7958437,
+       16.0279699
+      ],
+      [
+       -86.7958436,
+       16.0280603
+      ],
+      [
+       -86.7960306,
+       16.0280605
+      ]
+     ]
+    ]
+   },
+   "areaM2": 200.0,
+   "confidence": 0.3308,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280152,
+    "lng": -86.7959371
+   },
+   "sourcePixelCount": 2
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d018",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7930393,
+       16.0280576
+      ],
+      [
+       -86.7930394,
+       16.0279672
+      ],
+      [
+       -86.7928524,
+       16.0279671
+      ],
+      [
+       -86.7928523,
+       16.0280575
+      ],
+      [
+       -86.7930393,
+       16.0280576
+      ]
+     ]
+    ]
+   },
+   "areaM2": 200.0,
+   "confidence": 0.3149,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280123,
+    "lng": -86.7929459
+   },
+   "sourcePixelCount": 2
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d019",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7911697,
+       16.0280558
+      ],
+      [
+       -86.7911698,
+       16.0279654
+      ],
+      [
+       -86.7909829,
+       16.0279652
+      ],
+      [
+       -86.7909828,
+       16.0280556
+      ],
+      [
+       -86.7911697,
+       16.0280558
+      ]
+     ]
+    ]
+   },
+   "areaM2": 200.0,
+   "confidence": 0.316,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280105,
+    "lng": -86.7910763
+   },
+   "sourcePixelCount": 2
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d020",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7901415,
+       16.0280548
+      ],
+      [
+       -86.7901416,
+       16.0279644
+      ],
+      [
+       -86.7899546,
+       16.0279642
+      ],
+      [
+       -86.7899545,
+       16.0280546
+      ],
+      [
+       -86.7901415,
+       16.0280548
+      ]
+     ]
+    ]
+   },
+   "areaM2": 200.0,
+   "confidence": 0.2992,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280095,
+    "lng": -86.790048
+   },
+   "sourcePixelCount": 2
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d021",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7893002,
+       16.028054
+      ],
+      [
+       -86.7893003,
+       16.0279636
+      ],
+      [
+       -86.7891133,
+       16.0279634
+      ],
+      [
+       -86.7891132,
+       16.0280538
+      ],
+      [
+       -86.7893002,
+       16.028054
+      ]
+     ]
+    ]
+   },
+   "areaM2": 200.0,
+   "confidence": 0.3142,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280087,
+    "lng": -86.7892068
+   },
+   "sourcePixelCount": 2
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d022",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7883654,
+       16.0280531
+      ],
+      [
+       -86.7883655,
+       16.0279627
+      ],
+      [
+       -86.7881785,
+       16.0279625
+      ],
+      [
+       -86.7881784,
+       16.0280529
+      ],
+      [
+       -86.7883654,
+       16.0280531
+      ]
+     ]
+    ]
+   },
+   "areaM2": 200.0,
+   "confidence": 0.2985,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280078,
+    "lng": -86.788272
+   },
+   "sourcePixelCount": 2
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d023",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7833176,
+       16.028048
+      ],
+      [
+       -86.7833177,
+       16.0279576
+      ],
+      [
+       -86.7831307,
+       16.0279574
+      ],
+      [
+       -86.7831307,
+       16.0280479
+      ],
+      [
+       -86.7833176,
+       16.028048
+      ]
+     ]
+    ]
+   },
+   "areaM2": 200.0,
+   "confidence": 0.3569,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280027,
+    "lng": -86.7832242
+   },
+   "sourcePixelCount": 2
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d024",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7805133,
+       16.0280452
+      ],
+      [
+       -86.7805134,
+       16.0279548
+      ],
+      [
+       -86.7803264,
+       16.0279546
+      ],
+      [
+       -86.7803263,
+       16.028045
+      ],
+      [
+       -86.7805133,
+       16.0280452
+      ]
+     ]
+    ]
+   },
+   "areaM2": 200.0,
+   "confidence": 0.3182,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0279999,
+    "lng": -86.7804198
+   },
+   "sourcePixelCount": 2
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d025",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7969654,
+       16.0280614
+      ],
+      [
+       -86.7969654,
+       16.027971
+      ],
+      [
+       -86.796872,
+       16.0279709
+      ],
+      [
+       -86.7968719,
+       16.0280613
+      ],
+      [
+       -86.7969654,
+       16.0280614
+      ]
+     ]
+    ]
+   },
+   "areaM2": 100.0,
+   "confidence": 0.3091,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280161,
+    "lng": -86.7969187
+   },
+   "sourcePixelCount": 1
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9-d026",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -86.7887393,
+       16.0280534
+      ],
+      [
+       -86.7887394,
+       16.027963
+      ],
+      [
+       -86.7886459,
+       16.027963
+      ],
+      [
+       -86.7886458,
+       16.0280534
+      ],
+      [
+       -86.7887393,
+       16.0280534
+      ]
+     ]
+    ]
+   },
+   "areaM2": 100.0,
+   "confidence": 0.3134,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 16.0280082,
+    "lng": -86.7886926
+   },
+   "sourcePixelCount": 1
+  }
+ ],
+ "densityGrid": {
+  "method": "Blocks of 25 x 25 source pixels. Coverage = debris pixels of the kept detections / imaged pixels in the block. A detection takes the level of the block holding most of its pixels. Hotspots join 8-adjacent High and Critical blocks (Moderate when there are none).",
+  "cellSizeM": 250.0,
+  "cellSizePx": 25,
+  "rows": 11,
+  "cols": 11,
+  "thresholds": {
+   "moderate": 2.0,
+   "high": 8.0,
+   "critical": 20.0
+  },
+  "cells": [
+   {
+    "id": "r10c0",
+    "row": 10,
+    "col": 0,
+    "bounds": {
+     "north": 16.0281567,
+     "south": 16.0258944,
+     "east": -86.7998631,
+     "west": -86.8022023
+    },
+    "areaM2": 62500.0,
+    "debrisAreaM2": 500.0,
+    "coveragePercent": 0.8,
+    "level": "low",
+    "detectionAreasM2": {
+     "S2_9-10-17_16PEC_9-d008": 300.0,
+     "S2_9-10-17_16PEC_9-d016": 200.0
+    }
+   },
+   {
+    "id": "r10c1",
+    "row": 10,
+    "col": 1,
+    "bounds": {
+     "north": 16.0281545,
+     "south": 16.0258922,
+     "east": -86.7975261,
+     "west": -86.7998653
+    },
+    "areaM2": 62500.0,
+    "debrisAreaM2": 700.0,
+    "coveragePercent": 1.12,
+    "level": "low",
+    "detectionAreasM2": {
+     "S2_9-10-17_16PEC_9-d003": 400.0,
+     "S2_9-10-17_16PEC_9-d004": 300.0
+    }
+   },
+   {
+    "id": "r10c2",
+    "row": 10,
+    "col": 2,
+    "bounds": {
+     "north": 16.0281523,
+     "south": 16.02589,
+     "east": -86.7951892,
+     "west": -86.7975284
+    },
+    "areaM2": 62500.0,
+    "debrisAreaM2": 800.0,
+    "coveragePercent": 1.28,
+    "level": "low",
+    "detectionAreasM2": {
+     "S2_9-10-17_16PEC_9-d001": 400.0,
+     "S2_9-10-17_16PEC_9-d004": 100.0,
+     "S2_9-10-17_16PEC_9-d017": 200.0,
+     "S2_9-10-17_16PEC_9-d025": 100.0
+    }
+   },
+   {
+    "id": "r10c3",
+    "row": 10,
+    "col": 3,
+    "bounds": {
+     "north": 16.0281501,
+     "south": 16.0258878,
+     "east": -86.7928522,
+     "west": -86.7951915
+    },
+    "areaM2": 62500.0,
+    "debrisAreaM2": 1200.0,
+    "coveragePercent": 1.92,
+    "level": "low",
+    "detectionAreasM2": {
+     "S2_9-10-17_16PEC_9-d001": 300.0,
+     "S2_9-10-17_16PEC_9-d005": 400.0,
+     "S2_9-10-17_16PEC_9-d009": 300.0,
+     "S2_9-10-17_16PEC_9-d018": 200.0
+    }
+   },
+   {
+    "id": "r10c4",
+    "row": 10,
+    "col": 4,
+    "bounds": {
+     "north": 16.0281479,
+     "south": 16.0258855,
+     "east": -86.7905153,
+     "west": -86.7928546
+    },
+    "areaM2": 62500.0,
+    "debrisAreaM2": 900.0,
+    "coveragePercent": 1.44,
+    "level": "low",
+    "detectionAreasM2": {
+     "S2_9-10-17_16PEC_9-d006": 400.0,
+     "S2_9-10-17_16PEC_9-d010": 300.0,
+     "S2_9-10-17_16PEC_9-d019": 200.0
+    }
+   },
+   {
+    "id": "r10c5",
+    "row": 10,
+    "col": 5,
+    "bounds": {
+     "north": 16.0281456,
+     "south": 16.0258832,
+     "east": -86.7881784,
+     "west": -86.7905177
+    },
+    "areaM2": 62500.0,
+    "debrisAreaM2": 700.0,
+    "coveragePercent": 1.12,
+    "level": "low",
+    "detectionAreasM2": {
+     "S2_9-10-17_16PEC_9-d020": 200.0,
+     "S2_9-10-17_16PEC_9-d021": 200.0,
+     "S2_9-10-17_16PEC_9-d022": 200.0,
+     "S2_9-10-17_16PEC_9-d026": 100.0
+    }
+   },
+   {
+    "id": "r10c6",
+    "row": 10,
+    "col": 6,
+    "bounds": {
+     "north": 16.0281433,
+     "south": 16.0258809,
+     "east": -86.7858414,
+     "west": -86.7881807
+    },
+    "areaM2": 62500.0,
+    "debrisAreaM2": 700.0,
+    "coveragePercent": 1.12,
+    "level": "low",
+    "detectionAreasM2": {
+     "S2_9-10-17_16PEC_9-d007": 400.0,
+     "S2_9-10-17_16PEC_9-d011": 300.0
+    }
+   },
+   {
+    "id": "r10c7",
+    "row": 10,
+    "col": 7,
+    "bounds": {
+     "north": 16.028141,
+     "south": 16.0258786,
+     "east": -86.7835045,
+     "west": -86.7858438
+    },
+    "areaM2": 62500.0,
+    "debrisAreaM2": 600.0,
+    "coveragePercent": 0.96,
+    "level": "low",
+    "detectionAreasM2": {
+     "S2_9-10-17_16PEC_9-d012": 300.0,
+     "S2_9-10-17_16PEC_9-d013": 300.0
+    }
+   },
+   {
+    "id": "r10c8",
+    "row": 10,
+    "col": 8,
+    "bounds": {
+     "north": 16.0281386,
+     "south": 16.0258762,
+     "east": -86.7811675,
+     "west": -86.7835069
+    },
+    "areaM2": 62500.0,
+    "debrisAreaM2": 500.0,
+    "coveragePercent": 0.8,
+    "level": "low",
+    "detectionAreasM2": {
+     "S2_9-10-17_16PEC_9-d014": 300.0,
+     "S2_9-10-17_16PEC_9-d023": 200.0
+    }
+   },
+   {
+    "id": "r10c9",
+    "row": 10,
+    "col": 9,
+    "bounds": {
+     "north": 16.0281363,
+     "south": 16.0258738,
+     "east": -86.7788306,
+     "west": -86.78117
+    },
+    "areaM2": 62500.0,
+    "debrisAreaM2": 1100.0,
+    "coveragePercent": 1.76,
+    "level": "low",
+    "detectionAreasM2": {
+     "S2_9-10-17_16PEC_9-d002": 600.0,
+     "S2_9-10-17_16PEC_9-d015": 300.0,
+     "S2_9-10-17_16PEC_9-d024": 200.0
+    }
+   }
+  ]
+ },
+ "hotspots": [],
+ "suppressedRegions": [],
+ "warnings": [
+  "LOW_CONFIDENCE"
+ ],
+ "cloudCoveragePercent": 0.0,
+ "resolutionM": 10.0,
+ "sceneContext": {
+  "validPixels": 65536,
+  "debrisPercent": 0.1175,
+  "cloudPercent": 0.0,
+  "shipPercent": 0.0,
+  "foamPercent": 0.0,
+  "sargassumPercent": 0.0,
+  "naturalOrganicPercent": 0.0,
+  "classPixelCounts": {
+   "1": 77,
+   "2": 0,
+   "3": 0,
+   "4": 0,
+   "5": 0,
+   "6": 0,
+   "7": 65459,
+   "8": 0,
+   "9": 0,
+   "10": 0,
+   "11": 0
+  }
+ },
+ "classPalette": [
+  {
+   "id": 1,
+   "name": "Marine Debris",
+   "color": "#C4503A",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 2,
+   "name": "Dense Sargassum",
+   "color": "#6FA35A",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 3,
+   "name": "Sparse Sargassum",
+   "color": "#B3CF7B",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 4,
+   "name": "Natural Organic Material",
+   "color": "#B39B78",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 5,
+   "name": "Ship",
+   "color": "#9384C6",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 6,
+   "name": "Clouds",
+   "color": "#BAC4CD",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 7,
+   "name": "Marine Water",
+   "color": null,
+   "opacity": 0.0,
+   "drawn": false
+  },
+  {
+   "id": 8,
+   "name": "Sediment-Laden Water",
+   "color": null,
+   "opacity": 0.0,
+   "drawn": false
+  },
+  {
+   "id": 9,
+   "name": "Foam",
+   "color": "#72C2C8",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 10,
+   "name": "Turbid Water",
+   "color": null,
+   "opacity": 0.0,
+   "drawn": false
+  },
+  {
+   "id": 11,
+   "name": "Shallow Water",
+   "color": null,
+   "opacity": 0.0,
+   "drawn": false
+  }
+ ],
+ "overlay": {
+  "crs": "EPSG:4326",
+  "bounds": {
+   "north": 16.0281567,
+   "south": 16.00499,
+   "east": -86.7782697,
+   "west": -86.8022229
+  }
+ },
+ "geospatial": {
+  "width": 256,
+  "height": 256,
+  "bandCount": 11,
+  "dataType": "float32",
+  "crs": "EPSG:32616",
+  "crsName": "WGS 84 / UTM zone 16N",
+  "pixelSizeX": 10.0,
+  "pixelSizeY": 10.0,
+  "pixelSizeUnit": "m",
+  "pixelAreaM2": 100.0,
+  "totalPixels": 65536,
+  "validPixels": 65536,
+  "sceneAreaM2": 6553600.0,
+  "debrisPixels": 77,
+  "debrisAreaM2": 7700.0,
+  "debrisCoveragePercent": 0.117493,
+  "debrisCentroid": {
+   "lat": 16.0280097,
+   "lng": -86.7902538
+  },
+  "sceneCentre": {
+   "lat": 16.0165737,
+   "lng": -86.790247
+  }
+ },
+ "processing": {
+  "startedAt": "2026-10-09T09:20:55.346Z",
+  "finishedAt": "2026-10-09T09:20:55.572Z",
+  "modelName": "U-Net marine debris segmentation",
+  "modelVersion": "f19c947d5a0a",
+  "device": "cpu",
+  "stagesMs": {
+   "preprocessMs": 19.5,
+   "detectMs": 112.5,
+   "mapMs": 82.3
+  }
+ },
+ "modelMetrics": {
+  "precision": 0.371,
+  "recall": 0.8793,
+  "f1": 0.5218,
+  "accuracy": 0.8825,
+  "iou": 0.353,
+  "meanIoU": 0.5535,
+  "macroF1": 0.6799,
+  "benchmark": "MARIDA test split (from logs/evaluating_unet.log)",
+  "isPlaceholder": false
+ },
+ "maridaPatch": {
+  "id": "S2_9-10-17_16PEC_9",
+  "tile": "16PEC",
+  "date": "2017-10-09",
+  "split": "train"
+ },
+ "referenceDebrisPixels": 0,
+ "segmentationUrl": "/samples/S2_9-10-17_16PEC_9/segmentation.tif",
+ "segmentationPreviewUrl": "/samples/S2_9-10-17_16PEC_9/segmentation.png",
+ "sceneImageUrl": "/samples/S2_9-10-17_16PEC_9/scene.png",
+ "referenceUrl": "/samples/S2_9-10-17_16PEC_9/reference.png"
+}

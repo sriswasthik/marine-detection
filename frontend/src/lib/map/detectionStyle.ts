@@ -21,14 +21,17 @@ export interface DetectionStyleState {
   onImagery?: boolean
 }
 
-export const DETECTION_FILL_OPACITY = 0.5
+/** Severity fill at about 0.55 with a 1px stroke in the level's darker colour. */
+export const DETECTION_FILL_OPACITY = 0.55
 export const LOW_CONFIDENCE_FILL_OPACITY = 0.3
-export const IMAGERY_FILL_OPACITY = 0.75
-export const IMAGERY_LOW_CONFIDENCE_FILL_OPACITY = 0.45
+/** Over imagery: stronger fill and a 1.5px white casing, so severity stays readable on dark water. */
+export const IMAGERY_FILL_OPACITY = 0.8
+export const IMAGERY_LOW_CONFIDENCE_FILL_OPACITY = 0.5
 export const LOW_CONFIDENCE_STROKE_OPACITY = 0.8
 export const EMPHASIS_FILL_BOOST = 0.15
 export const LOW_CONFIDENCE_DASH = '4 3'
-export const DETECTION_STROKE_WEIGHT = 1.5
+export const DETECTION_STROKE_WEIGHT = 1
+export const IMAGERY_STROKE_WEIGHT = 1.5
 export const HOVER_STROKE_WEIGHT = 3
 export const SELECTED_STROKE_WEIGHT = 2.5
 export const SELECTION_HALO_WEIGHT = 7
@@ -40,7 +43,7 @@ export function isLowConfidence(confidence: number): boolean {
 /**
  * Detection style. Fill and stroke come from the density level. Confidence below the low
  * threshold gets a dashed stroke and lower opacity, in every state, so confidence stays readable.
- * Hover thickens the stroke. Selection swaps the stroke to the accent colour; a white halo is
+ * Hover thickens the stroke. Selection swaps the stroke to the Tar Black mark; a white halo is
  * drawn underneath with getSelectionHaloStyle. Over imagery the outline is white and the fill
  * stronger, so levels stay readable on dark water.
  */
@@ -60,12 +63,14 @@ export function getDetectionStyle(
       : DETECTION_FILL_OPACITY
   const emphasised = state.selected || state.hovered
   return {
-    color: state.selected ? MAP_COLORS.accent : onImagery ? MAP_COLORS.halo : level.stroke,
+    color: state.selected ? MAP_COLORS.mark : onImagery ? MAP_COLORS.halo : level.stroke,
     weight: state.selected
       ? SELECTED_STROKE_WEIGHT
       : state.hovered
         ? HOVER_STROKE_WEIGHT
-        : DETECTION_STROKE_WEIGHT,
+        : onImagery
+          ? IMAGERY_STROKE_WEIGHT
+          : DETECTION_STROKE_WEIGHT,
     opacity: lowConfidence && !state.selected ? LOW_CONFIDENCE_STROKE_OPACITY : 1,
     fillColor: level.color,
     fillOpacity: emphasised ? baseFill + EMPHASIS_FILL_BOOST : baseFill,
@@ -74,7 +79,7 @@ export function getDetectionStyle(
   }
 }
 
-/** White halo under a selected detection so the accent outline reads on any basemap. */
+/** White halo under a selected detection so the dark outline reads on any basemap or imagery. */
 export function getSelectionHaloStyle(): PathStyle {
   return {
     color: MAP_COLORS.halo,
@@ -111,13 +116,16 @@ export function getDensityCellStyle(
   }
 }
 
-/** Source image footprint: 1px accent line, dashed, or dotted when georeferencing is partial. */
+/**
+ * Source image footprint: a quiet 1px dashed line in the muted ink colour (white over imagery),
+ * dotted when georeferencing is partial. It frames the scene without competing with the data.
+ */
 export function getFootprintStyle(approximate: boolean, onImagery = false): PathStyle {
   return {
-    color: onImagery ? MAP_COLORS.halo : MAP_COLORS.accent,
+    color: onImagery ? MAP_COLORS.halo : MAP_COLORS.muted,
     weight: 1,
     opacity: 0.9,
-    fillColor: MAP_COLORS.accent,
+    fillColor: MAP_COLORS.muted,
     fillOpacity: 0,
     dashArray: approximate ? '1 4' : '6 4',
     fill: false,

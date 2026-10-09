@@ -1,15 +1,16 @@
 import { Check, CircleCheck, PlugZap } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import {
-  Badge,
   Banner,
   Button,
   Checkbox,
+  InfoTip,
   PageSkeleton,
   SegmentedControl,
   SeveritySwatch,
   Skeleton,
   Slider,
+  Tag,
   TextInput,
   useToast,
 } from '@/components/ui'
@@ -23,6 +24,7 @@ import {
 } from '@/lib/config'
 import { DENSITY_LEVELS } from '@/lib/density'
 import { formatConfidence, formatCoordinates, formatLength } from '@/lib/format'
+import { GLOSSARY } from '@/lib/glossary'
 import { BASEMAP_ORDER, BASEMAPS } from '@/lib/map/basemaps'
 import { MAP_LAYER_IDS, MAP_LAYER_LABELS } from '@/lib/map/layers'
 import {
@@ -53,10 +55,10 @@ function useSaved() {
 
 function SavedNote({ state }: { state: 'idle' | 'saved' | 'session' }) {
   return (
-    <span aria-live="polite" className="text-caption">
+    <span aria-live="polite" className="text-small">
       {state === 'saved' ? (
         <span className="inline-flex items-center gap-1 text-success">
-          <Check aria-hidden className="size-3.5" />
+          <Check aria-hidden className="size-4" />
           Saved
         </span>
       ) : state === 'session' ? (
@@ -84,16 +86,16 @@ function Section({
   return (
     <section
       aria-labelledby={id}
-      className="grid gap-4 border-t border-border py-7 first:border-t-0 first:pt-0 md:grid-cols-[14rem_minmax(0,1fr)] md:gap-8"
+      className="grid gap-4 border-t border-rule py-8 first:pt-0 md:grid-cols-[14rem_minmax(0,1fr)] md:gap-8"
     >
       <div className="flex flex-col gap-1">
         <div className="flex flex-wrap items-center gap-2">
-          <h2 id={id} className="text-heading text-ink">
+          <h2 id={id} className="label pt-1 text-ink-2">
             {title}
           </h2>
           {saved ? <SavedNote state={saved} /> : null}
         </div>
-        {description ? <p className="text-small text-ink-muted">{description}</p> : null}
+        {description ? <p className="text-small text-ink-2">{description}</p> : null}
       </div>
       <div className="flex min-w-0 flex-col gap-5">{children}</div>
     </section>
@@ -110,10 +112,10 @@ function Setting({
   children: ReactNode
 }) {
   return (
-    <div className="flex flex-col items-start gap-1.5">
+    <div className="flex flex-col items-start gap-2">
       <p className="text-small font-medium text-ink">{label}</p>
       {children}
-      {hint ? <p className="text-caption text-ink-muted">{hint}</p> : null}
+      {hint ? <p className="text-small text-ink-2">{hint}</p> : null}
     </div>
   )
 }
@@ -144,7 +146,7 @@ export function UnitsSection() {
         hint={
           <>
             Example:{' '}
-            <span className="mono-label">
+            <span className="data">
               {formatCoordinates(EXAMPLE_POINT, { format: settings.coordinateFormat })}
             </span>
           </>
@@ -212,7 +214,7 @@ export function MapSection() {
       </Setting>
       <Setting
         label="Density grid cell"
-        hint={`Fixed: each cell spans ${cellPixels} × ${cellPixels} image pixels, so it is ${formatLength(GRID_CELL_SIZE_M)} on a ${REFERENCE_RESOLUTION_M} m Sentinel-2 image and smaller on high-resolution drone images. Density is the share of each cell covered by debris.`}
+        hint={`Fixed: each cell spans ${cellPixels} × ${cellPixels} image pixels, so it is ${formatLength(GRID_CELL_SIZE_M)} on a ${REFERENCE_RESOLUTION_M} m Sentinel-2 image. Density is the share of each cell covered by debris.`}
       >
         <p className="num text-body text-ink">
           {formatLength(GRID_CELL_SIZE_M)} at {REFERENCE_RESOLUTION_M} m per pixel
@@ -243,29 +245,29 @@ export function ThresholdsSection() {
       <table className="w-full max-w-md text-small">
         <caption className="sr-only">Density thresholds by share of cell covered by debris</caption>
         <thead>
-          <tr className="border-b border-border text-left text-caption text-ink-muted">
-            <th scope="col" className="py-1.5 font-medium">
+          <tr className="border-b border-hairline text-left text-small text-ink-2">
+            <th scope="col" className="py-2 font-medium">
               Level
             </th>
-            <th scope="col" className="py-1.5 font-medium">
+            <th scope="col" className="py-2 font-medium">
               Cell covered by debris
             </th>
-            <th scope="col" className="py-1.5 font-medium">
+            <th scope="col" className="py-2 font-medium">
               Meaning
             </th>
           </tr>
         </thead>
         <tbody>
           {rows.map(({ level, range }) => (
-            <tr key={level} className="border-b border-border last:border-0">
-              <td className="py-1.5">
-                <span className="inline-flex items-center gap-1.5 font-medium text-ink">
+            <tr key={level} className="border-b border-hairline last:border-0">
+              <td className="py-2">
+                <span className="inline-flex items-center gap-2 font-medium text-ink">
                   <SeveritySwatch level={level} />
                   {DENSITY_LEVELS[level].label}
                 </span>
               </td>
-              <td className="num py-1.5 text-ink">{range}</td>
-              <td className="py-1.5 text-ink-muted">{DENSITY_LEVELS[level].meaning}</td>
+              <td className="data py-2 text-ink">{range}</td>
+              <td className="py-2 text-ink-2">{DENSITY_LEVELS[level].meaning}</td>
             </tr>
           ))}
         </tbody>
@@ -289,7 +291,7 @@ function ErrorBanner({ error, onRetry }: { error: AppError; onRetry?: () => void
         ) : null
       }
     >
-      {error.message} <span className="mono-label text-ink-muted">{error.code}</span>
+      {error.message} <span className="data text-ink-2">{error.code}</span>
     </Banner>
   )
 }
@@ -356,27 +358,30 @@ export function DataSourceSection() {
       <Setting label="In use now">
         <CurrentSourceStatus />
       </Setting>
-      <SegmentedControl
-        label="Data source"
-        className="self-start"
-        size="sm"
-        options={[
-          { value: 'mock' as const, label: 'Sample data' },
-          { value: 'live' as const, label: 'Live API' },
-        ]}
-        value={choice}
-        onChange={(next) => {
-          setChoice(next)
-          if (next === 'mock' && settings.dataSource !== 'mock') {
-            save({ dataSource: 'mock' })
-            toast.show({ title: 'Using sample data', tone: 'success' })
-          }
-        }}
-      />
+      {/* Sample data is offered only where the environment turns the mock on (VITE_USE_MOCK). */}
+      {store.sampleDataAllowed() ? (
+        <SegmentedControl
+          label="Data source"
+          className="self-start"
+          size="sm"
+          options={[
+            { value: 'mock' as const, label: 'Sample data' },
+            { value: 'live' as const, label: 'Live API' },
+          ]}
+          value={choice}
+          onChange={(next) => {
+            setChoice(next)
+            if (next === 'mock' && settings.dataSource !== 'mock') {
+              save({ dataSource: 'mock' })
+              toast.show({ title: 'Using sample data', tone: 'success' })
+            }
+          }}
+        />
+      ) : null}
       {choice === 'mock' ? (
-        <p className="text-small text-ink-muted">
-          Six synthetic sample observations, generated in the browser. Every screen labels them
-          "Sample data".
+        <p className="text-small text-ink-2">
+          Synthetic scenes generated in the browser, labelled "Sample data", and real model output
+          on MARIDA patches exported by the backend, labelled with their patch.
         </p>
       ) : (
         <div className="flex flex-col gap-3">
@@ -406,11 +411,9 @@ export function DataSourceSection() {
             </Button>
             {settings.dataSource === 'live' &&
             settings.apiBaseUrl === (validation.ok ? validation.url : '') ? (
-              <Badge tone="success" dot>
-                In use
-              </Badge>
+              <Tag tone="success">In use</Tag>
             ) : (
-              <Button variant="primary" size="sm" disabled={!passed} onClick={useLive}>
+              <Button variant="secondary" size="sm" disabled={!passed} onClick={useLive}>
                 Use this service
               </Button>
             )}
@@ -426,14 +429,13 @@ export function DataSourceSection() {
               <ErrorBanner error={test.result.error} />
             )
           ) : (
-            <p className="text-caption text-ink-muted">
-              Test the connection before switching. The live client currently implements the health
-              check; other screens report "Not available from the live service yet" until the
-              service contract is connected.
+            <p className="text-small text-ink-2">
+              Test the connection before switching. The live service lists, analyses and serves
+              observations; start it with backend/run.sh.
             </p>
           )}
           {!store.persistent() ? (
-            <p className="text-caption text-warning">
+            <p className="text-small text-warning">
               This browser does not allow saving settings, so the choice lasts for this visit only.
             </p>
           ) : null}
@@ -446,25 +448,25 @@ export function DataSourceSection() {
 export function ModelCardSection() {
   const m = PLACEHOLDER_MODEL_METRICS
   const figures = [
-    { label: 'Precision', value: m.precision },
-    { label: 'Recall', value: m.recall },
-    { label: 'F1 score', value: m.f1 },
-    { label: 'Accuracy', value: m.accuracy },
+    { label: 'Precision', value: m.precision, hint: GLOSSARY.precision },
+    { label: 'Recall', value: m.recall, hint: GLOSSARY.recall },
+    { label: 'F1 score', value: m.f1, hint: GLOSSARY.f1 },
+    { label: 'Accuracy', value: m.accuracy, hint: GLOSSARY.accuracy },
   ]
   return (
     <Section id="model" title="Model card" description="The model behind every detection.">
-      <dl className="grid max-w-lg grid-cols-[auto_1fr] gap-x-6 gap-y-1.5 text-small">
-        <dt className="text-ink-muted">Model</dt>
+      <dl className="grid max-w-lg grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-small">
+        <dt className="text-ink-2">Model</dt>
         <dd className="text-ink">
-          {MODEL_CARD.name} <span className="mono-label">{MODEL_CARD.version}</span>
+          {MODEL_CARD.name} <span className="data">{MODEL_CARD.version}</span>
         </dd>
-        <dt className="text-ink-muted">Architecture</dt>
+        <dt className="text-ink-2">Architecture</dt>
         <dd className="text-ink">{MODEL_CARD.architecture}</dd>
-        <dt className="text-ink-muted">Training data</dt>
+        <dt className="text-ink-2">Training data</dt>
         <dd className="text-ink">{MODEL_CARD.trainingData}</dd>
-        <dt className="text-ink-muted">Evaluation data</dt>
+        <dt className="text-ink-2">Evaluation data</dt>
         <dd className="text-ink">{MODEL_CARD.evaluationData}</dd>
-        <dt className="text-ink-muted">Confidence</dt>
+        <dt className="text-ink-2">Confidence</dt>
         <dd className="text-ink">
           High from {formatConfidence(CONFIDENCE_THRESHOLDS.high)}, low below{' '}
           {formatConfidence(CONFIDENCE_THRESHOLDS.low)}
@@ -473,18 +475,21 @@ export function ModelCardSection() {
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <h3 className="text-small font-medium text-ink">Evaluation</h3>
-          {m.isPlaceholder ? <Badge tone="warning">Sample values</Badge> : null}
+          {m.isPlaceholder ? <Tag tone="warning">Sample values</Tag> : null}
         </div>
         <dl className="grid max-w-lg grid-cols-4 gap-3">
           {figures.map((figure) => (
             <div key={figure.label} className="flex flex-col">
-              <dt className="text-caption text-ink-muted">{figure.label}</dt>
-              <dd className="num text-heading text-ink">{formatConfidence(figure.value)}</dd>
+              <dt className="flex items-center gap-1 text-small text-ink-2">
+                {figure.label}
+                <InfoTip label={figure.label}>{figure.hint}</InfoTip>
+              </dt>
+              <dd className="num text-title text-ink">{formatConfidence(figure.value)}</dd>
             </div>
           ))}
         </dl>
         {m.isPlaceholder ? (
-          <p className="text-caption text-ink-muted">
+          <p className="text-small text-ink-2">
             Placeholder figures, not an evaluation of this model. {m.benchmark}.
           </p>
         ) : null}
@@ -530,7 +535,7 @@ export function AboutSection({ appName }: { appName: string }) {
         {ATTRIBUTIONS.map((item) => (
           <div key={item.name} className="grid grid-cols-[10rem_1fr] gap-3">
             <dt className="font-medium text-ink">{item.name}</dt>
-            <dd className="text-ink-muted">{item.detail}</dd>
+            <dd className="text-ink-2">{item.detail}</dd>
           </div>
         ))}
       </dl>

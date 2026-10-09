@@ -1,0 +1,330 @@
+{
+ "id": "S2_3-11-16_16PDC_5",
+ "name": "Ulua patch 5",
+ "source": "satellite",
+ "capturedAt": "2016-11-03T12:00:00.000Z",
+ "region": "Ulua (16PDC)",
+ "imageUrl": "/samples/S2_3-11-16_16PDC_5/preview.png",
+ "previewUrl": "/samples/S2_3-11-16_16PDC_5/preview.png",
+ "maskUrl": "/samples/S2_3-11-16_16PDC_5/classes.png",
+ "bounds": {
+  "north": 15.8672937,
+  "south": 15.8441152,
+  "east": -87.3050211,
+  "west": -87.328967
+ },
+ "crs": "EPSG:32616",
+ "status": "completed",
+ "debrisAreaM2": 200.0,
+ "waterAreaM2": 68100.0,
+ "waterAreaDefinition": "Water surface = every valid pixel the model did not classify as Clouds (class 6). MARIDA has no land class, so any land in the scene is counted as water.",
+ "coveragePercent": 0.293686,
+ "averageConfidence": 0.4394,
+ "densityLevel": "low",
+ "detections": [
+  {
+   "id": "S2_3-11-16_16PDC_5-d001",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -87.3288734,
+       15.8671684
+      ],
+      [
+       -87.3288733,
+       15.867078
+      ],
+      [
+       -87.3287799,
+       15.8670781
+      ],
+      [
+       -87.32878,
+       15.8671685
+      ],
+      [
+       -87.3288734,
+       15.8671684
+      ]
+     ]
+    ]
+   },
+   "areaM2": 100.0,
+   "confidence": 0.6313,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 15.8671232,
+    "lng": -87.3288266
+   },
+   "sourcePixelCount": 1
+  },
+  {
+   "id": "S2_3-11-16_16PDC_5-d002",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -87.3289302,
+       15.8445673
+      ],
+      [
+       -87.32893,
+       15.8444769
+      ],
+      [
+       -87.3288366,
+       15.844477
+      ],
+      [
+       -87.3288368,
+       15.8445674
+      ],
+      [
+       -87.3289302,
+       15.8445673
+      ]
+     ]
+    ]
+   },
+   "areaM2": 100.0,
+   "confidence": 0.2474,
+   "densityLevel": "low",
+   "centroid": {
+    "lat": 15.8445221,
+    "lng": -87.3288834
+   },
+   "sourcePixelCount": 1
+  }
+ ],
+ "densityGrid": {
+  "method": "Blocks of 25 x 25 source pixels. Coverage = debris pixels of the kept detections / imaged pixels in the block. A detection takes the level of the block holding most of its pixels. Hotspots join 8-adjacent High and Critical blocks (Moderate when there are none).",
+  "cellSizeM": 250.0,
+  "cellSizePx": 25,
+  "rows": 11,
+  "cols": 11,
+  "thresholds": {
+   "moderate": 2.0,
+   "high": 8.0,
+   "critical": 20.0
+  },
+  "cells": [
+   {
+    "id": "r0c0",
+    "row": 0,
+    "col": 0,
+    "bounds": {
+     "north": 15.8446612,
+     "south": 15.8441152,
+     "east": -87.3265947,
+     "west": -87.3289303
+    },
+    "areaM2": 15000.0,
+    "debrisAreaM2": 100.0,
+    "coveragePercent": 0.6667,
+    "level": "low",
+    "detectionAreasM2": {
+     "S2_3-11-16_16PDC_5-d002": 100.0
+    }
+   },
+   {
+    "id": "r10c0",
+    "row": 10,
+    "col": 0,
+    "bounds": {
+     "north": 15.8672622,
+     "south": 15.8649985,
+     "east": -87.3266283,
+     "west": -87.328967
+    },
+    "areaM2": 62500.0,
+    "debrisAreaM2": 100.0,
+    "coveragePercent": 0.16,
+    "level": "low",
+    "detectionAreasM2": {
+     "S2_3-11-16_16PDC_5-d001": 100.0
+    }
+   }
+  ]
+ },
+ "hotspots": [],
+ "suppressedRegions": [],
+ "warnings": [
+  "LOW_CONFIDENCE",
+  "HIGH_CLOUD"
+ ],
+ "cloudCoveragePercent": 98.9609,
+ "resolutionM": 10.0,
+ "sceneContext": {
+  "validPixels": 65536,
+  "debrisPercent": 0.0031,
+  "cloudPercent": 98.9609,
+  "shipPercent": 0.0015,
+  "foamPercent": 0.0366,
+  "sargassumPercent": 0.1617,
+  "naturalOrganicPercent": 0.0,
+  "classPixelCounts": {
+   "1": 2,
+   "2": 15,
+   "3": 91,
+   "4": 0,
+   "5": 1,
+   "6": 64855,
+   "7": 342,
+   "8": 151,
+   "9": 24,
+   "10": 1,
+   "11": 54
+  }
+ },
+ "classPalette": [
+  {
+   "id": 1,
+   "name": "Marine Debris",
+   "color": "#C4503A",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 2,
+   "name": "Dense Sargassum",
+   "color": "#6FA35A",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 3,
+   "name": "Sparse Sargassum",
+   "color": "#B3CF7B",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 4,
+   "name": "Natural Organic Material",
+   "color": "#B39B78",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 5,
+   "name": "Ship",
+   "color": "#9384C6",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 6,
+   "name": "Clouds",
+   "color": "#BAC4CD",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 7,
+   "name": "Marine Water",
+   "color": null,
+   "opacity": 0.0,
+   "drawn": false
+  },
+  {
+   "id": 8,
+   "name": "Sediment-Laden Water",
+   "color": null,
+   "opacity": 0.0,
+   "drawn": false
+  },
+  {
+   "id": 9,
+   "name": "Foam",
+   "color": "#72C2C8",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 10,
+   "name": "Turbid Water",
+   "color": null,
+   "opacity": 0.0,
+   "drawn": false
+  },
+  {
+   "id": 11,
+   "name": "Shallow Water",
+   "color": null,
+   "opacity": 0.0,
+   "drawn": false
+  }
+ ],
+ "overlay": {
+  "crs": "EPSG:4326",
+  "bounds": {
+   "north": 15.8672937,
+   "south": 15.8441152,
+   "east": -87.3050211,
+   "west": -87.328967
+  }
+ },
+ "geospatial": {
+  "width": 256,
+  "height": 256,
+  "bandCount": 11,
+  "dataType": "float32",
+  "crs": "EPSG:32616",
+  "crsName": "WGS 84 / UTM zone 16N",
+  "pixelSizeX": 10.0,
+  "pixelSizeY": 10.0,
+  "pixelSizeUnit": "m",
+  "pixelAreaM2": 100.0,
+  "totalPixels": 65536,
+  "validPixels": 65536,
+  "sceneAreaM2": 6553600.0,
+  "debrisPixels": 2,
+  "debrisAreaM2": 200.0,
+  "debrisCoveragePercent": 0.003052,
+  "debrisCentroid": {
+   "lat": 15.8558227,
+   "lng": -87.328855
+  },
+  "sceneCentre": {
+   "lat": 15.8557048,
+   "lng": -87.3169934
+  }
+ },
+ "processing": {
+  "startedAt": "2026-10-09T09:20:58.312Z",
+  "finishedAt": "2026-10-09T09:20:58.481Z",
+  "modelName": "U-Net marine debris segmentation",
+  "modelVersion": "f19c947d5a0a",
+  "device": "cpu",
+  "stagesMs": {
+   "preprocessMs": 29.8,
+   "detectMs": 102.7,
+   "mapMs": 24.3
+  }
+ },
+ "modelMetrics": {
+  "precision": 0.371,
+  "recall": 0.8793,
+  "f1": 0.5218,
+  "accuracy": 0.8825,
+  "iou": 0.353,
+  "meanIoU": 0.5535,
+  "macroF1": 0.6799,
+  "benchmark": "MARIDA test split (from logs/evaluating_unet.log)",
+  "isPlaceholder": false
+ },
+ "maridaPatch": {
+  "id": "S2_3-11-16_16PDC_5",
+  "tile": "16PDC",
+  "date": "2016-11-03",
+  "split": "test"
+ },
+ "referenceDebrisPixels": 0,
+ "segmentationUrl": "/samples/S2_3-11-16_16PDC_5/segmentation.tif",
+ "segmentationPreviewUrl": "/samples/S2_3-11-16_16PDC_5/segmentation.png",
+ "sceneImageUrl": "/samples/S2_3-11-16_16PDC_5/scene.png",
+ "referenceUrl": "/samples/S2_3-11-16_16PDC_5/reference.png"
+}

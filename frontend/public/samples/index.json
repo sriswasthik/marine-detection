@@ -1,0 +1,330 @@
+{
+ "generatedBy": "backend/scripts/export_samples.py",
+ "note": "Model output on MARIDA patches, with density levels and hotspots graded by backend/pipeline.py.",
+ "samples": [
+  {
+   "id": "S2_9-10-17_16PEC_0",
+   "name": "La Ceiba patch 0",
+   "region": "La Ceiba (16PEC)",
+   "date": "2017-10-09",
+   "capturedAt": "2017-10-09T12:00:00.000Z",
+   "split": "train",
+   "case": "Demo sample (sample_data)",
+   "debrisPixels": 183,
+   "detectionCount": 59,
+   "debrisAreaM2": 18300.0,
+   "averageConfidence": 0.2888,
+   "cloudPercent": 0.0916,
+   "referenceDebrisPixels": 0,
+   "warnings": [
+    "LOW_CONFIDENCE"
+   ],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_9-10-17_16PEC_1",
+   "name": "La Ceiba patch 1",
+   "region": "La Ceiba (16PEC)",
+   "date": "2017-10-09",
+   "capturedAt": "2017-10-09T12:00:00.000Z",
+   "split": "train",
+   "case": "Demo sample (sample_data)",
+   "debrisPixels": 92,
+   "detectionCount": 29,
+   "debrisAreaM2": 9200.0,
+   "averageConfidence": 0.3633,
+   "cloudPercent": 3.7476,
+   "referenceDebrisPixels": 0,
+   "warnings": [
+    "LOW_CONFIDENCE"
+   ],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_9-10-17_16PEC_10",
+   "name": "La Ceiba patch 10",
+   "region": "La Ceiba (16PEC)",
+   "date": "2017-10-09",
+   "capturedAt": "2017-10-09T12:00:00.000Z",
+   "split": "train",
+   "case": "Demo sample (sample_data)",
+   "debrisPixels": 37,
+   "detectionCount": 16,
+   "debrisAreaM2": 3700.0,
+   "averageConfidence": 0.3326,
+   "cloudPercent": 4.4678,
+   "referenceDebrisPixels": 0,
+   "warnings": [
+    "LOW_CONFIDENCE"
+   ],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_9-10-17_16PEC_2",
+   "name": "La Ceiba patch 2",
+   "region": "La Ceiba (16PEC)",
+   "date": "2017-10-09",
+   "capturedAt": "2017-10-09T12:00:00.000Z",
+   "split": "train",
+   "case": "Demo sample (sample_data)",
+   "debrisPixels": 185,
+   "detectionCount": 77,
+   "debrisAreaM2": 18500.0,
+   "averageConfidence": 0.267,
+   "cloudPercent": 0.0,
+   "referenceDebrisPixels": 0,
+   "warnings": [
+    "LOW_CONFIDENCE"
+   ],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_9-10-17_16PEC_3",
+   "name": "La Ceiba patch 3",
+   "region": "La Ceiba (16PEC)",
+   "date": "2017-10-09",
+   "capturedAt": "2017-10-09T12:00:00.000Z",
+   "split": "train",
+   "case": "Demo sample (sample_data)",
+   "debrisPixels": 368,
+   "detectionCount": 107,
+   "debrisAreaM2": 36800.0,
+   "averageConfidence": 0.2993,
+   "cloudPercent": 0.1175,
+   "referenceDebrisPixels": 0,
+   "warnings": [
+    "LOW_CONFIDENCE"
+   ],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_9-10-17_16PEC_4",
+   "name": "La Ceiba patch 4",
+   "region": "La Ceiba (16PEC)",
+   "date": "2017-10-09",
+   "capturedAt": "2017-10-09T12:00:00.000Z",
+   "split": "train",
+   "case": "Demo sample (sample_data)",
+   "debrisPixels": 40,
+   "detectionCount": 15,
+   "debrisAreaM2": 4000.0,
+   "averageConfidence": 0.3227,
+   "cloudPercent": 0.0,
+   "referenceDebrisPixels": 0,
+   "warnings": [
+    "LOW_CONFIDENCE"
+   ],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_9-10-17_16PEC_5",
+   "name": "La Ceiba patch 5",
+   "region": "La Ceiba (16PEC)",
+   "date": "2017-10-09",
+   "capturedAt": "2017-10-09T12:00:00.000Z",
+   "split": "train",
+   "case": "Demo sample (sample_data)",
+   "debrisPixels": 291,
+   "detectionCount": 109,
+   "debrisAreaM2": 29100.0,
+   "averageConfidence": 0.2704,
+   "cloudPercent": 0.0,
+   "referenceDebrisPixels": 0,
+   "warnings": [
+    "LOW_CONFIDENCE"
+   ],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_9-10-17_16PEC_6",
+   "name": "La Ceiba patch 6",
+   "region": "La Ceiba (16PEC)",
+   "date": "2017-10-09",
+   "capturedAt": "2017-10-09T12:00:00.000Z",
+   "split": "train",
+   "case": "Demo sample (sample_data)",
+   "debrisPixels": 14,
+   "detectionCount": 8,
+   "debrisAreaM2": 1400.0,
+   "averageConfidence": 0.2067,
+   "cloudPercent": 0.0,
+   "referenceDebrisPixels": 0,
+   "warnings": [
+    "LOW_CONFIDENCE"
+   ],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_9-10-17_16PEC_7",
+   "name": "La Ceiba patch 7",
+   "region": "La Ceiba (16PEC)",
+   "date": "2017-10-09",
+   "capturedAt": "2017-10-09T12:00:00.000Z",
+   "split": "train",
+   "case": "Demo sample (sample_data)",
+   "debrisPixels": 261,
+   "detectionCount": 69,
+   "debrisAreaM2": 26100.0,
+   "averageConfidence": 0.3636,
+   "cloudPercent": 12.8525,
+   "referenceDebrisPixels": 0,
+   "warnings": [
+    "LOW_CONFIDENCE"
+   ],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_9-10-17_16PEC_8",
+   "name": "La Ceiba patch 8",
+   "region": "La Ceiba (16PEC)",
+   "date": "2017-10-09",
+   "capturedAt": "2017-10-09T12:00:00.000Z",
+   "split": "train",
+   "case": "Demo sample (sample_data)",
+   "debrisPixels": 116,
+   "detectionCount": 29,
+   "debrisAreaM2": 11600.0,
+   "averageConfidence": 0.337,
+   "cloudPercent": 0.0,
+   "referenceDebrisPixels": 0,
+   "warnings": [
+    "LOW_CONFIDENCE"
+   ],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_9-10-17_16PEC_9",
+   "name": "La Ceiba patch 9",
+   "region": "La Ceiba (16PEC)",
+   "date": "2017-10-09",
+   "capturedAt": "2017-10-09T12:00:00.000Z",
+   "split": "train",
+   "case": "Demo sample (sample_data)",
+   "debrisPixels": 77,
+   "detectionCount": 26,
+   "debrisAreaM2": 7700.0,
+   "averageConfidence": 0.3253,
+   "cloudPercent": 0.0,
+   "referenceDebrisPixels": 0,
+   "warnings": [
+    "LOW_CONFIDENCE"
+   ],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_22-12-20_18QYF_0",
+   "name": "Haiti patch 0",
+   "region": "Haiti (18QYF)",
+   "date": "2020-12-22",
+   "capturedAt": "2020-12-22T12:00:00.000Z",
+   "split": "test",
+   "case": "Most predicted debris",
+   "debrisPixels": 574,
+   "detectionCount": 35,
+   "debrisAreaM2": 57400.0,
+   "averageConfidence": 0.5321,
+   "cloudPercent": 0.0,
+   "referenceDebrisPixels": 28,
+   "warnings": [
+    "LOW_CONFIDENCE",
+    "STRIPE_ARTEFACT"
+   ],
+   "suppressedPixels": 698
+  },
+  {
+   "id": "S2_14-9-18_16PCC_26",
+   "name": "Motagua patch 26",
+   "region": "Motagua (16PCC)",
+   "date": "2018-09-14",
+   "capturedAt": "2018-09-14T12:00:00.000Z",
+   "split": "test",
+   "case": "Medium debris",
+   "debrisPixels": 89,
+   "detectionCount": 8,
+   "debrisAreaM2": 8900.0,
+   "averageConfidence": 0.5035,
+   "cloudPercent": 0.0,
+   "referenceDebrisPixels": 2,
+   "warnings": [
+    "LOW_CONFIDENCE"
+   ],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_19-9-18_16PDC_6",
+   "name": "Ulua patch 6",
+   "region": "Ulua (16PDC)",
+   "date": "2018-09-19",
+   "capturedAt": "2018-09-19T12:00:00.000Z",
+   "split": "test",
+   "case": "Few debris pixels",
+   "debrisPixels": 5,
+   "detectionCount": 2,
+   "debrisAreaM2": 500.0,
+   "averageConfidence": 0.3641,
+   "cloudPercent": 0.0,
+   "referenceDebrisPixels": 2,
+   "warnings": [
+    "LOW_CONFIDENCE"
+   ],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_12-12-20_16PCC_5",
+   "name": "Motagua patch 5",
+   "region": "Motagua (16PCC)",
+   "date": "2020-12-12",
+   "capturedAt": "2020-12-12T12:00:00.000Z",
+   "split": "test",
+   "case": "No debris predicted",
+   "debrisPixels": 0,
+   "detectionCount": 0,
+   "debrisAreaM2": 0.0,
+   "averageConfidence": null,
+   "cloudPercent": 0.0,
+   "referenceDebrisPixels": 0,
+   "warnings": [],
+   "suppressedPixels": 0
+  },
+  {
+   "id": "S2_27-1-19_16PCC_24",
+   "name": "Motagua patch 24",
+   "region": "Motagua (16PCC)",
+   "date": "2019-01-27",
+   "capturedAt": "2019-01-27T12:00:00.000Z",
+   "split": "test",
+   "case": "Sargassum or foam",
+   "debrisPixels": 130,
+   "detectionCount": 12,
+   "debrisAreaM2": 13000.0,
+   "averageConfidence": 0.2633,
+   "cloudPercent": 0.0,
+   "referenceDebrisPixels": 0,
+   "warnings": [
+    "LOW_CONFIDENCE",
+    "STRIPE_ARTEFACT"
+   ],
+   "suppressedPixels": 598
+  },
+  {
+   "id": "S2_3-11-16_16PDC_5",
+   "name": "Ulua patch 5",
+   "region": "Ulua (16PDC)",
+   "date": "2016-11-03",
+   "capturedAt": "2016-11-03T12:00:00.000Z",
+   "split": "test",
+   "case": "High cloud share",
+   "debrisPixels": 2,
+   "detectionCount": 2,
+   "debrisAreaM2": 200.0,
+   "averageConfidence": 0.4394,
+   "cloudPercent": 98.9609,
+   "referenceDebrisPixels": 0,
+   "warnings": [
+    "LOW_CONFIDENCE",
+    "HIGH_CLOUD"
+   ],
+   "suppressedPixels": 0
+  }
+ ]
+}

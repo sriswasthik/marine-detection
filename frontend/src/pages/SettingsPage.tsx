@@ -1,3 +1,4 @@
+import { NextStep } from '@/app/shell/NextStep'
 import { Banner } from '@/components/ui'
 import {
   AboutSection,
@@ -35,6 +36,7 @@ export function SettingsPage() {
           <ModelCardSection />
           <AboutSection appName={ENV.appName} />
         </div>
+        <NextStep page="settings" observationId={null} />
       </div>
     </PageContainer>
   )

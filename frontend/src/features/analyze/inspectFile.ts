@@ -1,12 +1,13 @@
 /**
- * Reads what can be read from a chosen file, in the browser: size, georeferencing and a small
- * preview. It never throws and never blocks the user; anything it cannot read is left unknown
+ * Reads what can be read from a chosen GeoTIFF, in the browser: size, band count,
+ * georeferencing and a small true-colour preview. It never throws and never blocks the user; anything it cannot read is left unknown
  * and checked after upload instead.
  */
+import { MODEL_INPUT } from '@/lib/config'
 import { bboxToGeoBounds, resolutionMeters } from '@/lib/crs'
 import { formatCoordinates } from '@/lib/format'
 import { boundsCenter } from '@/lib/geo'
-import { fileKind, type FileFacts, type FileInspection, type FileKind } from './validate'
+import { fileKind, type FileFacts, type FileInspection } from './validate'
 
 const PREVIEW_MAX_PX = 640
 
@@ -16,11 +17,12 @@ export interface InspectionResult {
   regionHint: string | null
 }
 
-function emptyInspection(kind: FileKind, readError: string | null): FileInspection {
+function emptyInspection(readError: string | null): FileInspection {
   return {
-    kind,
+    kind: 'geotiff',
     width: null,
     height: null,
+    bands: null,
     georeferenced: false,
     embeddedBounds: null,
     epsg: null,
@@ -46,24 +48,10 @@ function fitWithin(width: number, height: number): { width: number; height: numb
   }
 }
 
-async function inspectBitmap(file: File, kind: FileKind): Promise<FileInspection> {
-  if (typeof createImageBitmap !== 'function') {
-    return emptyInspection(kind, 'This browser cannot read the image here.')
-  }
-  const bitmap = await createImageBitmap(file)
-  try {
-    const size = fitWithin(bitmap.width, bitmap.height)
-    const canvas = canvasFor(size.width, size.height)
-    canvas?.getContext('2d')?.drawImage(bitmap, 0, 0, size.width, size.height)
-    return {
-      ...emptyInspection(kind, null),
-      width: bitmap.width,
-      height: bitmap.height,
-      previewUrl: canvas ? canvas.toDataURL('image/jpeg', 0.85) : null,
-    }
-  } finally {
-    bitmap.close()
-  }
+/** Bands for the preview: true colour for a model-ready image, else the first three, else one. */
+export function previewBands(bands: number): number[] {
+  if (bands === MODEL_INPUT.bands) return [...MODEL_INPUT.trueColourBands]
+  return bands >= 3 ? [0, 1, 2] : [0]
 }
 
 /** Contrast stretch between the 2nd and 98th percentiles, to 0..255. */
@@ -86,6 +74,7 @@ async function inspectGeoTiff(file: File): Promise<FileInspection> {
   const image = await tiff.getImage()
   const width = image.getWidth()
   const height = image.getHeight()
+  const bandCount = image.getSamplesPerPixel()
   const keys = image.getGeoKeys() ?? {}
   const rawEpsg: unknown = keys.ProjectedCSTypeGeoKey ?? keys.GeographicTypeGeoKey
   const epsg = typeof rawEpsg === 'number' && rawEpsg > 0 && rawEpsg < 32767 ? rawEpsg : null
@@ -105,6 +94,7 @@ async function inspectGeoTiff(file: File): Promise<FileInspection> {
     kind: 'geotiff',
     width,
     height,
+    bands: bandCount,
     georeferenced: bbox !== null && epsg !== null,
     embeddedBounds,
     epsg,
@@ -116,7 +106,7 @@ async function inspectGeoTiff(file: File): Promise<FileInspection> {
   // The preview is a nice-to-have: any failure here keeps the facts read above.
   try {
     const size = fitWithin(width, height)
-    const samples = image.getSamplesPerPixel() >= 3 ? [0, 1, 2] : [0]
+    const samples = previewBands(bandCount)
     const rasters = await image.readRasters({
       width: size.width,
       height: size.height,
@@ -153,17 +143,12 @@ async function inspectGeoTiff(file: File): Promise<FileInspection> {
 export async function inspectFile(file: File): Promise<InspectionResult> {
   const facts: FileFacts = { name: file.name, size: file.size, type: file.type }
   const kind = fileKind(facts)
-  if (!kind) return { inspection: emptyInspection('png', 'Unsupported format.'), regionHint: null }
+  if (!kind) return { inspection: emptyInspection('Unsupported format.'), regionHint: null }
   let inspection: FileInspection
   try {
-    inspection = kind === 'geotiff' ? await inspectGeoTiff(file) : await inspectBitmap(file, kind)
+    inspection = await inspectGeoTiff(file)
   } catch {
-    inspection = emptyInspection(
-      kind,
-      kind === 'geotiff'
-        ? 'The GeoTIFF header could not be read here.'
-        : 'The image could not be decoded here.',
-    )
+    inspection = emptyInspection('The GeoTIFF header could not be read here.')
   }
   const regionHint = inspection.embeddedBounds
     ? `Image centre near ${formatCoordinates(boundsCenter(inspection.embeddedBounds), { digits: 2 })}`

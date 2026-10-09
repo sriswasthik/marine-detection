@@ -11,6 +11,7 @@ export interface Validated<T> {
 export interface CreateObservationInput {
   file: File
   source: ObservationSource
+  /** Shown name. Empty: the service names the result after the image's location. */
   region: string
   /** ISO 8601 timestamp of image capture. */
   capturedAt: string

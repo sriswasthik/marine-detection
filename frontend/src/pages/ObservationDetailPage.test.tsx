@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { afterEach, describe, expect, it } from 'vitest'
 import { AppProviders } from '@/app/providers'
-import { routes } from '@/app/router'
+import { routes } from '@/test/routes'
 import { ApiError } from '@/features/observations/api/errors'
 import { createMockApi } from '@/features/observations/api/mockApi'
 import type { ObservationsApi } from '@/features/observations/api/types'
@@ -73,9 +73,12 @@ describe('Observation detail page', { timeout: 20_000 }, () => {
     renderDetail(detailPath(hero))
     await title(hero.region)
 
-    expect(screen.getByRole('navigation', { name: 'Breadcrumb' })).toHaveTextContent(
-      `Observations${hero.region}`,
+    const crumbs = screen.getByRole('navigation', { name: 'Breadcrumb' })
+    expect(within(crumbs).getByRole('link', { name: 'Observations' })).toHaveAttribute(
+      'href',
+      '/observations',
     )
+    expect(within(crumbs).getByText(hero.region)).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: /Open on map/ })).toHaveAttribute(
       'href',
       `/map/${hero.id}`,
@@ -206,8 +209,7 @@ describe('Observation detail page', { timeout: 20_000 }, () => {
     ).toBeInTheDocument()
     expect(screen.queryByRole('table', { name: /^Detections/ })).not.toBeInTheDocument()
 
-    const metric = (label: string) =>
-      screen.getByText(label).closest('div.rounded-card')?.textContent ?? ''
+    const metric = (label: string) => screen.getByRole('group', { name: label }).textContent ?? ''
     expect(metric('Detected area')).toContain('0 m²')
     expect(metric('Coverage')).toContain('0%')
     expect(metric('Detected regions')).toContain('0')

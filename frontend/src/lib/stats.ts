@@ -4,7 +4,6 @@ import { DENSITY_LEVEL_ORDER } from '@/lib/density'
 import type { Hotspot } from '@/lib/hotspots'
 
 export type ConfidenceBand = 'low' | 'medium' | 'high'
-export const CONFIDENCE_BANDS: readonly ConfidenceBand[] = ['low', 'medium', 'high']
 
 export const CONFIDENCE_BAND_LABELS: Readonly<Record<ConfidenceBand, string>> = {
   low: 'Low',

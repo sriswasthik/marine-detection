@@ -1,6 +1,6 @@
 import type { ComponentPropsWithRef, ReactNode } from 'react'
-import { cn } from '@/lib/cn'
 import { Field } from './Field'
+import { inputStyles } from './inputStyles'
 
 export interface TextInputProps extends Omit<ComponentPropsWithRef<'input'>, 'size'> {
   label: ReactNode
@@ -9,11 +9,11 @@ export interface TextInputProps extends Omit<ComponentPropsWithRef<'input'>, 'si
   error?: ReactNode
   hideLabel?: boolean
   size?: 'sm' | 'md'
-  /** Monospace and tabular figures, for coordinates. */
+  /** Mono and tabular figures, for coordinates. */
   numeric?: boolean
 }
 
-/** Labelled text input (also number, date and datetime-local). */
+/** A Field with an underlined text input (also number, date and datetime-local). */
 export function TextInput({
   label,
   hint,
@@ -39,14 +39,7 @@ export function TextInput({
           id={controlId}
           aria-describedby={describedBy}
           aria-invalid={invalid || undefined}
-          className={cn(
-            'w-full rounded-control border bg-surface px-3 text-ink shadow-subtle placeholder:text-ink-muted/70',
-            'transition-colors duration-150 ease-out hover:border-ink-muted/60',
-            'disabled:cursor-not-allowed disabled:bg-bg disabled:text-ink-muted',
-            size === 'sm' ? 'h-8 text-small' : 'h-9 text-body',
-            numeric && 'num font-mono text-small',
-            invalid ? 'border-danger' : 'border-border-strong',
-          )}
+          className={inputStyles({ invalid, size, numeric })}
           {...rest}
         />
       )}

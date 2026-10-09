@@ -1,6 +1,8 @@
-import type { DensityLevel, Detection, GeoBounds, LatLng } from '@/features/observations/types'
+import type { DensityLevel, Detection, Hotspot } from '@/features/observations/types'
 import { getCell, maxDensityLevel, type DensityCell, type DensityGrid } from '@/lib/density'
 import { boundsCenter, unionBounds } from '@/lib/geo'
+
+export type { Hotspot }
 
 /** Weight of each level in the priority score. */
 export const HOTSPOT_LEVEL_WEIGHTS: Readonly<Record<DensityLevel, number>> = {
@@ -17,27 +19,6 @@ export const PRIORITY_SCORE_RULE =
 /** The same rule in plain words, for the inspection panel. */
 export const PRIORITY_SCORE_EXPLANATION =
   'Hotspots are ranked by priority score: the debris area inside the hotspot, times the average model confidence, times a weight for the density level (Low 1, Moderate 2, High 3, Critical 4). Larger, denser and more certain hotspots come first.'
-
-export interface Hotspot {
-  /** `hotspot-{rank}`. */
-  id: string
-  /** 1 is the highest priority. */
-  rank: number
-  /** Highest level among the hotspot's cells. */
-  level: DensityLevel
-  bounds: GeoBounds
-  /** Debris-area-weighted centre of the hotspot's cells. */
-  centroid: LatLng
-  cellIds: string[]
-  /** Detections with any area inside the hotspot's cells. */
-  detectionIds: string[]
-  /** Debris area inside the hotspot's cells, square meters. */
-  totalAreaM2: number
-  /** Mean confidence of the hotspot's detections, 0 to 1. */
-  meanConfidence: number
-  /** totalAreaM2 × meanConfidence × HOTSPOT_LEVEL_WEIGHTS[level]. */
-  priorityScore: number
-}
 
 const NEIGHBOUR_OFFSETS = [
   [-1, -1],
@@ -60,6 +41,7 @@ export function priorityScore(totalAreaM2: number, meanConfidence: number, level
  * Cells at High or Critical form hotspots. If there are none, Moderate cells form them instead.
  * An observation with only Low cells, or no debris at all, has no hotspots.
  * Results are sorted by priority score, highest first.
+ * backend/pipeline.py find_hotspots applies the same rules to the service's grid.
  */
 export function findHotspots(grid: DensityGrid, detections: readonly Detection[]): Hotspot[] {
   const severe = new Set<DensityLevel>(['high', 'critical'])

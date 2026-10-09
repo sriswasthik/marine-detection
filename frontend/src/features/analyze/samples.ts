@@ -1,11 +1,12 @@
 import { getSampleObservation, SAMPLE_IDS } from '@/features/observations/mock/samples'
 import type { Observation, ObservationSource } from '@/features/observations/types'
+import { MODEL_INPUT } from '@/lib/config'
 import { toDateTimeLocalValue } from '@/lib/datetime'
 import { slugify } from '@/lib/format'
 import { degreesToMeters } from '@/lib/geo'
 import { boundsToInput, type BoundsInput, type FileFacts, type FileInspection } from './validate'
 
-/** Sample scenes offered on the Analyze page: the hero, the drone survey and a clear result. */
+/** Sample scenes offered on the Analyze page: the hero, a Moderate scene and a clear result. */
 export const SAMPLE_SCENE_IDS = [SAMPLE_IDS.ennore, SAMPLE_IDS.mahim, SAMPLE_IDS.mannar] as const
 
 export interface SampleSelection {
@@ -44,6 +45,7 @@ export function sampleSelection(observation: Observation): SampleSelection {
       kind: 'geotiff',
       width: size ? Math.round(size.dxM / resolution) : null,
       height: size ? Math.round(size.dyM / resolution) : null,
+      bands: MODEL_INPUT.bands,
       georeferenced: bounds !== null,
       embeddedBounds: bounds,
       epsg,

@@ -23,7 +23,7 @@ export interface FieldProps {
   children: (props: FieldRenderProps) => ReactNode
 }
 
-/** Label, hint and error around one form control, wired with ids. */
+/** Label above, then the control, then a hint or an error, wired with ids. */
 export function Field({
   label,
   hint,
@@ -42,22 +42,22 @@ export function Field({
   const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined
 
   return (
-    <div className={cn('flex flex-col gap-1.5', className)}>
+    <div className={cn('flex flex-col gap-1', className)}>
       <div className={cn('flex items-baseline justify-between gap-3', hideLabel && 'sr-only')}>
         <label id={labelId} htmlFor={controlId} className="text-small font-medium text-ink">
           {label}
         </label>
-        {aside ? <span className="num text-small text-ink-muted">{aside}</span> : null}
+        {aside ? <span className="data text-ink-2">{aside}</span> : null}
       </div>
       {children({ id: controlId, labelId, describedBy, invalid: Boolean(error) })}
       {hint ? (
-        <p id={hintId} className="text-caption text-ink-muted">
+        <p id={hintId} className="mt-1 text-small text-ink-2">
           {hint}
         </p>
       ) : null}
       {error ? (
-        <p id={errorId} className="flex items-start gap-1.5 text-caption text-danger">
-          <CircleAlert className="mt-px size-3.5 shrink-0" aria-hidden />
+        <p id={errorId} className="mt-1 flex items-start gap-2 text-small text-danger">
+          <CircleAlert className="mt-1 size-3 shrink-0" aria-hidden />
           <span>{error}</span>
         </p>
       ) : null}

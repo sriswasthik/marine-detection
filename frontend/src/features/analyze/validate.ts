@@ -9,12 +9,13 @@ import {
   MAX_UPLOAD_BYTES,
   MAX_UPLOAD_MB,
   MIN_IMAGE_PX,
+  MODEL_INPUT,
   RESOLUTION_LIMITS_M,
 } from '@/lib/config'
 import { formatLength } from '@/lib/format'
 import { degreesToMeters } from '@/lib/geo'
 
-export type FileKind = 'geotiff' | 'png' | 'jpeg'
+export type FileKind = 'geotiff'
 
 /** What the browser tells us about a file before reading it. */
 export interface FileFacts {
@@ -28,6 +29,8 @@ export interface FileInspection {
   kind: FileKind
   width: number | null
   height: number | null
+  /** Bands per pixel; the model needs MODEL_INPUT.bands. */
+  bands: number | null
   /** True when the file carries georeferencing, even in a system this app cannot convert. */
   georeferenced: boolean
   /** Bounds read from the file, when its coordinate system could be converted. */
@@ -49,10 +52,10 @@ export interface ValidationIssue {
 const KIND_BY_EXTENSION: Readonly<Record<string, FileKind>> = {
   '.tif': 'geotiff',
   '.tiff': 'geotiff',
-  '.png': 'png',
-  '.jpg': 'jpeg',
-  '.jpeg': 'jpeg',
 }
+
+/** Photo formats people often try. They hold 3 colour bands, so they get their own message. */
+const PHOTO_EXTENSIONS: readonly string[] = ['.png', '.jpg', '.jpeg']
 
 const ACCEPTED_MIME_TYPES: readonly string[] = Object.keys(ACCEPTED_TYPES)
 
@@ -70,7 +73,10 @@ export function fileKind(facts: Pick<FileFacts, 'name' | 'type'>): FileKind | nu
   return kind
 }
 
-const FORMAT_FIX = 'Export the image as GeoTIFF (.tif), PNG or JPEG and choose it again.'
+const FORMAT_FIX = `Choose an ${MODEL_INPUT.bands}-band Sentinel-2 GeoTIFF (.tif), for example a MARIDA patch.`
+
+const BANDS_FIX =
+  'Stack Sentinel-2 bands B1 to B8A, B11 and B12, in that order, into one GeoTIFF and choose it again.'
 
 /** Format and size checks that need nothing but the file name, type and size. */
 export function validateFile(facts: FileFacts): ValidationIssue[] {
@@ -79,9 +85,11 @@ export function validateFile(facts: FileFacts): ValidationIssue[] {
     const extension = fileExtension(facts.name)
     issues.push({
       code: 'UNSUPPORTED_FORMAT',
-      message: extension
-        ? `${extension} files are not supported. Supported: ${ACCEPTED_EXTENSIONS.join(', ')}.`
-        : `The file has no extension. Supported: ${ACCEPTED_EXTENSIONS.join(', ')}.`,
+      message: PHOTO_EXTENSIONS.includes(extension)
+        ? `${extension} images hold 3 colour bands. The model needs an ${MODEL_INPUT.bands}-band Sentinel-2 GeoTIFF.`
+        : extension
+          ? `${extension} files are not supported. Supported: ${ACCEPTED_EXTENSIONS.join(', ')}.`
+          : `The file has no extension. Supported: ${ACCEPTED_EXTENSIONS.join(', ')}.`,
       fix: FORMAT_FIX,
     })
   }
@@ -223,7 +231,8 @@ export function estimateResolutionM(bounds: GeoBounds, widthPx: number): number 
 // ---------------------------------------------------------------------------
 
 export type CheckStatus = 'pass' | 'warning' | 'fail' | 'pending'
-export type QualityCheckId = 'format' | 'dimensions' | 'georeferencing' | 'cloud' | 'resolution'
+export type QualityCheckId =
+  'format' | 'bands' | 'dimensions' | 'georeferencing' | 'cloud' | 'resolution'
 
 export interface QualityCheck {
   id: QualityCheckId
@@ -253,12 +262,29 @@ function formatCheck(facts: FileFacts): QualityCheck {
       fix: first.fix,
     }
   }
-  const kind = fileKind(facts)
+  return { id: 'format', label: 'Format', status: 'pass', detail: 'GeoTIFF' }
+}
+
+/** The model reads exactly MODEL_INPUT.bands bands; anything else is refused before upload. */
+function bandsCheck({ inspection, inspecting }: QualityInput): QualityCheck {
+  const base = { id: 'bands' as const, label: 'Bands' }
+  const expected = MODEL_INPUT.bands
+  if (inspection?.bands) {
+    if (inspection.bands === expected) {
+      return { ...base, status: 'pass', detail: `${expected} bands, Sentinel-2 order assumed` }
+    }
+    return {
+      ...base,
+      status: 'fail',
+      detail: `The image has ${inspection.bands} ${inspection.bands === 1 ? 'band' : 'bands'}. The model needs ${expected}.`,
+      fix: BANDS_FIX,
+    }
+  }
+  if (inspecting) return { ...base, status: 'pending', detail: 'Reading the file' }
   return {
-    id: 'format',
-    label: 'Format',
-    status: 'pass',
-    detail: kind === 'geotiff' ? 'GeoTIFF' : kind === 'png' ? 'PNG' : 'JPEG',
+    ...base,
+    status: 'warning',
+    detail: 'The band count could not be read here. It is checked after upload.',
   }
 }
 
@@ -336,10 +362,14 @@ function resolutionCheck({ inspection, bounds }: QualityInput): QualityCheck {
   }
 }
 
-/** The checklist shown next to the preview: Format, Dimensions, Georeferencing, Cloud cover, Resolution. */
+/** The checklist shown next to the preview: Format, Bands, Dimensions, Georeferencing, Cloud cover, Resolution. */
 export function qualityChecks(input: QualityInput): QualityCheck[] {
+  const format = formatCheck(input.facts)
+  // A file the model cannot read is not checked further: the other results would only add noise.
+  if (!fileKind(input.facts)) return [format]
   return [
-    formatCheck(input.facts),
+    format,
+    bandsCheck(input),
     dimensionsCheck(input),
     georeferencingCheck(input),
     {
@@ -363,7 +393,6 @@ export function runReadiness(input: {
   hasFile: boolean
   inspecting: boolean
   checks: readonly QualityCheck[]
-  region: string
   capturedAtIso: string | null
   /** False while the device is offline. The form can still be filled in. */
   online?: boolean
@@ -373,7 +402,6 @@ export function runReadiness(input: {
   if (input.inspecting) return block('Reading the file. This takes a moment.')
   const failed = input.checks.find((c) => c.status === 'fail')
   if (failed) return block(`${failed.label}: ${failed.fix ?? failed.detail}`)
-  if (input.region.trim() === '') return block('Enter a region name.')
   if (!input.capturedAtIso) return block('Enter when the image was captured.')
   if (input.online === false) return block("You're offline. Reconnect to run detection.")
   return { ready: true, reason: null }

@@ -1,0 +1,39 @@
+[
+  { "name": "overview", "path": "/" },
+  { "name": "analyze-empty", "path": "/analyze" },
+  {
+    "name": "analyze-file",
+    "path": "/analyze",
+    "steps": [
+      { "upload": "../semantic_segmentation/unet/sample_data/S2_9-10-17_16PEC_0.tif" },
+      { "wait": 2500 }
+    ]
+  },
+  {
+    "name": "analyze-processing",
+    "path": "/analyze",
+    "steps": [
+      { "upload": "../semantic_segmentation/unet/sample_data/S2_9-10-17_16PEC_0.tif" },
+      { "wait": 2500 },
+      { "click": "Run detection" },
+      { "wait": 2500 }
+    ]
+  },
+  {
+    "name": "analyze-result",
+    "path": "/analyze",
+    "steps": [
+      { "upload": "../semantic_segmentation/unet/sample_data/S2_9-10-17_16PEC_0.tif" },
+      { "wait": 2500 },
+      { "click": "Run detection" },
+      { "waitForText": "Detection complete", "timeout": 20000 },
+      { "press": "Shift" },
+      { "wait": 800 }
+    ]
+  },
+  { "name": "map-hotspot", "path": "/map/obs-ennore-20261003?h=hotspot-1", "fullPage": false },
+  { "name": "observation-detail", "path": "/observations/obs-ennore-20261003" },
+  { "name": "observations", "path": "/observations" },
+  { "name": "settings", "path": "/settings" },
+  { "name": "report", "path": "/observations/obs-ennore-20261003/report" }
+]

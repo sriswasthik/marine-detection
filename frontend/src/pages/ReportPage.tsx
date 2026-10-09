@@ -1,14 +1,16 @@
-import { ArrowLeft, Printer } from 'lucide-react'
+import { Printer } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
+import { ContextLine } from '@/app/shell/ContextLine'
+import { NextStep } from '@/app/shell/NextStep'
 import {
   Button,
-  buttonStyles,
+  ObservationGlyph,
   PageSkeleton,
   SegmentedControl,
   Skeleton,
+  SkeletonFigures,
   SkeletonMap,
-  SkeletonMetricCards,
   SkeletonPageHeader,
   SkeletonText,
 } from '@/components/ui'
@@ -36,10 +38,10 @@ function ReportSkeleton() {
   return (
     <PageSkeleton label="Loading report" className="mx-auto flex flex-col gap-4">
       <Skeleton className="h-8 w-80" />
-      <div className="mwi-report-sheet flex flex-col gap-4 rounded-card border border-border">
+      <div className="mwi-report-sheet flex flex-col gap-4 border border-hairline">
         <SkeletonPageHeader />
-        <SkeletonMap controls={false} className="h-[74mm] rounded-card" />
-        <SkeletonMetricCards count={6} className="grid grid-cols-3 gap-3" />
+        <SkeletonMap controls={false} className="h-[74mm]" />
+        <SkeletonFigures count={6} className="grid grid-cols-3 gap-3" />
         <SkeletonText lines={6} />
       </div>
     </PageSkeleton>
@@ -101,25 +103,14 @@ function PrintableReport({
   }, [wantsPrint, ready, setSearchParams])
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="mwi-report-screen-only flex w-full max-w-[210mm] flex-wrap items-center justify-between gap-3">
-        <Link
-          to={`/observations/${encodeURIComponent(observation.id)}`}
-          className={buttonStyles({ variant: 'ghost', size: 'sm' })}
-        >
-          <ArrowLeft aria-hidden />
-          Back to evidence
-        </Link>
-        <div className="flex flex-wrap items-center gap-3">
-          <SegmentedControl
-            label="Report basemap"
-            size="sm"
-            options={BASEMAP_OPTIONS}
-            value={basemap}
-            onChange={setBasemap}
-          />
+    <div className="flex flex-col items-center gap-6">
+      <ContextLine
+        region={observation.region}
+        glyph={<ObservationGlyph observation={observation} size={16} />}
+        className="mwi-report-screen-only w-full"
+        action={
           <Button
-            variant="primary"
+            variant="secondary"
             size="sm"
             iconStart={<Printer aria-hidden />}
             loading={!ready}
@@ -128,8 +119,17 @@ function PrintableReport({
           >
             Print or save as PDF
           </Button>
-        </div>
-        <p className="w-full text-right text-caption text-ink-muted" aria-live="polite">
+        }
+      />
+      <div className="mwi-report-screen-only flex w-full max-w-[210mm] flex-wrap items-center justify-between gap-3">
+        <SegmentedControl
+          label="Report basemap"
+          size="sm"
+          options={BASEMAP_OPTIONS}
+          value={basemap}
+          onChange={setBasemap}
+        />
+        <p className="text-small text-ink-2" aria-live="polite">
           {!ready
             ? 'Waiting for the map tiles to finish loading.'
             : tilesLoaded
@@ -137,7 +137,13 @@ function PrintableReport({
               : 'Some map tiles did not load, so the map may be incomplete. You can still print.'}
         </p>
       </div>
-      <div className="w-full overflow-x-auto pb-2 print:overflow-visible print:pb-0">
+      <div
+        // Scrolls sideways on narrow screens; focusable so the keyboard can scroll it too.
+        tabIndex={0}
+        role="region"
+        aria-label="Report sheet"
+        className="w-full overflow-x-auto pb-2 print:overflow-visible print:pb-0"
+      >
         <div className="mx-auto w-fit">
           <ReportSheet
             observation={observation}
@@ -150,6 +156,11 @@ function PrintableReport({
           />
         </div>
       </div>
+      <NextStep
+        page="report"
+        observationId={observation.id}
+        className="mwi-report-screen-only w-full max-w-[210mm]"
+      />
     </div>
   )
 }
@@ -174,7 +185,7 @@ export function ReportPage() {
       />
     ) : (
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
-        <h1 className="text-title text-ink">Report: {observation.region}</h1>
+        <h1 className="text-page text-ink">Report: {observation.region}</h1>
         <ObservationStatusState observation={observation} />
       </div>
     )
@@ -186,5 +197,9 @@ export function ReportPage() {
     body = <ReportSkeleton />
   }
 
-  return <div className="mwi-report-page w-full px-4 py-6 sm:px-6">{body}</div>
+  return (
+    <div className="mwi-report-page mx-auto w-full max-w-page px-4 pt-2 pb-12 sm:px-6 lg:px-8">
+      {body}
+    </div>
+  )
 }

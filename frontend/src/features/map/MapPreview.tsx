@@ -39,7 +39,7 @@ export function MapPreview({
       fitPadding={16}
       overlay={overlay}
       onBasemapLoad={onBasemapLoad}
-      className={cn('rounded-card border border-border', className)}
+      className={cn('border border-rule', className)}
     />
   )
 }

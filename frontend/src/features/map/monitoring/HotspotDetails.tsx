@@ -1,5 +1,5 @@
 import { Flag } from 'lucide-react'
-import { ConfidenceBadge, SeverityBadge } from '@/components/ui'
+import { ConfidenceTag, SeverityTag } from '@/components/ui'
 import type { Detection } from '@/features/observations/types'
 import { DENSITY_LEVELS } from '@/lib/density'
 import { formatConfidence, formatInteger, shortId } from '@/lib/format'
@@ -30,8 +30,8 @@ export function HotspotDetails({
   return (
     <div className="flex flex-col gap-5">
       {hotspot.level === 'critical' ? (
-        <div className="flex items-start gap-2.5 rounded-control border border-critical/25 bg-critical-soft px-3 py-2.5 text-small text-ink">
-          <Flag aria-hidden className="mt-0.5 size-4 shrink-0 text-critical" />
+        <div className="flex items-start gap-3 border-l-2 border-critical py-1 pl-3 text-small text-ink">
+          <Flag aria-hidden className="mt-1 size-4 shrink-0 text-critical" />
           <span>
             <span className="font-medium">Priority for inspection.</span> Critical density: send a
             team or a drone pass here first.
@@ -40,7 +40,7 @@ export function HotspotDetails({
       ) : null}
 
       <Section title="Key facts">
-        <dl className="flex flex-col gap-2.5">
+        <dl className="flex flex-col gap-3">
           <Fact label="Rank">
             <span className="num font-medium">
               {hotspot.rank} of {formatInteger(hotspotCount)}
@@ -48,10 +48,8 @@ export function HotspotDetails({
           </Fact>
           <Fact label="Density level">
             <span className="flex flex-col items-start gap-1">
-              <SeverityBadge level={hotspot.level} />
-              <span className="text-caption text-ink-muted">
-                {DENSITY_LEVELS[hotspot.level].meaning}
-              </span>
+              <SeverityTag level={hotspot.level} />
+              <span className="text-small text-ink-2">{DENSITY_LEVELS[hotspot.level].meaning}</span>
             </span>
           </Fact>
           <Fact label="Total area">
@@ -64,23 +62,23 @@ export function HotspotDetails({
             <span className="num">{formatConfidence(hotspot.meanConfidence)}</span>
           </Fact>
           <Fact label="Centre">
-            <span className="mono-label">{fmt.coordinates(hotspot.centroid)}</span>
+            <span className="data">{fmt.coordinates(hotspot.centroid)}</span>
           </Fact>
         </dl>
       </Section>
 
       <Section title="Priority score">
-        <p className="num text-display text-ink">{formatInteger(hotspot.priorityScore)}</p>
-        <p className="num rounded-control bg-bg px-3 py-2 font-mono text-caption text-ink">
+        <p className="num text-page text-ink">{formatInteger(hotspot.priorityScore)}</p>
+        <p className="data border-l-2 border-rule py-1 pl-3 text-ink">
           {formatInteger(hotspot.totalAreaM2)} m² × {hotspot.meanConfidence.toFixed(2)} confidence ×{' '}
           {weight} ({DENSITY_LEVELS[hotspot.level].label} weight)
         </p>
-        <p className="text-caption text-ink-muted">{PRIORITY_SCORE_RULE}</p>
+        <p className="text-small text-ink-2">{PRIORITY_SCORE_RULE}</p>
       </Section>
 
       <Section title="Detections in this hotspot">
         {members.length === 0 ? (
-          <p className="text-small text-ink-muted">No detections match the current filters.</p>
+          <p className="text-small text-ink-2">No detections match the current filters.</p>
         ) : (
           <ul className="-mx-2 flex flex-col">
             {members.map((detection) => (
@@ -88,18 +86,20 @@ export function HotspotDetails({
                 <button
                   type="button"
                   onClick={() => onSelectDetection(detection.id)}
-                  className="flex w-full items-center gap-2 rounded-control px-2 py-1.5 text-left text-small hover:bg-bg"
+                  className="flex w-full items-center gap-2 px-2 py-2 text-left text-small hover:bg-ink/5"
                 >
-                  <span className="mono-label w-12 shrink-0 text-ink">{shortId(detection.id)}</span>
-                  <SeverityBadge level={detection.densityLevel} variant="plain" />
-                  <span className="num ml-auto text-ink">{fmt.area(detection.areaM2)}</span>
-                  <ConfidenceBadge value={detection.confidence} showValue={false} />
+                  <span className="data w-12 shrink-0 text-ink">{shortId(detection.id)}</span>
+                  <SeverityTag level={detection.densityLevel} variant="plain" />
+                  <span className="data flex-1 text-right text-ink">
+                    {fmt.area(detection.areaM2)}
+                  </span>
+                  <ConfidenceTag value={detection.confidence} showValue={false} />
                 </button>
               </li>
             ))}
           </ul>
         )}
-        <p className="text-caption text-ink-muted">
+        <p className="text-small text-ink-2">
           A detection belongs to the hotspot when any part of it lies inside the hotspot cells.
         </p>
       </Section>

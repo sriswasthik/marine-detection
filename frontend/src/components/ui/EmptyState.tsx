@@ -2,19 +2,19 @@ import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 
 export interface EmptyStateProps {
-  icon?: ReactNode
   title: ReactNode
+  /** Why there is nothing here, in plain words. */
   description?: ReactNode
+  /** One action: a button or link. */
   action?: ReactNode
-  /** Compact version for panels and table bodies. */
+  /** Compact version for panels and ledger bodies. */
   size?: 'sm' | 'md'
   className?: string
   headingLevel?: 1 | 2 | 3
 }
 
-/** Explains why there is nothing here and what to do next. */
+/** Typographic: a title, a sentence and one action. No illustration, no box. */
 export function EmptyState({
-  icon,
   title,
   description,
   action,
@@ -26,22 +26,18 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'mx-auto flex max-w-sm flex-col items-center text-center',
-        size === 'md' ? 'gap-3 py-12' : 'gap-2 py-6',
+        'flex max-w-prose flex-col items-start',
+        size === 'md' ? 'gap-2 py-12' : 'gap-1 py-6',
         className,
       )}
     >
-      {icon ? (
-        <span
-          aria-hidden
-          className="mb-1 inline-flex size-10 items-center justify-center rounded-control border border-border bg-surface text-ink-muted [&_svg]:size-5"
-        >
-          {icon}
-        </span>
+      <Heading className={cn(size === 'md' ? 'text-title' : 'text-lead font-medium', 'text-ink')}>
+        {title}
+      </Heading>
+      {description ? (
+        <p className={cn(size === 'md' ? 'text-lead' : 'text-body', 'text-ink-2')}>{description}</p>
       ) : null}
-      <Heading className="text-heading text-ink">{title}</Heading>
-      {description ? <p className="text-body text-ink-muted">{description}</p> : null}
-      {action ? <div className="mt-2 flex flex-wrap justify-center gap-2">{action}</div> : null}
+      {action ? <div className="mt-4">{action}</div> : null}
     </div>
   )
 }

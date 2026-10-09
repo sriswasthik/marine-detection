@@ -36,11 +36,15 @@ export function useAnalysisRun() {
   const queryClient = useQueryClient()
   const [state, dispatch] = useReducer(runReducer, IDLE_RUN)
   const controller = useRef<AbortController | null>(null)
+  /** True from the moment a run starts until it ends: a second click must not upload twice. */
+  const inFlight = useRef(false)
 
   useEffect(() => () => controller.current?.abort(), [])
 
   const start = useCallback(
     async (input: CreateObservationInput) => {
+      if (inFlight.current) return
+      inFlight.current = true
       controller.current?.abort()
       const run = new AbortController()
       controller.current = run
@@ -100,12 +104,15 @@ export function useAnalysisRun() {
       } catch (error) {
         const failure = failureFromError(error)
         if (failure && !signal.aborted) dispatch({ type: 'failed', failure, at: Date.now(), step })
+      } finally {
+        if (controller.current === run) inFlight.current = false
       }
     },
     [api, queryClient],
   )
 
   const cancel = useCallback(() => {
+    inFlight.current = false
     controller.current?.abort()
     dispatch({ type: 'cancel' })
   }, [])

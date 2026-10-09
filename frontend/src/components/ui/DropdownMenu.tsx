@@ -186,8 +186,8 @@ export function DropdownMenu({
           aria-labelledby={triggerId}
           onKeyDown={onMenuKeyDown}
           className={cn(
-            'absolute z-50 max-h-[min(24rem,70dvh)] min-w-52 overflow-y-auto rounded-card border border-border bg-surface p-1 shadow-popover',
-            side === 'top' ? 'bottom-full mb-1.5' : 'top-full mt-1.5',
+            'absolute z-50 max-h-[min(24rem,70dvh)] min-w-52 overflow-y-auto rounded-panel border border-hairline bg-white py-1 shadow-popover',
+            side === 'top' ? 'bottom-full mb-2' : 'top-full mt-2',
             'animate-[tooltip-in_120ms_var(--ease-out)]',
             align === 'end' ? 'right-0' : 'left-0',
             menuClassName,
@@ -195,15 +195,11 @@ export function DropdownMenu({
         >
           {items.map((entry) => {
             if (entry.type === 'separator') {
-              return <div key={entry.id} role="separator" className="my-1 h-px bg-border" />
+              return <div key={entry.id} role="separator" className="my-1 h-px bg-hairline" />
             }
             if (entry.type === 'label') {
               return (
-                <div
-                  key={entry.id}
-                  role="presentation"
-                  className="px-2.5 pt-2 pb-1 text-caption font-medium text-ink-muted"
-                >
+                <div key={entry.id} role="presentation" className="label px-3 pt-2 pb-1 text-ink-2">
                   {entry.label}
                 </div>
               )
@@ -225,36 +221,32 @@ export function DropdownMenu({
                   !entry.disabled && index !== activeIndex && setActiveIndex(index)
                 }
                 className={cn(
-                  'flex cursor-pointer items-start gap-2.5 rounded-control px-2.5 py-2 text-body outline-none select-none',
-                  'focus:bg-bg [&_svg]:size-4 [&_svg]:shrink-0',
+                  'flex cursor-pointer items-start gap-3 px-3 py-2 text-body outline-none select-none',
+                  'focus:bg-accent-wash [&_svg]:size-4 [&_svg]:shrink-0',
                   entry.tone === 'danger' ? 'text-danger' : 'text-ink',
                   entry.disabled && 'cursor-not-allowed opacity-50',
                 )}
               >
                 {entry.icon ? (
-                  <span aria-hidden className="mt-0.5 text-ink-muted">
+                  <span aria-hidden className="mt-1 text-ink-2">
                     {entry.icon}
                   </span>
                 ) : null}
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span>{entry.label}</span>
                   {entry.description ? (
-                    <span className="text-caption text-ink-muted">{entry.description}</span>
+                    <span className="text-small text-ink-2">{entry.description}</span>
                   ) : null}
                 </span>
                 {entry.shortcut ? (
-                  <span className="mt-0.5 text-caption text-ink-muted">{entry.shortcut}</span>
+                  <span className="mt-1 text-small text-ink-2">{entry.shortcut}</span>
                 ) : null}
-                {entry.aside ? (
-                  <span className="mono-label mt-0.5 rounded-badge border border-border px-1.5 text-ink-muted">
-                    {entry.aside}
-                  </span>
-                ) : null}
+                {entry.aside ? <span className="data text-ink-2">{entry.aside}</span> : null}
                 {radio ? (
                   <Check
                     aria-hidden
                     className={cn(
-                      'mt-0.5 text-accent',
+                      'mt-1 text-accent-ink',
                       entry.checked ? 'opacity-100' : 'opacity-0',
                     )}
                   />

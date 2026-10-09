@@ -11,10 +11,13 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "design:audit": "node scripts/design-audit.mjs",
+    "e2e": "playwright test"
   },
   "dependencies": {
-    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
+    "@fontsource-variable/instrument-sans": "^5.3.0",
     "@tanstack/react-query": "^5.104.1",
     "@turf/area": "^7.4.0",
     "@turf/bbox": "^7.4.0",
@@ -33,6 +36,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
@@ -50,6 +54,7 @@
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
     "jsdom": "^29.1.1",
+    "playwright": "1.63.0",
     "prettier": "^3.9.9",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",

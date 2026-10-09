@@ -1,20 +1,17 @@
-import { Inbox, ScanSearch } from 'lucide-react'
+import type { Map as LeafletMap } from 'leaflet'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import {
-  buttonStyles,
-  EmptyState,
-  ErrorBoundary,
-  PageSkeleton,
-  SkeletonMap,
-  useToast,
-} from '@/components/ui'
-import { MapControls, MapLegend, MapView, type MapHandle } from '@/features/map'
+import { useNavigate, useParams } from 'react-router-dom'
+import { EmptyState, ErrorBoundary, PageSkeleton, SkeletonMap, useToast } from '@/components/ui'
+import { MapView, type MapHandle } from '@/features/map'
+import { LegendLine } from '@/features/map/LegendLine'
+import { MapControlGroup } from '@/features/map/MapControlGroup'
+import { MapStatusStrip } from '@/features/map/MapStatusStrip'
 import { DetectionDrawer } from '@/features/map/monitoring/DetectionDrawer'
-import { FilterBar } from '@/features/map/monitoring/FilterBar'
-import { InspectionPriority } from '@/features/map/monitoring/InspectionPriority'
+import { InspectNextLedger } from '@/features/map/monitoring/InspectNextLedger'
+import { LayersPanel } from '@/features/map/monitoring/LayersPanel'
+import { MapToolbar } from '@/features/map/monitoring/MapToolbar'
 import { NoDebrisCard } from '@/features/map/monitoring/NoDebrisCard'
-import { ResultStrip } from '@/features/map/monitoring/ResultStrip'
+import { SidePanel } from '@/features/map/monitoring/SidePanel'
 import { useMapState } from '@/features/map/useMapState'
 import { useCurrentObservationId } from '@/features/observations/currentObservationContext'
 import { ObservationNotices } from '@/features/observations/components/ObservationNotices'
@@ -22,29 +19,47 @@ import {
   LoadError,
   ObservationNotFound,
   ObservationStatusState,
+  StartLink,
 } from '@/features/observations/components/ObservationStates'
 import type { ExportSource } from '@/features/export/exportFiles'
-import { ExportMenu } from '@/features/export/ExportMenu'
 import { useObservation, useObservations } from '@/features/observations/hooks'
 import { hasResult, isNotFound } from '@/features/observations/status'
-import type { Observation } from '@/features/observations/types'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { analyzeObservation, type ObservationAnalysis } from '@/lib/analysis'
-import { cn } from '@/lib/cn'
+import { useShortcuts } from '@/hooks/useShortcuts'
+import { analyzeObservation } from '@/lib/analysis'
+import { registerCommand } from '@/lib/commandBus'
 import { gridCellSizeForResolution } from '@/lib/config'
+import { describeFilters } from '@/lib/export/scope'
 import { applyFilters, hasActiveFilters } from '@/lib/filters'
 import { formatInteger } from '@/lib/format'
-import { describeFilters } from '@/lib/export/scope'
+import { mapStatusText } from '@/lib/map/status'
 import { serializeMapSearch } from '@/lib/mapUrlState'
+import { nextStepFor } from '@/lib/navigation'
+import { LAYER_SHORTCUTS } from '@/lib/shortcuts'
 import type { NoticeId } from '@/lib/warnings'
 
 /** The map has little room: only the caveats about what it draws. */
-const MAP_NOTICES: readonly NoticeId[] = ['low-confidence', 'approximate-positions', 'partial-data']
+const MAP_NOTICES: readonly NoticeId[] = [
+  'low-confidence',
+  'approximate-positions',
+  'partial-data',
+  'stripe-artefact',
+]
 
 /**
- * Map / Monitoring: the full-bleed map with filters, the inspection list and the detail drawer.
- * Everything about the view lives in the URL, so a reload or a shared link restores it.
+ * The page fills the space between the top bar (52px plus its 1px hairline) and the phone tab
+ * bar, exactly: nothing below the status strip falls past the viewport.
+ */
+const PAGE_HEIGHT =
+  'h-[calc(100dvh-var(--spacing-topbar)-1px-var(--offline-bar-height,0px)-var(--tabbar-offset))]'
+
+/**
+ * Map / Monitoring, as a strict grid (features/map/map.css): the toolbar across the top, the side
+ * panel (Inspect next, Layers) on the left, the map, the status strip under it, and the drawer on
+ * the right while something is selected. Inside the map there are only two overlays: the control
+ * group at the top right and the legend line at the bottom left. Everything about the view lives
+ * in the URL, so a reload or a shared link restores it.
  */
 export function MapPage() {
   useDocumentTitle('Map')
@@ -52,10 +67,14 @@ export function MapPage() {
   const navigate = useNavigate()
   const toast = useToast()
   const mapState = useMapState()
-  const isDesktop = useMediaQuery('(min-width: 768px)')
+  const sideDocked = useMediaQuery('(min-width: 1100px)')
+  const drawerBeside = useMediaQuery('(min-width: 768px)')
+  const [panelOpen, setPanelOpen] = useState(false)
+  const [leafletMap, setLeafletMap] = useState<LeafletMap | null>(null)
+  const [basemapUnavailable, setBasemapUnavailable] = useState(false)
 
   const list = useObservations()
-  // Without an id in the path, show the observation picked in the top bar, else the latest.
+  // Without an id in the path, show the observation picked last, else the latest.
   const currentId = useCurrentObservationId(list.data?.data)
   const id = observationId ?? currentId ?? undefined
   const query = useObservation(id)
@@ -63,6 +82,31 @@ export function MapPage() {
   const issues = query.data?.issues ?? []
 
   const mapRef = useRef<MapHandle | null>(null)
+
+  // Keyboard: f fits, l opens the legend details, 1 to 4 toggle the layers (lib/shortcuts.ts).
+  const [legendOpen, setLegendOpen] = useState(false)
+  const { toggleLayer } = mapState
+  useShortcuts(
+    useMemo(
+      () => ({
+        f: () => mapRef.current?.fitToDetections(),
+        l: () => setLegendOpen((open) => !open),
+        ...Object.fromEntries(
+          Object.entries(LAYER_SHORTCUTS).map(([key, layer]) => [key, () => toggleLayer(layer)]),
+        ),
+      }),
+      [toggleLayer],
+    ),
+  )
+  // The command palette's map actions.
+  useEffect(() => {
+    const removeFit = registerCommand('map.fit', () => mapRef.current?.fitToDetections())
+    const removeDensity = registerCommand('map.toggle-density', () => toggleLayer('density'))
+    return () => {
+      removeFit()
+      removeDensity()
+    }
+  }, [toggleLayer])
   const [highlightedHotspotId, setHighlightedHotspotId] = useState<string | null>(null)
   // Captured once: the page was opened straight from the Analyze flow.
   const [arrivedFresh] = useState(() => mapState.fresh)
@@ -75,18 +119,22 @@ export function MapPage() {
     () => (filtered ? analyzeObservation(filtered.observation) : null),
     [filtered],
   )
-  const shownDetections = filtered?.observation.detections ?? []
+  const shownDetections = useMemo(() => filtered?.observation.detections ?? [], [filtered])
   // Exports follow the active filters; the summary still describes the whole observation.
-  const filterDescription = describeFilters(mapState.filters)
-  const exportSource = (full: Observation, shownAnalysis: ObservationAnalysis): ExportSource => ({
-    observation: full,
-    detections: shownDetections,
-    analysis: shownAnalysis,
-    filters: filterDescription,
-  })
+  const exportSource = useMemo<ExportSource | null>(
+    () =>
+      observation && analysis
+        ? {
+            observation,
+            detections: shownDetections,
+            analysis,
+            filters: describeFilters(mapState.filters),
+          }
+        : null,
+    [observation, analysis, shownDetections, mapState.filters],
+  )
   const selectedDetection = shownDetections.find((d) => d.id === mapState.detectionId) ?? null
   const selectedHotspot = analysis?.hotspots.find((h) => h.id === mapState.hotspotId) ?? null
-  const drawerOpen = Boolean(selectedDetection ?? selectedHotspot)
 
   // Result arrival: announce once, then drop ?fresh=1 so a reload does not repeat it.
   const announced = useRef(false)
@@ -110,52 +158,103 @@ export function MapPage() {
     (hotspotId: string | null) => {
       selectHotspot(hotspotId)
       if (hotspotId) mapRef.current?.flyToHotspot(hotspotId)
+      // The slide-over steps aside so the drawer and the map are both in view.
+      if (hotspotId && !sideDocked) setPanelOpen(false)
     },
-    [selectHotspot],
+    [selectHotspot, sideDocked],
   )
 
   const changeObservation = (nextId: string) => {
     const search = serializeMapSearch(
-      {
-        ...mapState,
-        detectionId: null,
-        hotspotId: null,
-        fresh: false,
-      },
+      { ...mapState, detectionId: null, hotspotId: null, fresh: false },
       mapState.defaults,
     ).toString()
     navigate(`/map/${encodeURIComponent(nextId)}${search ? `?${search}` : ''}`)
   }
 
-  // A no-debris result has nothing to rank; the card on the map says so.
-  const priorityPanel =
-    analysis && filtered && filtered.totalCount > 0 ? (
-      <InspectionPriority
-        hotspots={analysis.hotspots}
-        selectedId={selectedHotspot?.id ?? null}
-        hasDetections={filtered.shownCount > 0}
-        onHighlight={setHighlightedHotspotId}
-        onSelect={onSelectHotspot}
-        defaultOpen={isDesktop}
-        className="pointer-events-auto"
+  let content
+  if (observation && !hasResult(observation)) {
+    content = (
+      <div className="flex h-full items-center justify-center bg-map-fallback px-4">
+        <ObservationStatusState observation={observation} className="w-full max-w-lg" />
+      </div>
+    )
+  } else if (observation && filtered && analysis && exportSource) {
+    const noDebris = observation.detections.length === 0
+    const status = mapStatusText({
+      shown: filtered.shownCount,
+      total: filtered.totalCount,
+      hotspots: analysis.hotspots.length,
+      filtered: hasActiveFilters(mapState.filters),
+    })
+    const cellSizeM = gridCellSizeForResolution(observation.resolutionM)
+    const sidePanel = (mode: 'docked' | 'slide-over') => (
+      <SidePanel
+        mode={mode}
+        onClose={() => setPanelOpen(false)}
+        next={nextStepFor('map', observation.id)}
+        inspect={
+          <InspectNextLedger
+            hotspots={analysis.hotspots}
+            selectedId={selectedHotspot?.id ?? null}
+            onHighlight={setHighlightedHotspotId}
+            onSelect={onSelectHotspot}
+            emptyText={
+              noDebris
+                ? 'No debris detected, so there is nothing to inspect.'
+                : filtered.shownCount > 0
+                  ? 'No hotspots in view. The detections shown are scattered or low density.'
+                  : 'Nothing to inspect with the current filters.'
+            }
+          />
+        }
+        layers={
+          <LayersPanel
+            visibleLayers={mapState.layers}
+            onToggleLayer={toggleLayer}
+            counts={{
+              detections: filtered.shownCount,
+              density: analysis.grid ? analysis.grid.cells.filter((c) => c.level).length : 0,
+              hotspots: analysis.hotspots.length,
+              footprint: null,
+            }}
+            basemap={mapState.basemap}
+            onBasemapChange={mapState.setBasemap}
+            cellSizeM={cellSizeM}
+          />
+        }
       />
-    ) : null
+    )
 
-  return (
-    <div className="relative isolate h-[calc(100dvh-var(--spacing-topbar)-var(--offline-bar-height,0px))] w-full overflow-hidden">
-      <h1 className="sr-only">Map{observation ? `: ${observation.region}` : ''}</h1>
-
-      {observation && !hasResult(observation) ? (
-        <div className="flex h-full items-center justify-center bg-map-fallback px-4">
-          <ObservationStatusState observation={observation} className="w-full max-w-lg" />
+    content = (
+      <>
+        <div className="mwi-area-toolbar">
+          <MapToolbar
+            observations={list.data?.data ?? []}
+            observation={observation}
+            onObservationChange={changeObservation}
+            filters={mapState.filters}
+            baseline={mapState.baseline}
+            onFiltersChange={mapState.setFilters}
+            onReset={mapState.resetFilters}
+            status={status}
+            matches={filtered.matches}
+            exportSource={exportSource}
+            panel={sideDocked ? null : { open: panelOpen, onToggle: () => setPanelOpen((o) => !o) }}
+          />
         </div>
-      ) : observation && filtered && analysis ? (
-        <>
-          <ErrorBoundary
-            label="The map"
-            resetKeys={[observation.id]}
-            className="h-full w-full rounded-none border-0"
-          >
+        {sideDocked ? <div className="mwi-area-side">{sidePanel('docked')}</div> : null}
+        <div className="mwi-area-notices">
+          <ObservationNotices
+            observation={observation}
+            partialData={issues.length > 0}
+            only={MAP_NOTICES}
+            size="sm"
+            className="border-b border-hairline bg-sheet px-3 py-2"
+          />
+        </div>
+        <div className="mwi-area-map">
+          <ErrorBoundary label="The map" resetKeys={[observation.id]} className="h-full w-full">
             <MapView
               ref={mapRef}
               observation={filtered.observation}
@@ -168,78 +267,39 @@ export function MapPage() {
               onSelectDetection={selectDetection}
               onSelectHotspot={onSelectHotspot}
               introAnimation={arrivedFresh}
+              chrome="bare"
+              onMap={setLeafletMap}
+              onBasemapUnavailableChange={setBasemapUnavailable}
               className="h-full w-full"
-              overlay={
-                observation.detections.length === 0 ? (
-                  <NoDebrisCard observation={observation} />
-                ) : null
+              overlay={noDebris ? <NoDebrisCard observation={observation} /> : null}
+              overlays={
+                <>
+                  <MapControlGroup mapRef={mapRef} hasDetections={filtered.shownCount > 0} />
+                  {/* Phones with the drawer open: the map is short, the drawer names the level. */}
+                  {noDebris || (!drawerBeside && (selectedDetection ?? selectedHotspot)) ? null : (
+                    <LegendLine
+                      cellSizeM={cellSizeM}
+                      approximateFootprint={observation.crs === null}
+                      open={legendOpen}
+                      onOpenChange={setLegendOpen}
+                    />
+                  )}
+                </>
               }
             />
           </ErrorBoundary>
-
-          {/* Top left: filters, result count, notices and, on desktop, the inspection list. */}
-          <div
-            className={cn(
-              'pointer-events-none absolute top-3 left-3 z-[600] flex max-h-[calc(100%-1.5rem)] w-[calc(100%-13.5rem)] flex-col items-start gap-2 md:w-[calc(100%-15rem)]',
-              // Leave room for the drawer and the controls that move aside for it.
-              drawerOpen && 'md:w-[calc(100%-var(--spacing-drawer)-15rem)]',
-            )}
-          >
-            <div className="pointer-events-auto max-w-full">
-              <FilterBar
-                observations={list.data?.data ?? []}
-                observationId={observation.id}
-                onObservationChange={changeObservation}
-                filters={mapState.filters}
-                onFiltersChange={mapState.setFilters}
-                onReset={mapState.resetFilters}
-                baseline={mapState.baseline}
-              />
-            </div>
-            <div className="pointer-events-auto flex max-w-full flex-wrap items-center gap-2">
-              <ResultStrip
-                shown={filtered.shownCount}
-                total={filtered.totalCount}
-                hotspots={analysis.hotspots.length}
-                matches={filtered.matches}
-                filtered={hasActiveFilters(mapState.filters)}
-                onReset={mapState.resetFilters}
-              />
-              <ExportMenu source={exportSource(observation, analysis)} align="start" size="sm" />
-            </div>
-            <ObservationNotices
-              observation={observation}
-              partialData={issues.length > 0}
-              only={MAP_NOTICES}
-              className="w-full max-w-sm"
-              bannerClassName="pointer-events-auto shadow-subtle"
-            />
-            {isDesktop ? priorityPanel : null}
-          </div>
-
-          <MapControls
-            mapRef={mapRef}
+        </div>
+        <div className="mwi-area-status">
+          <MapStatusStrip
+            map={leafletMap}
             basemap={mapState.basemap}
-            onBasemapChange={mapState.setBasemap}
-            visibleLayers={mapState.layers}
-            onToggleLayer={mapState.toggleLayer}
-            hasDetections={filtered.shownCount > 0}
-            className={cn(
-              'absolute top-3 right-3 z-[600] transition-[right] duration-200 ease-out',
-              drawerOpen && 'md:right-[calc(var(--spacing-drawer)+0.75rem)]',
-            )}
+            basemapUnavailable={basemapUnavailable}
+            status={drawerBeside ? undefined : status}
           />
-
-          <div className="pointer-events-none absolute bottom-6 left-3 z-[600] flex flex-col items-start gap-2">
-            {isDesktop ? null : priorityPanel}
-            <MapLegend
-              cellSizeM={gridCellSizeForResolution(observation.resolutionM)}
-              approximateFootprint={observation.crs === null}
-              className="pointer-events-auto"
-            />
-          </div>
-
+        </div>
+        <div className="mwi-area-drawer">
           <DetectionDrawer
+            layout={drawerBeside ? 'side' : 'bottom'}
             observation={observation}
             detections={shownDetections}
             detection={selectedDetection}
@@ -251,40 +311,53 @@ export function MapPage() {
               mapRef.current?.flyToDetection(detectionId)
             }}
             onShowDetectionOnMap={(detectionId) => mapRef.current?.flyToDetection(detectionId)}
-            exportSource={exportSource(observation, analysis)}
-          />
-        </>
-      ) : query.isError && isNotFound(query.error) ? (
-        <div className="flex h-full items-center justify-center bg-map-fallback px-4">
-          <ObservationNotFound id={id} headingLevel={2} />
-        </div>
-      ) : query.isError || list.isError ? (
-        <div className="flex h-full items-center justify-center bg-map-fallback px-4">
-          <LoadError
-            error={query.isError ? query.error : list.error}
-            onRetry={() => void (query.isError ? query.refetch() : list.refetch())}
+            exportSource={exportSource}
           />
         </div>
-      ) : list.isSuccess && list.data.data.length === 0 && !observationId ? (
-        <div className="flex h-full items-center justify-center bg-map-fallback px-4">
-          <EmptyState
-            icon={<Inbox />}
-            headingLevel={2}
-            title="Nothing to map yet"
-            description="Analyze a satellite or drone image, and its detections appear here on the map."
-            action={
-              <Link to="/analyze" className={buttonStyles({ variant: 'primary' })}>
-                <ScanSearch aria-hidden />
-                Analyze new imagery
-              </Link>
-            }
-          />
-        </div>
-      ) : (
-        <PageSkeleton label="Loading map" className="h-full">
-          <SkeletonMap className="h-full w-full" />
-        </PageSkeleton>
-      )}
+        {!sideDocked && panelOpen ? sidePanel('slide-over') : null}
+      </>
+    )
+  } else if (query.isError && isNotFound(query.error)) {
+    content = (
+      <div className="flex h-full items-center justify-center bg-map-fallback px-4">
+        <ObservationNotFound id={id} headingLevel={2} />
+      </div>
+    )
+  } else if (query.isError || list.isError) {
+    content = (
+      <div className="flex h-full items-center justify-center bg-map-fallback px-4">
+        <LoadError
+          error={query.isError ? query.error : list.error}
+          onRetry={() => void (query.isError ? query.refetch() : list.refetch())}
+        />
+      </div>
+    )
+  } else if (list.isSuccess && list.data.data.length === 0 && !observationId) {
+    content = (
+      <div className="flex h-full items-center justify-center bg-map-fallback px-4">
+        <EmptyState
+          headingLevel={2}
+          title="Nothing to map yet"
+          description="Analyze a Sentinel-2 image, and its detections appear here on the map."
+          action={<StartLink />}
+        />
+      </div>
+    )
+  } else {
+    content = (
+      <PageSkeleton label="Loading map" className="h-full">
+        <SkeletonMap className="h-full w-full" />
+      </PageSkeleton>
+    )
+  }
+
+  const gridded = Boolean(observation && filtered && analysis && hasResult(observation))
+  return (
+    <div
+      className={`relative isolate w-full overflow-hidden ${PAGE_HEIGHT} ${gridded ? 'mwi-map-page' : ''}`}
+    >
+      <h1 className="sr-only">Map{observation ? `: ${observation.region}` : ''}</h1>
+      {content}
     </div>
   )
 }

@@ -164,14 +164,18 @@ describe('sample scenes tell the intended stories', () => {
     expect(mean(sorted.slice(-quarter))).toBeGreaterThan(mean(sorted.slice(0, quarter)))
   })
 
-  it('Mahim Bay is a drone scene at Moderate density', () => {
+  it('Mahim Bay is a Sentinel-2 scene at Moderate density', () => {
     const mahim = sample(SAMPLE_IDS.mahim)
-    expect(mahim.source).toBe('drone')
-    expect(mahim.resolutionM).toBe(0.1)
+    expect(mahim.source).toBe('satellite')
+    expect(mahim.resolutionM).toBe(10)
     expect(mahim.densityLevel).toBe('moderate')
     expect(mahim.detections.length).toBeGreaterThanOrEqual(20)
     expect(mahim.detections.length).toBeLessThanOrEqual(30)
-    expect(Math.max(...mahim.detections.map((d) => d.areaM2))).toBeLessThan(2)
+    expect(Math.max(...mahim.detections.map((d) => d.areaM2))).toBeLessThan(5000)
+  })
+
+  it('every sample is a satellite scene, the only imagery the model accepts', () => {
+    expect(samples.every((s) => s.source === 'satellite' && s.resolutionM === 10)).toBe(true)
   })
 
   it('Vembanad Lake is Low density', () => {
@@ -227,7 +231,7 @@ describe('pickSampleIdForUpload', () => {
     ).toBe(SAMPLE_IDS.sundarbans)
   })
 
-  it('then uses file name keywords, then the source, then the hero', () => {
+  it('then uses file name keywords, then the hero', () => {
     expect(
       pickSampleIdForUpload({
         fileName: 'Vizag_2026.tif',
@@ -236,7 +240,11 @@ describe('pickSampleIdForUpload', () => {
       }),
     ).toBe(SAMPLE_IDS.visakhapatnam)
     expect(
-      pickSampleIdForUpload({ fileName: 'flight-07.jpg', source: 'drone', scenario: 'success' }),
+      pickSampleIdForUpload({
+        fileName: 'mahim-bay.tif',
+        source: 'satellite',
+        scenario: 'success',
+      }),
     ).toBe(SAMPLE_IDS.mahim)
     expect(
       pickSampleIdForUpload({ fileName: 'scene.tif', source: 'satellite', scenario: 'success' }),

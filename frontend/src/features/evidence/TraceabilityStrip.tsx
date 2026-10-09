@@ -45,7 +45,7 @@ const MaskThumbnail = memo(function MaskThumbnail({
       preserveAspectRatio="xMidYMid meet"
       className="h-full w-full bg-map-fallback"
     >
-      <rect width={MASK_WIDTH} height={height} className="fill-surface" />
+      <rect width={MASK_WIDTH} height={height} className="fill-white" />
       {paths.map((p) => (
         <path
           key={p.id}
@@ -89,10 +89,10 @@ const LocationThumbnail = memo(function LocationThumbnail({ bounds }: { bounds: 
         bounds={footprint}
         interactive={false}
         pathOptions={{
-          color: MAP_COLORS.accent,
+          color: MAP_COLORS.mark,
           weight: 2,
-          fillColor: MAP_COLORS.accent,
-          fillOpacity: 0.15,
+          fillColor: MAP_COLORS.mark,
+          fillOpacity: 0.12,
         }}
       />
     </MapContainer>
@@ -120,23 +120,23 @@ function Tile({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        'group flex min-w-0 flex-1 flex-col overflow-hidden rounded-control border bg-surface text-left',
-        'transition-colors duration-150 ease-out',
-        active ? 'border-accent ring-1 ring-accent' : 'border-border hover:border-border-strong',
+        'group flex min-w-0 flex-1 flex-col overflow-hidden border text-left',
+        'transition-colors duration-[120ms] ease-out',
+        active ? 'border-accent-ink ring-1 ring-accent-ink' : 'border-hairline hover:border-ink',
       )}
     >
       {/* Decorative: the label says what the tile opens. */}
       <span
         aria-hidden
-        className="block h-16 w-full overflow-hidden border-b border-border sm:h-20"
+        className="block h-16 w-full overflow-hidden border-b border-hairline sm:h-20"
       >
         {thumbnail}
       </span>
-      <span className="flex flex-col px-2.5 py-2">
-        <span className={cn('text-small font-medium', active ? 'text-accent' : 'text-ink')}>
+      <span className="flex flex-col px-3 py-2">
+        <span className={cn('text-small font-medium', active ? 'text-accent-ink' : 'text-ink')}>
           {label}
         </span>
-        <span className="hidden text-caption text-ink-muted sm:block">{description}</span>
+        <span className="hidden text-small text-ink-2 sm:block">{description}</span>
       </span>
     </button>
   )
@@ -159,11 +159,11 @@ export function TraceabilityStrip({
 }) {
   const bounds = source.bounds
   if (!bounds) return null
-  const arrow = <ArrowRight aria-hidden className="size-4 shrink-0 self-center text-ink-muted" />
-  const item = 'flex min-w-0 flex-1 items-stretch gap-1.5 sm:gap-3'
+  const arrow = <ArrowRight aria-hidden className="size-4 shrink-0 self-center text-ink-2" />
+  const item = 'flex min-w-0 flex-1 items-stretch gap-2 sm:gap-3'
   return (
     <nav aria-label="Trace from image to location">
-      <ol className="flex items-stretch gap-1.5 sm:gap-3">
+      <ol className="flex items-stretch gap-2 sm:gap-3">
         <li className={item}>
           <Tile
             active={mode === 'original'}

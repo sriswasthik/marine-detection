@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { afterEach, describe, expect, it } from 'vitest'
 import { AppProviders } from '@/app/providers'
-import { routes } from '@/app/router'
+import { routes } from '@/test/routes'
 import { createMockApi } from '@/features/observations/api/mockApi'
 import { getMockScenario, setMockScenario } from '@/features/observations/mock/scenario'
 
@@ -75,12 +75,10 @@ describe('Observations page', { timeout: 20_000 }, () => {
     expect(router.state.location.search).toBe('?q=bengal')
   })
 
-  it('filters by source, status and density, and sorts every column', async () => {
+  it('filters by status and density, and sorts every column', async () => {
     const { router, user } = renderList()
     const t = await table()
-    await user.click(screen.getByRole('radio', { name: 'Drone' }))
-    expect(regions(await table())).toEqual(['Mahim Bay'])
-    await user.click(screen.getByRole('radio', { name: 'All' }))
+    expect(screen.queryByRole('radiogroup', { name: 'Source' })).not.toBeInTheDocument()
 
     await user.click(
       within(screen.getByRole('group', { name: 'Status' })).getByRole('button', {
@@ -121,14 +119,13 @@ describe('Observations page', { timeout: 20_000 }, () => {
   })
 
   it('restores filters and sort from the URL', async () => {
-    renderList('/observations?src=satellite&sort=coverage&dir=desc')
-    expect(regions(await table())[0]).toBe('Ennore coast')
-    expect(screen.getByRole('radio', { name: 'Satellite' })).toBeChecked()
-    expect(screen.queryByRole('cell', { name: /Mahim/ })).not.toBeInTheDocument()
+    renderList('/observations?q=coast&sort=coverage&dir=desc')
+    expect(regions(await table())).toEqual(['Ennore coast', 'Visakhapatnam coast'])
+    expect(screen.getByRole('searchbox', { name: 'Search by region' })).toHaveValue('coast')
   })
 
   it('shows a filtered-empty state with Reset', async () => {
-    const { router, user } = renderList('/observations?src=drone&lv=critical')
+    const { router, user } = renderList('/observations?q=mannar&lv=critical')
     expect(
       await screen.findByRole('heading', { name: 'No observations match these filters' }, OPTS),
     ).toBeInTheDocument()

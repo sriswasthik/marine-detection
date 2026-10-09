@@ -1,4 +1,4 @@
-import { CircleAlert, RotateCcw } from 'lucide-react'
+import { RotateCcw } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 import type { AppError } from '@/lib/errors/appError'
@@ -16,16 +16,22 @@ export interface ErrorStateProps {
   description?: ReactNode
   onRetry?: () => void
   retryLabel?: string
-  /** Extra actions, for example a link back to the overview. */
+  /**
+   * The action when there is nothing to retry, or an alternative beside the retry (a tertiary
+   * link, for example "Switch to sample data").
+   */
   action?: ReactNode
-  /** Technical reference such as an error code, shown small for support. */
+  /** Technical reference such as an error code, shown small in mono for support. */
   details?: string
   size?: 'sm' | 'md'
   className?: string
   headingLevel?: 1 | 2 | 3
 }
 
-/** Explains a failure and offers the next step. Never shows raw messages or stack traces. */
+/**
+ * Typographic failure: a danger rule, the title, what to do next and one action (retry when it
+ * can help), with at most one alternative link. Never shows raw messages or stack traces.
+ */
 export function ErrorState({
   error,
   title,
@@ -50,21 +56,19 @@ export function ErrorState({
     <div
       role="alert"
       className={cn(
-        'mx-auto flex max-w-md flex-col items-center text-center',
-        size === 'md' ? 'gap-3 py-12' : 'gap-2 py-6',
+        'flex max-w-prose flex-col items-start border-l-2 border-danger pl-4',
+        size === 'md' ? 'my-12 gap-2' : 'my-6 gap-1',
         className,
       )}
     >
-      <span
-        aria-hidden
-        className="mb-1 inline-flex size-10 items-center justify-center rounded-control bg-danger-soft text-danger"
-      >
-        <CircleAlert className="size-5" />
-      </span>
-      <Heading className="text-heading text-ink">{shownTitle}</Heading>
-      <p className="text-body text-ink-muted">{shownDescription}</p>
+      <Heading className={cn(size === 'md' ? 'text-title' : 'text-lead font-medium', 'text-ink')}>
+        {shownTitle}
+      </Heading>
+      <p className={cn(size === 'md' ? 'text-lead' : 'text-body', 'text-ink-2')}>
+        {shownDescription}
+      </p>
       {retry || action ? (
-        <div className="mt-2 flex flex-wrap justify-center gap-2">
+        <div className="mt-4 flex flex-wrap items-center gap-6">
           {retry ? (
             <Button variant="secondary" iconStart={<RotateCcw aria-hidden />} onClick={retry}>
               {retryLabel}
@@ -73,7 +77,7 @@ export function ErrorState({
           {action}
         </div>
       ) : null}
-      {reference ? <p className="mono-label mt-1 text-ink-muted">{reference}</p> : null}
+      {reference ? <p className="data mt-2 text-ink-2">{reference}</p> : null}
     </div>
   )
 }

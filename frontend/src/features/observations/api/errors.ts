@@ -10,6 +10,14 @@ export type ApiErrorCode =
   | 'UNSUPPORTED_FILE'
   | 'NOT_IMPLEMENTED'
   | 'SERVER_ERROR'
+  // Codes from the processing service (docs/BACKEND_CONTRACT.md).
+  | 'INVALID_BANDS'
+  | 'NO_GEOREF'
+  | 'UNREADABLE'
+  | 'TOO_LARGE'
+  | 'UNSUPPORTED_SOURCE'
+  | 'INVALID_REQUEST'
+  | 'QUEUE_FULL'
 
 export class ApiError extends Error {
   /** HTTP status, or null when the request never got a response. */
@@ -45,10 +53,6 @@ export function timeoutError(timeoutMs: number): ApiError {
     status: null,
     code: 'TIMEOUT',
   })
-}
-
-export function isAbortError(error: unknown): boolean {
-  return error instanceof DOMException && error.name === 'AbortError'
 }
 
 export function isClientError(error: unknown): boolean {

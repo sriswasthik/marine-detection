@@ -19,18 +19,18 @@ function Marker({ status, index }: { status: StepStatus; index: number }) {
     <span
       aria-hidden
       className={cn(
-        'relative z-10 flex size-7 shrink-0 items-center justify-center rounded-full border text-caption font-semibold',
-        'transition-colors duration-150 ease-out',
-        status === 'done' && 'border-accent bg-accent text-white',
-        status === 'active' && 'border-accent bg-surface text-accent ring-4 ring-accent-soft',
+        'data relative z-10 flex size-7 shrink-0 items-center justify-center border font-medium',
+        'transition-colors duration-[120ms] ease-out',
+        status === 'done' && 'border-ink bg-ink text-white',
+        status === 'active' && 'border-accent-ink bg-accent-wash text-accent-ink',
         status === 'failed' && 'border-danger bg-danger-soft text-danger',
-        status === 'pending' && 'border-border-strong bg-surface text-ink-muted',
+        status === 'pending' && 'border-rule bg-paper text-ink-2',
       )}
     >
       {status === 'done' ? (
-        <Check className="size-3.5" strokeWidth={3} />
+        <Check className="size-4" strokeWidth={2.5} />
       ) : status === 'failed' ? (
-        <X className="size-3.5" strokeWidth={3} />
+        <X className="size-4" strokeWidth={2.5} />
       ) : (
         index + 1
       )}
@@ -40,16 +40,14 @@ function Marker({ status, index }: { status: StepStatus; index: number }) {
 
 function Bar({ percent }: { percent: number | null }) {
   return (
-    <span
-      aria-hidden
-      className="mt-2 block h-1 w-full max-w-xs overflow-hidden rounded-full bg-border"
-    >
+    <span aria-hidden className="mt-2 block h-px w-full max-w-xs overflow-hidden bg-rule">
       {percent === null ? (
-        <span className="block h-full w-2/5 rounded-full bg-accent animate-[indeterminate_1.4s_ease-in-out_infinite]" />
+        <span className="block h-full w-2/5 bg-tar animate-[indeterminate_1.4s_ease-in-out_infinite]" />
       ) : (
+        // Full-width bar slid in from the left: a translate, not a width change.
         <span
-          className="block h-full rounded-full bg-accent transition-[width] duration-150 ease-out"
-          style={{ width: `${percent}%` }}
+          className="block h-full w-full bg-tar transition-transform duration-150 ease-out"
+          style={{ transform: `translateX(${percent - 100}%)` }}
         />
       )}
     </span>
@@ -99,11 +97,11 @@ export function ProcessingStepper({
     <section aria-labelledby="stepper-title" className={cn('flex flex-col gap-5', className)}>
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h2 id="stepper-title" className="text-heading text-ink">
+          <h2 id="stepper-title" className="text-lead font-medium text-ink">
             {allDone ? 'Detection complete' : failed ? 'Detection stopped' : title}
           </h2>
           {elapsedMs !== null ? (
-            <p className="num text-caption text-ink-muted">
+            <p className="num text-small text-ink-2">
               <span className="sr-only">Elapsed time: </span>
               {allDone || failed ? formatDuration(elapsedMs) : formatElapsed(elapsedMs)}
             </p>
@@ -126,39 +124,37 @@ export function ProcessingStepper({
           const copy = PIPELINE_STEP_COPY[step]
           const last = index === JOB_STEPS.length - 1
           return (
-            <li key={step} className="relative flex gap-4 pb-6 last:pb-0">
+            <li
+              key={step}
+              aria-current={status === 'active' ? 'step' : undefined}
+              className="relative flex gap-4 pb-6 last:pb-0"
+            >
               {last ? null : (
                 <span
                   aria-hidden
                   className={cn(
                     'absolute top-7 bottom-0 left-[13.5px] w-px transition-colors duration-150 ease-out',
-                    status === 'done' ? 'bg-accent' : 'bg-border',
+                    status === 'done' ? 'bg-ink' : 'bg-hairline',
                   )}
                 />
               )}
               <Marker status={status} index={index} />
-              <div className="min-w-0 flex-1 pt-0.5">
+              <div className="min-w-0 flex-1 pt-1">
                 <p className="flex flex-wrap items-baseline gap-x-3 text-small">
                   <span
-                    className={cn(
-                      'font-medium',
-                      status === 'pending' ? 'text-ink-muted' : 'text-ink',
-                    )}
+                    className={cn('font-medium', status === 'pending' ? 'text-ink-2' : 'text-ink')}
                   >
                     {copy.label}
                   </span>
                   <span
-                    className={cn(
-                      'text-caption',
-                      status === 'failed' ? 'text-danger' : 'text-ink-muted',
-                    )}
+                    className={cn('text-small', status === 'failed' ? 'text-danger' : 'text-ink-2')}
                   >
                     {step === 'upload' && status === 'active' && uploadPercent !== null
                       ? `${uploadPercent}%`
                       : STATUS_WORD[status]}
                   </span>
                 </p>
-                <p className="text-small text-ink-muted">{copy.description}</p>
+                <p className="text-small text-ink-2">{copy.description}</p>
                 {status === 'active' ? (
                   <Bar percent={step === 'upload' ? uploadPercent : null} />
                 ) : null}

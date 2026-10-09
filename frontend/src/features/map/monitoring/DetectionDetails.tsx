@@ -1,7 +1,7 @@
 import { Copy } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { ConfidenceBadge, IconButton, SeverityBadge, Button } from '@/components/ui'
+import { Button, ConfidenceTag, IconButton, SeverityTag } from '@/components/ui'
 import { SourceIcon } from '@/features/observations/components/SourceIcon'
 import { SOURCE_LABELS } from '@/features/observations/labels'
 import type { Detection, Observation } from '@/features/observations/types'
@@ -16,8 +16,8 @@ import { useFormat } from '@/features/settings/settingsContext'
 
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="flex flex-col gap-3 border-t border-border pt-4 first:border-t-0 first:pt-0">
-      <h3 className="text-caption font-medium tracking-wide text-ink-muted uppercase">{title}</h3>
+    <section className="flex flex-col gap-3 border-t border-hairline pt-4 first:border-t-0 first:pt-0">
+      <h3 className="text-small font-medium tracking-wide text-ink-2 uppercase">{title}</h3>
       {children}
     </section>
   )
@@ -26,7 +26,7 @@ export function Section({ title, children }: { title: string; children: ReactNod
 export function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="grid grid-cols-[7.5rem_1fr] items-start gap-3 text-small">
-      <dt className="text-ink-muted">{label}</dt>
+      <dt className="text-ink-2">{label}</dt>
       <dd className="min-w-0 text-ink">{children}</dd>
     </div>
   )
@@ -36,7 +36,7 @@ function CopyValue({ value, what }: { value: string; what: string }) {
   const copy = useCopy()
   return (
     <span className="flex items-center gap-1">
-      <span className="mono-label min-w-0 break-words text-ink">{value}</span>
+      <span className="data min-w-0 break-words text-ink">{value}</span>
       <IconButton
         label={`Copy ${what.toLowerCase()}`}
         icon={<Copy aria-hidden />}
@@ -65,29 +65,27 @@ export function DetectionDetails({ detection, observation, onShowOnMap }: Detect
   return (
     <div className="flex flex-col gap-5">
       <Section title="Key facts">
-        <dl className="flex flex-col gap-2.5">
+        <dl className="flex flex-col gap-3">
           <Fact label="Area">
             <span className="num font-medium">{formatArea(detection.areaM2, { unit: 'm2' })}</span>{' '}
-            <span className="num text-ink-muted">
-              {formatArea(detection.areaM2, { unit: 'ha' })}
-            </span>
+            <span className="num text-ink-2">{formatArea(detection.areaM2, { unit: 'ha' })}</span>
           </Fact>
           <Fact label="Confidence">
             <span className="flex flex-col items-start gap-1">
-              <ConfidenceBadge value={detection.confidence} />
-              <span className="text-caption text-ink-muted">{CONFIDENCE_BAND_MEANINGS[band]}</span>
+              <ConfidenceTag value={detection.confidence} />
+              <span className="text-small text-ink-2">{CONFIDENCE_BAND_MEANINGS[band]}</span>
             </span>
           </Fact>
           <Fact label="Density level">
             <span className="flex flex-col items-start gap-1">
-              <SeverityBadge level={detection.densityLevel} />
-              <span className="text-caption text-ink-muted">
+              <SeverityTag level={detection.densityLevel} />
+              <span className="text-small text-ink-2">
                 {DENSITY_LEVELS[detection.densityLevel].meaning}
               </span>
             </span>
           </Fact>
           <Fact label="Centroid">
-            <span className="flex flex-col gap-0.5">
+            <span className="flex flex-col gap-1">
               <CopyValue
                 value={formatCoordinates(detection.centroid, { format: 'decimal' })}
                 what="Coordinates"
@@ -104,37 +102,37 @@ export function DetectionDetails({ detection, observation, onShowOnMap }: Detect
           <Fact label="Observation">
             <Link
               to={`/observations/${encodeURIComponent(observation.id)}`}
-              className="font-medium text-accent hover:underline"
+              className="font-medium text-accent-ink hover:underline"
             >
               {observation.name ?? observation.region}
             </Link>
           </Fact>
           <Fact label="Source">
-            <span className="flex items-center gap-1.5">
-              <SourceIcon source={observation.source} className="size-4 text-ink-muted" />
+            <span className="flex items-center gap-2">
+              <SourceIcon source={observation.source} className="size-4 text-ink-2" />
               {SOURCE_LABELS[observation.source]}
-              <span className="text-ink-muted">· {formatDateTime(observation.capturedAt)}</span>
+              <span className="text-ink-2">· {formatDateTime(observation.capturedAt)}</span>
             </span>
           </Fact>
         </dl>
       </Section>
 
       <Section title="Trace this detection">
-        <TraceView detection={detection} observationId={observation.id} onShowOnMap={onShowOnMap} />
+        <TraceView detection={detection} onShowOnMap={onShowOnMap} />
       </Section>
 
       <Section title="Geometry">
-        <dl className="flex flex-col gap-2.5">
+        <dl className="flex flex-col gap-3">
           <Fact label="Vertices">
             <span className="num">{formatInteger(countVertices(detection.geometry))}</span>
           </Fact>
           <Fact label="Bounding box">
-            <span className="flex flex-col gap-0.5">
-              <span className="mono-label">
+            <span className="flex flex-col gap-1">
+              <span className="data">
                 <span className="sr-only">North-east corner: </span>
                 {fmt.coordinates({ lat: box.north, lng: box.east })}
               </span>
-              <span className="mono-label">
+              <span className="data">
                 <span className="sr-only">South-west corner: </span>
                 {fmt.coordinates({ lat: box.south, lng: box.west })}
               </span>

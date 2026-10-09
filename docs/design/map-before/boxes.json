@@ -1,0 +1,970 @@
+{
+  "1440x900": {
+    "viewport": "1440x900",
+    "boxCount": 14,
+    "boxes": [
+      {
+        "label": "Tiles © Esri",
+        "x": 1376,
+        "y": 885,
+        "width": 64,
+        "height": 16
+      },
+      {
+        "label": "500 mMap centre: 13.22000° N, 80.36800° E",
+        "x": 1154,
+        "y": 849,
+        "width": 278,
+        "height": 28
+      },
+      {
+        "label": "ObservationEnnore coast, 3 Oct 2026Visakhapatnam",
+        "x": 12,
+        "y": 65,
+        "width": 800,
+        "height": 90
+      },
+      {
+        "label": "61 detections· 3 hotspots",
+        "x": 12,
+        "y": 165,
+        "width": 183,
+        "height": 30
+      },
+      {
+        "label": "Export",
+        "x": 203,
+        "y": 164,
+        "width": 115,
+        "height": 32
+      },
+      {
+        "label": "Sample data",
+        "x": 326,
+        "y": 170,
+        "width": 109,
+        "height": 20
+      },
+      {
+        "label": "Next step",
+        "x": 444,
+        "y": 163,
+        "width": 170,
+        "height": 34
+      },
+      {
+        "label": "Where to inspect next",
+        "x": 12,
+        "y": 205,
+        "width": 320,
+        "height": 239
+      },
+      {
+        "label": "LightSatellite",
+        "x": 897,
+        "y": 65,
+        "width": 131,
+        "height": 32
+      },
+      {
+        "label": "LayersVisible layersDetectionsDensityHotspotsFoo",
+        "x": 852,
+        "y": 105,
+        "width": 176,
+        "height": 163
+      },
+      {
+        "label": "Map view",
+        "x": 994,
+        "y": 276,
+        "width": 34,
+        "height": 133
+      },
+      {
+        "label": "Keyboard shortcuts (?)",
+        "x": 994,
+        "y": 417,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "label": "Map legend",
+        "x": 12,
+        "y": 594,
+        "width": 288,
+        "height": 283
+      },
+      {
+        "label": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "x": 1040,
+        "y": 52,
+        "width": 400,
+        "height": 848
+      }
+    ],
+    "intersections": [
+      {
+        "a": "Tiles © Esri",
+        "b": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "overlap": "64x15"
+      },
+      {
+        "a": "500 mMap centre: 13.22000° N, 80.36800° E",
+        "b": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "overlap": "278x28"
+      }
+    ],
+    "attribution": {
+      "text": "Tiles © Esri",
+      "right": 1440,
+      "bottom": 901,
+      "clipped": true
+    },
+    "textSizes": [
+      "11px",
+      "12px",
+      "13px",
+      "14px"
+    ]
+  },
+  "1440x900-idle": {
+    "viewport": "1440x900",
+    "boxCount": 13,
+    "boxes": [
+      {
+        "label": "Tiles © Esri",
+        "x": 1376,
+        "y": 885,
+        "width": 64,
+        "height": 16
+      },
+      {
+        "label": "500 mMap centre: 13.22000° N, 80.36800° E",
+        "x": 1154,
+        "y": 849,
+        "width": 278,
+        "height": 28
+      },
+      {
+        "label": "ObservationEnnore coast, 3 Oct 2026Visakhapatnam",
+        "x": 12,
+        "y": 65,
+        "width": 1101,
+        "height": 50
+      },
+      {
+        "label": "61 detections· 3 hotspots",
+        "x": 12,
+        "y": 125,
+        "width": 183,
+        "height": 30
+      },
+      {
+        "label": "Export",
+        "x": 203,
+        "y": 124,
+        "width": 115,
+        "height": 32
+      },
+      {
+        "label": "Sample data",
+        "x": 326,
+        "y": 130,
+        "width": 109,
+        "height": 20
+      },
+      {
+        "label": "Next step",
+        "x": 444,
+        "y": 123,
+        "width": 170,
+        "height": 34
+      },
+      {
+        "label": "Where to inspect next",
+        "x": 12,
+        "y": 165,
+        "width": 320,
+        "height": 239
+      },
+      {
+        "label": "LightSatellite",
+        "x": 1297,
+        "y": 65,
+        "width": 131,
+        "height": 32
+      },
+      {
+        "label": "LayersVisible layersDetectionsDensityHotspotsFoo",
+        "x": 1252,
+        "y": 105,
+        "width": 176,
+        "height": 163
+      },
+      {
+        "label": "Map view",
+        "x": 1394,
+        "y": 276,
+        "width": 34,
+        "height": 133
+      },
+      {
+        "label": "Keyboard shortcuts (?)",
+        "x": 1394,
+        "y": 417,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "label": "Map legend",
+        "x": 12,
+        "y": 594,
+        "width": 288,
+        "height": 283
+      }
+    ],
+    "intersections": [],
+    "attribution": {
+      "text": "Tiles © Esri",
+      "right": 1440,
+      "bottom": 901,
+      "clipped": true
+    },
+    "textSizes": [
+      "11px",
+      "12px",
+      "13px",
+      "14px"
+    ]
+  },
+  "1280x720": {
+    "viewport": "1280x720",
+    "boxCount": 14,
+    "boxes": [
+      {
+        "label": "Tiles © Esri",
+        "x": 1216,
+        "y": 705,
+        "width": 64,
+        "height": 16
+      },
+      {
+        "label": "500 mMap centre: 13.22000° N, 80.36800° E",
+        "x": 994,
+        "y": 669,
+        "width": 278,
+        "height": 28
+      },
+      {
+        "label": "ObservationEnnore coast, 3 Oct 2026Visakhapatnam",
+        "x": 12,
+        "y": 65,
+        "width": 640,
+        "height": 90
+      },
+      {
+        "label": "61 detections· 3 hotspots",
+        "x": 12,
+        "y": 165,
+        "width": 183,
+        "height": 30
+      },
+      {
+        "label": "Export",
+        "x": 203,
+        "y": 164,
+        "width": 115,
+        "height": 32
+      },
+      {
+        "label": "Sample data",
+        "x": 326,
+        "y": 170,
+        "width": 109,
+        "height": 20
+      },
+      {
+        "label": "Next step",
+        "x": 444,
+        "y": 163,
+        "width": 170,
+        "height": 34
+      },
+      {
+        "label": "Where to inspect next",
+        "x": 12,
+        "y": 205,
+        "width": 320,
+        "height": 239
+      },
+      {
+        "label": "LightSatellite",
+        "x": 737,
+        "y": 65,
+        "width": 131,
+        "height": 32
+      },
+      {
+        "label": "LayersVisible layersDetectionsDensityHotspotsFoo",
+        "x": 692,
+        "y": 105,
+        "width": 176,
+        "height": 163
+      },
+      {
+        "label": "Map view",
+        "x": 834,
+        "y": 276,
+        "width": 34,
+        "height": 133
+      },
+      {
+        "label": "Keyboard shortcuts (?)",
+        "x": 834,
+        "y": 417,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "label": "Map legend",
+        "x": 12,
+        "y": 414,
+        "width": 288,
+        "height": 283
+      },
+      {
+        "label": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "x": 880,
+        "y": 52,
+        "width": 400,
+        "height": 668
+      }
+    ],
+    "intersections": [
+      {
+        "a": "Tiles © Esri",
+        "b": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "overlap": "64x15"
+      },
+      {
+        "a": "500 mMap centre: 13.22000° N, 80.36800° E",
+        "b": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "overlap": "278x28"
+      },
+      {
+        "a": "Where to inspect next",
+        "b": "Map legend",
+        "overlap": "288x30"
+      }
+    ],
+    "attribution": {
+      "text": "Tiles © Esri",
+      "right": 1280,
+      "bottom": 721,
+      "clipped": true
+    },
+    "textSizes": [
+      "11px",
+      "12px",
+      "13px",
+      "14px"
+    ]
+  },
+  "1280x720-idle": {
+    "viewport": "1280x720",
+    "boxCount": 13,
+    "boxes": [
+      {
+        "label": "Tiles © Esri",
+        "x": 1216,
+        "y": 705,
+        "width": 64,
+        "height": 16
+      },
+      {
+        "label": "500 mMap centre: 13.22000° N, 80.36800° E",
+        "x": 994,
+        "y": 669,
+        "width": 278,
+        "height": 28
+      },
+      {
+        "label": "ObservationEnnore coast, 3 Oct 2026Visakhapatnam",
+        "x": 12,
+        "y": 65,
+        "width": 1040,
+        "height": 90
+      },
+      {
+        "label": "61 detections· 3 hotspots",
+        "x": 12,
+        "y": 165,
+        "width": 183,
+        "height": 30
+      },
+      {
+        "label": "Export",
+        "x": 203,
+        "y": 164,
+        "width": 115,
+        "height": 32
+      },
+      {
+        "label": "Sample data",
+        "x": 326,
+        "y": 170,
+        "width": 109,
+        "height": 20
+      },
+      {
+        "label": "Next step",
+        "x": 444,
+        "y": 163,
+        "width": 170,
+        "height": 34
+      },
+      {
+        "label": "Where to inspect next",
+        "x": 12,
+        "y": 205,
+        "width": 320,
+        "height": 239
+      },
+      {
+        "label": "LightSatellite",
+        "x": 1137,
+        "y": 65,
+        "width": 131,
+        "height": 32
+      },
+      {
+        "label": "LayersVisible layersDetectionsDensityHotspotsFoo",
+        "x": 1092,
+        "y": 105,
+        "width": 176,
+        "height": 163
+      },
+      {
+        "label": "Map view",
+        "x": 1234,
+        "y": 276,
+        "width": 34,
+        "height": 133
+      },
+      {
+        "label": "Keyboard shortcuts (?)",
+        "x": 1234,
+        "y": 417,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "label": "Map legend",
+        "x": 12,
+        "y": 414,
+        "width": 288,
+        "height": 283
+      }
+    ],
+    "intersections": [
+      {
+        "a": "Where to inspect next",
+        "b": "Map legend",
+        "overlap": "288x30"
+      }
+    ],
+    "attribution": {
+      "text": "Tiles © Esri",
+      "right": 1280,
+      "bottom": 721,
+      "clipped": true
+    },
+    "textSizes": [
+      "11px",
+      "12px",
+      "13px",
+      "14px"
+    ]
+  },
+  "1024x768": {
+    "viewport": "1024x768",
+    "boxCount": 14,
+    "boxes": [
+      {
+        "label": "Tiles © Esri",
+        "x": 960,
+        "y": 753,
+        "width": 64,
+        "height": 16
+      },
+      {
+        "label": "500 mMap centre: 13.22000° N, 80.36800° E",
+        "x": 738,
+        "y": 717,
+        "width": 278,
+        "height": 28
+      },
+      {
+        "label": "Filters",
+        "x": 12,
+        "y": 65,
+        "width": 87,
+        "height": 32
+      },
+      {
+        "label": "61 detections· 3 hotspots",
+        "x": 12,
+        "y": 106,
+        "width": 183,
+        "height": 30
+      },
+      {
+        "label": "Export",
+        "x": 203,
+        "y": 105,
+        "width": 115,
+        "height": 32
+      },
+      {
+        "label": "Sample data",
+        "x": 12,
+        "y": 152,
+        "width": 109,
+        "height": 20
+      },
+      {
+        "label": "Next step",
+        "x": 129,
+        "y": 145,
+        "width": 170,
+        "height": 34
+      },
+      {
+        "label": "Where to inspect next",
+        "x": 12,
+        "y": 187,
+        "width": 320,
+        "height": 239
+      },
+      {
+        "label": "LightSatellite",
+        "x": 481,
+        "y": 65,
+        "width": 131,
+        "height": 32
+      },
+      {
+        "label": "LayersVisible layersDetectionsDensityHotspotsFoo",
+        "x": 436,
+        "y": 105,
+        "width": 176,
+        "height": 163
+      },
+      {
+        "label": "Map view",
+        "x": 578,
+        "y": 276,
+        "width": 34,
+        "height": 133
+      },
+      {
+        "label": "Keyboard shortcuts (?)",
+        "x": 578,
+        "y": 417,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "label": "Map legend",
+        "x": 12,
+        "y": 462,
+        "width": 288,
+        "height": 283
+      },
+      {
+        "label": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "x": 624,
+        "y": 52,
+        "width": 400,
+        "height": 716
+      }
+    ],
+    "intersections": [
+      {
+        "a": "Tiles © Esri",
+        "b": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "overlap": "64x15"
+      },
+      {
+        "a": "500 mMap centre: 13.22000° N, 80.36800° E",
+        "b": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "overlap": "278x28"
+      }
+    ],
+    "attribution": {
+      "text": "Tiles © Esri",
+      "right": 1024,
+      "bottom": 769,
+      "clipped": true
+    },
+    "textSizes": [
+      "11px",
+      "12px",
+      "13px",
+      "14px"
+    ]
+  },
+  "1024x768-idle": {
+    "viewport": "1024x768",
+    "boxCount": 13,
+    "boxes": [
+      {
+        "label": "Tiles © Esri",
+        "x": 960,
+        "y": 753,
+        "width": 64,
+        "height": 16
+      },
+      {
+        "label": "500 mMap centre: 13.22000° N, 80.36800° E",
+        "x": 738,
+        "y": 717,
+        "width": 278,
+        "height": 28
+      },
+      {
+        "label": "Filters",
+        "x": 12,
+        "y": 65,
+        "width": 87,
+        "height": 32
+      },
+      {
+        "label": "61 detections· 3 hotspots",
+        "x": 12,
+        "y": 107,
+        "width": 183,
+        "height": 30
+      },
+      {
+        "label": "Export",
+        "x": 203,
+        "y": 106,
+        "width": 115,
+        "height": 32
+      },
+      {
+        "label": "Sample data",
+        "x": 326,
+        "y": 112,
+        "width": 109,
+        "height": 20
+      },
+      {
+        "label": "Next step",
+        "x": 444,
+        "y": 105,
+        "width": 170,
+        "height": 34
+      },
+      {
+        "label": "Where to inspect next",
+        "x": 12,
+        "y": 147,
+        "width": 320,
+        "height": 239
+      },
+      {
+        "label": "LightSatellite",
+        "x": 881,
+        "y": 65,
+        "width": 131,
+        "height": 32
+      },
+      {
+        "label": "LayersVisible layersDetectionsDensityHotspotsFoo",
+        "x": 836,
+        "y": 105,
+        "width": 176,
+        "height": 163
+      },
+      {
+        "label": "Map view",
+        "x": 978,
+        "y": 276,
+        "width": 34,
+        "height": 133
+      },
+      {
+        "label": "Keyboard shortcuts (?)",
+        "x": 978,
+        "y": 417,
+        "width": 34,
+        "height": 34
+      },
+      {
+        "label": "Map legend",
+        "x": 12,
+        "y": 462,
+        "width": 288,
+        "height": 283
+      }
+    ],
+    "intersections": [],
+    "attribution": {
+      "text": "Tiles © Esri",
+      "right": 1024,
+      "bottom": 769,
+      "clipped": true
+    },
+    "textSizes": [
+      "11px",
+      "12px",
+      "13px",
+      "14px"
+    ]
+  },
+  "390x844": {
+    "viewport": "390x844",
+    "boxCount": 13,
+    "boxes": [
+      {
+        "label": "Tiles © Esri",
+        "x": 326,
+        "y": 773,
+        "width": 64,
+        "height": 16
+      },
+      {
+        "label": "3 kmMap centre: 13.22000° N, 80.36800° E",
+        "x": 275,
+        "y": 737,
+        "width": 107,
+        "height": 28
+      },
+      {
+        "label": "Filters",
+        "x": 12,
+        "y": 65,
+        "width": 87,
+        "height": 40
+      },
+      {
+        "label": "61 detections· 3 hotspots",
+        "x": 12,
+        "y": 113,
+        "width": 174,
+        "height": 54
+      },
+      {
+        "label": "Export",
+        "x": 12,
+        "y": 175,
+        "width": 115,
+        "height": 40
+      },
+      {
+        "label": "Sample data",
+        "x": 12,
+        "y": 223,
+        "width": 109,
+        "height": 20
+      },
+      {
+        "label": "Next step",
+        "x": 12,
+        "y": 251,
+        "width": 170,
+        "height": 42
+      },
+      {
+        "label": "LightSatellite",
+        "x": 247,
+        "y": 65,
+        "width": 131,
+        "height": 42
+      },
+      {
+        "label": "LayersVisible layersDetectionsDensityHotspotsFoo",
+        "x": 202,
+        "y": 115,
+        "width": 176,
+        "height": 42
+      },
+      {
+        "label": "Map view",
+        "x": 336,
+        "y": 165,
+        "width": 42,
+        "height": 165
+      },
+      {
+        "label": "Where to inspect next",
+        "x": 12,
+        "y": 673,
+        "width": 320,
+        "height": 42
+      },
+      {
+        "label": "Map legend",
+        "x": 12,
+        "y": 723,
+        "width": 288,
+        "height": 42
+      },
+      {
+        "label": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "x": 0,
+        "y": 422,
+        "width": 390,
+        "height": 422
+      }
+    ],
+    "intersections": [
+      {
+        "a": "Tiles © Esri",
+        "b": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "overlap": "64x16"
+      },
+      {
+        "a": "3 kmMap centre: 13.22000° N, 80.36800° E",
+        "b": "Map legend",
+        "overlap": "25x28"
+      },
+      {
+        "a": "3 kmMap centre: 13.22000° N, 80.36800° E",
+        "b": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "overlap": "107x28"
+      },
+      {
+        "a": "Where to inspect next",
+        "b": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "overlap": "320x42"
+      },
+      {
+        "a": "Map legend",
+        "b": "drawer: Hotspot 1CriticalEnnore coastPriority for inspec",
+        "overlap": "288x42"
+      }
+    ],
+    "attribution": {
+      "text": "Tiles © Esri",
+      "right": 390,
+      "bottom": 789,
+      "clipped": false
+    },
+    "textSizes": [
+      "11px",
+      "12px",
+      "13px"
+    ]
+  },
+  "390x844-idle": {
+    "viewport": "390x844",
+    "boxCount": 12,
+    "boxes": [
+      {
+        "label": "Tiles © Esri",
+        "x": 326,
+        "y": 773,
+        "width": 64,
+        "height": 16
+      },
+      {
+        "label": "3 kmMap centre: 13.22000° N, 80.36800° E",
+        "x": 275,
+        "y": 737,
+        "width": 107,
+        "height": 28
+      },
+      {
+        "label": "Filters",
+        "x": 12,
+        "y": 65,
+        "width": 87,
+        "height": 40
+      },
+      {
+        "label": "61 detections· 3 hotspots",
+        "x": 12,
+        "y": 113,
+        "width": 174,
+        "height": 54
+      },
+      {
+        "label": "Export",
+        "x": 12,
+        "y": 175,
+        "width": 115,
+        "height": 40
+      },
+      {
+        "label": "Sample data",
+        "x": 12,
+        "y": 223,
+        "width": 109,
+        "height": 20
+      },
+      {
+        "label": "Next step",
+        "x": 12,
+        "y": 251,
+        "width": 170,
+        "height": 42
+      },
+      {
+        "label": "LightSatellite",
+        "x": 247,
+        "y": 65,
+        "width": 131,
+        "height": 42
+      },
+      {
+        "label": "LayersVisible layersDetectionsDensityHotspotsFoo",
+        "x": 202,
+        "y": 115,
+        "width": 176,
+        "height": 42
+      },
+      {
+        "label": "Map view",
+        "x": 336,
+        "y": 165,
+        "width": 42,
+        "height": 165
+      },
+      {
+        "label": "Where to inspect next",
+        "x": 12,
+        "y": 673,
+        "width": 320,
+        "height": 42
+      },
+      {
+        "label": "Map legend",
+        "x": 12,
+        "y": 723,
+        "width": 288,
+        "height": 42
+      }
+    ],
+    "intersections": [
+      {
+        "a": "3 kmMap centre: 13.22000° N, 80.36800° E",
+        "b": "Map legend",
+        "overlap": "25x28"
+      }
+    ],
+    "attribution": {
+      "text": "Tiles © Esri",
+      "right": 390,
+      "bottom": 789,
+      "clipped": false
+    },
+    "textSizes": [
+      "11px",
+      "12px",
+      "13px"
+    ]
+  }
+}

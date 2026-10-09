@@ -7,10 +7,12 @@ import {
   MapPinned,
   Shapes,
 } from 'lucide-react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { buttonStyles, DropdownMenu, type DropdownMenuEntry } from '@/components/ui'
 import type { Detection } from '@/features/observations/types'
 import { cn } from '@/lib/cn'
+import { registerCommand } from '@/lib/commandBus'
 import { formatInteger, shortId } from '@/lib/format'
 import {
   detectionsCsvFile,
@@ -20,6 +22,10 @@ import {
   type ExportSource,
 } from './exportFiles'
 import { useExportActions } from './useExportActions'
+
+/** Matches the map toolbar's controls (features/map/monitoring/toolbarStyles.ts). */
+const TOOLBAR_TRIGGER =
+  'inline-flex h-8 items-center gap-2 rounded-control border border-rule bg-sheet px-3 text-small text-ink hover:border-ink max-sm:h-10 [&_svg]:size-4'
 
 const count = (n: number, one: string, many: string) =>
   `${formatInteger(n)} ${n === 1 ? one : many}`
@@ -32,6 +38,10 @@ export interface ExportMenuProps {
   /** Open upwards, for triggers near the bottom of the screen. */
   side?: 'bottom' | 'top'
   size?: 'sm' | 'md'
+  /** `toolbar`: the map toolbar's control style (a rule frame on the sheet, 32px). */
+  appearance?: 'button' | 'toolbar'
+  /** Classes for the trigger, for example a data attribute selector or a height. */
+  triggerClassName?: string
   className?: string
 }
 
@@ -46,6 +56,8 @@ export function ExportMenu({
   align = 'end',
   side = 'bottom',
   size = 'md',
+  appearance = 'button',
+  triggerClassName,
   className,
 }: ExportMenuProps) {
   const navigate = useNavigate()
@@ -57,6 +69,12 @@ export function ExportMenu({
   const detectionsLabel = filtered
     ? count(shown, 'filtered detection', 'filtered detections')
     : count(shown, 'detection', 'detections')
+
+  // The command palette's "Export GeoJSON" downloads the same file as the first menu item.
+  useEffect(
+    () => registerCommand('export.geojson', () => download(() => detectionsGeoJsonFile(source))),
+    [download, source],
+  )
 
   const items: DropdownMenuEntry[] = [
     ...(detection
@@ -137,7 +155,12 @@ export function ExportMenu({
         <button
           type="button"
           {...props}
-          className={cn(buttonStyles({ variant: 'secondary', size }))}
+          data-toolbar-control={appearance === 'toolbar' ? '' : undefined}
+          className={
+            appearance === 'toolbar'
+              ? cn(TOOLBAR_TRIGGER, triggerClassName)
+              : cn(buttonStyles({ variant: 'secondary', size }), triggerClassName)
+          }
         >
           <Download aria-hidden />
           Export

@@ -1,4 +1,3 @@
-import { FileSearch, Inbox } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { OfflineBanner } from '@/app/shell/OfflineBanner'
 import {
@@ -8,9 +7,9 @@ import {
   ErrorBoundary,
   ErrorState,
   PageSkeleton,
-  SkeletonCard,
+  SkeletonSection,
   SkeletonMap,
-  SkeletonMetricCards,
+  SkeletonFigures,
   SkeletonPageHeader,
   SkeletonTable,
   useToast,
@@ -41,8 +40,8 @@ import { observationNotices } from '@/lib/warnings'
 
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
-    <section aria-labelledby={id} className="flex flex-col gap-4 border-t border-border py-8">
-      <h2 id={id} className="text-heading text-ink">
+    <section aria-labelledby={id} className="flex flex-col gap-4 border-t border-hairline py-8">
+      <h2 id={id} className="text-lead font-medium text-ink">
         {title}
       </h2>
       {children}
@@ -62,8 +61,8 @@ function Specimen({
 }) {
   return (
     <figure className={className}>
-      <figcaption className="mb-2 text-caption font-medium text-ink-muted">{label}</figcaption>
-      <div className="rounded-card border border-border bg-surface p-4">{children}</div>
+      <figcaption className="mb-2 text-small font-medium text-ink-2">{label}</figcaption>
+      <div className="border-t border-rule pt-4">{children}</div>
     </figure>
   )
 }
@@ -160,9 +159,9 @@ export function StatesPage() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
       <header className="flex flex-col gap-1 pb-6">
-        <p className="mono-label text-ink-muted">/design/states · development only</p>
+        <p className="data text-ink-2">/design/states · development only</p>
         <h1 className="text-title text-ink">UI states</h1>
-        <p className="max-w-prose text-body text-ink-muted">
+        <p className="max-w-prose text-body text-ink-2">
           Every state of every shared component. The copy comes from the same files the app uses, so
           what you review here is what people see.
         </p>
@@ -186,19 +185,13 @@ export function StatesPage() {
         <div className="grid gap-4 md:grid-cols-2">
           <Specimen label="EmptyState, md, with action">
             <EmptyState
-              icon={<Inbox />}
               title="Nothing here yet"
               description="Explains why it is empty and what to do next."
               action={<Button variant="primary">Primary action</Button>}
             />
           </Specimen>
           <Specimen label="EmptyState, sm, no action">
-            <EmptyState
-              size="sm"
-              icon={<FileSearch />}
-              title="No matches"
-              description="Widen the filters to see more."
-            />
+            <EmptyState size="sm" title="No matches" description="Widen the filters to see more." />
           </Specimen>
           <Specimen label="No observations (Overview, list)">
             <NoObservations />
@@ -273,7 +266,7 @@ export function StatesPage() {
               {observationNotices(observation, { partialData }).length > 0 ? (
                 <ObservationNotices observation={observation} partialData={partialData} />
               ) : (
-                <p className="text-small text-ink-muted">Nothing to show: no banner renders.</p>
+                <p className="text-small text-ink-2">Nothing to show: no banner renders.</p>
               )}
             </Specimen>
           ))}
@@ -289,16 +282,16 @@ export function StatesPage() {
             <SkeletonPageHeader breadcrumb />
           </Specimen>
           <Specimen label="Card">
-            <SkeletonCard lines={4} />
+            <SkeletonSection lines={4} />
           </Specimen>
           <Specimen label="Metric cards">
-            <SkeletonMetricCards count={3} className="grid grid-cols-3 gap-3" />
+            <SkeletonFigures count={3} className="grid grid-cols-3 gap-3" />
           </Specimen>
           <Specimen label="Table">
             <SkeletonTable rows={5} />
           </Specimen>
           <Specimen label="Map" className="md:col-span-2">
-            <SkeletonMap className="h-64 rounded-card" />
+            <SkeletonMap className="h-64" />
           </Specimen>
           <Specimen label="Overview page" className="md:col-span-2">
             <PageSkeleton label="Loading overview" className="flex flex-col gap-10">
@@ -336,7 +329,6 @@ export function StatesPage() {
                 hotspotCount: 2,
                 notices: observationNotices(lowConfidence, { only: ['low-confidence'] }),
               }}
-              autoOpening={false}
               onViewResults={noop}
               onAnalyzeAnother={noop}
             />
@@ -344,7 +336,6 @@ export function StatesPage() {
           <Specimen label="Success, no debris">
             <SuccessPanel
               summary={{ detectionCount: 0, hotspotCount: 0, notices: [] }}
-              autoOpening
               onViewResults={noop}
               onAnalyzeAnother={noop}
             />

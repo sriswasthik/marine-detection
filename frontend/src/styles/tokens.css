@@ -1,6 +1,6 @@
 /*
- * Design tokens: the single source for colour, type, radius, shadow and motion.
- * Values mirror frontend/CLAUDE.md. Change them here, never inline in components.
+ * Design tokens: the survey chart (docs/DESIGN_SYSTEM.md) in the A.W.A.R.E. palette. The single
+ * source for colour, type, radius, shadow and motion. Change them here, never inline in components.
  * src/styles/tokens.test.ts checks text contrast; src/lib/density.test.ts checks that the
  * severity colours match src/lib/density.ts.
  *
@@ -8,29 +8,49 @@
  * JavaScript can rely on var(--token) at runtime.
  */
 @theme static {
-  /* Only project tokens exist: Tailwind's default palette and type sizes are removed. */
+  /* Only project tokens exist: Tailwind's default palette, type sizes, radii and shadows are gone. */
   --color-*: initial;
   --text-*: initial;
   --shadow-*: initial;
+  --radius-*: initial;
+  --font-weight-*: initial;
 
   --color-white: #ffffff;
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  /* Base */
-  --color-bg: #f7f8f7;
-  --color-surface: #ffffff;
-  --color-border: #e3e7e5;
-  --color-border-strong: #cdd4d1;
-  --color-ink: #18212b;
-  --color-ink-muted: #66717d;
+  /*
+   * The A.W.A.R.E. palette (the project deck): Concrete ground, Tar Black and Graphite ink,
+   * Signal Yellow kept for the logomark. Light mode only, so the deck's dark-slide text colours
+   * (Stone #C4C1B9, Fog Grey #9A9A92) are not used.
+   */
 
-  /* Accent */
-  --color-accent: #2f6f6d;
-  --color-accent-hover: #265957;
-  --color-accent-soft: #e6f0ef;
+  /* Surfaces and ink */
+  --color-paper: #e7e4dc; /* Concrete: the page */
+  --color-sheet: #f1efe9; /* Docked panels, map plates, tooltips */
+  --color-hairline: #d2cec4;
+  --color-rule: #ada89c;
+  --color-tar: #15171a; /* Tar Black: the logomark, labels on yellow, focus rings, map marks */
+  --color-ink: #3a3b3d; /* Graphite: body text, titles, figures */
+  /* Slate Grey: secondary text. All small text (under 18px) is ink-2 or darker. */
+  --color-ink-2: #5a5a55;
+  /* Large or decorative only: under 4.5:1 on Concrete. */
+  --color-ink-3: #78756c;
 
-  /* Severity scale. Text on a severity background is always ink, never the stroke colour. */
+  /*
+   * Accent: the one primary action is Tar Black with white text (17.9:1). Accent text, links and
+   * active states are Olive Ink; selections sit on a neutral wash. No yellow here: it sits next
+   * to the Low severity fill.
+   */
+  --color-accent: #15171a;
+  --color-accent-hover: #3a3b3d;
+  --color-accent-ink: #3b3420;
+  --color-accent-wash: #dcd8cd;
+
+  /* Signal Yellow: the brand colour, used only in the logomark (1.3:1 on Concrete). */
+  --color-signal: #f4c51d;
+
+  /* Severity ramp. Always with a text label; text on a tint is ink, never the stroke colour. */
   --color-low: #e8cf7a;
   --color-low-stroke: #b8993a;
   --color-low-soft: #faf3d9;
@@ -44,68 +64,77 @@
   --color-critical-stroke: #5c1824;
   --color-critical-soft: #ebd3d7;
 
-  /*
-   * Status. success and warning are slightly darker than the CLAUDE.md values
-   * (#3F7D58, #A66A12) so text reaches 4.5:1 on their soft backgrounds.
-   * success-soft is an addition for success badges.
-   */
-  --color-success: #3c7854;
+  /* Status, darkened from the earlier set so text keeps 4.5:1 on Concrete. info is Olive Ink. */
+  --color-success: #2e6343;
   --color-success-soft: #ebf3ee;
-  --color-warning: #996211;
+  --color-warning: #7f510c;
   --color-warning-soft: #fbf3e3;
-  --color-danger: #a8402f;
+  --color-danger: #963826;
   --color-danger-soft: #fbeae6;
-  --color-info: #2f6f6d;
-  --color-info-soft: #e6f0ef;
+  --color-info: #3b3420;
+  --color-info-soft: #dcd8cd;
 
   /* Map: flat neutral behind the basemap, shown when tiles cannot load. */
-  --color-map-fallback: #eef2f1;
+  --color-map-fallback: #dcd8ce;
 
-  /* Type */
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono:
-    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  /* Type: Instrument Sans for the interface, Geist Mono for data. Self-hosted (src/main.tsx). */
+  --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  /* Type scale. Large sizes only for the product title and KPI figures. */
-  --text-display: 1.75rem;
-  --text-display--line-height: 2.125rem;
-  --text-display--letter-spacing: -0.02em;
-  --text-display--font-weight: 600;
-  --text-title: 1.25rem;
-  --text-title--line-height: 1.75rem;
-  --text-title--letter-spacing: -0.01em;
-  --text-title--font-weight: 600;
-  --text-heading: 0.9375rem;
-  --text-heading--line-height: 1.375rem;
-  --text-heading--font-weight: 600;
-  --text-body: 0.875rem;
-  --text-body--line-height: 1.375rem;
+  /* Three weights only. */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* Eight sizes, no others. */
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1rem;
+  --text-label--letter-spacing: 0.06em;
+  --text-label--font-weight: 500;
+  --text-mono: 0.75rem;
+  --text-mono--line-height: 1rem;
   --text-small: 0.8125rem;
   --text-small--line-height: 1.25rem;
-  --text-caption: 0.75rem;
-  --text-caption--line-height: 1rem;
-  --text-mono-label: 0.75rem;
-  --text-mono-label--line-height: 1rem;
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.25rem;
+  --text-lead: 1rem;
+  --text-lead--line-height: 1.5rem;
+  --text-title: 1.375rem;
+  --text-title--line-height: 1.75rem;
+  --text-title--letter-spacing: -0.01em;
+  --text-title--font-weight: 500;
+  --text-page: 2rem;
+  --text-page--line-height: 2.5rem;
+  --text-page--letter-spacing: -0.015em;
+  --text-page--font-weight: 500;
+  --text-figure: 3.5rem;
+  --text-figure--line-height: 3.5rem;
+  --text-figure--letter-spacing: -0.02em;
+  --text-figure--font-weight: 500;
 
-  /* Radius */
-  --radius-badge: 6px;
-  --radius-control: 8px;
-  --radius-card: 12px;
+  /* Shape: no pills, not even the switch. */
+  --radius-tag: 2px;
+  --radius-panel: 2px;
+  --radius-control: 4px;
 
-  /* Shadow: subtle only */
-  --shadow-subtle: 0 1px 2px rgba(24, 33, 43, 0.04);
-  --shadow-popover: 0 8px 24px rgba(24, 33, 43, 0.08);
+  /* Elevation: none, or this. For dialogs, popovers, menus, tooltips, toasts and the drawer. */
+  --shadow-popover: 0 6px 20px rgba(21, 23, 26, 0.12);
 
-  /* Motion: 120-200 ms, ease-out */
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Motion: one curve. Overriding --ease-out makes Tailwind's ease-out use it everywhere. */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   --duration-fast: 120ms;
   --duration-base: 160ms;
   --duration-slow: 200ms;
+  --duration-reveal: 400ms;
 
   /* Layout */
-  --spacing-topbar: 56px;
+  --spacing-topbar: 52px;
+  /* Phones and tablets: the bottom tab bar under 900px. */
+  --spacing-tabbar: 56px;
   /* Side drawer width; map controls step aside by this much when it is open. */
-  --spacing-drawer: 380px;
+  --spacing-drawer: 400px;
+  /* Document pages: content width, 12 columns with 24px gutters. */
+  --container-page: 80rem;
 
   /* Extra breakpoints: xs for the product name, nav where the top bar shows full navigation. */
   --breakpoint-xs: 30rem;

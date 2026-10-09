@@ -1,5 +1,5 @@
-import { isRouteErrorResponse, Link, useRouteError } from 'react-router-dom'
-import { buttonStyles, ErrorState } from '@/components/ui'
+import { isRouteErrorResponse, useRouteError } from 'react-router-dom'
+import { ArrowLink, ErrorState } from '@/components/ui'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { toAppError } from '@/lib/errors/appError'
 
@@ -15,16 +15,12 @@ export function RouteErrorBoundary() {
   useDocumentTitle(error.title)
 
   return (
-    <div className="px-4 py-8">
+    <div className="mx-auto w-full max-w-page px-4 py-8 sm:px-6 lg:px-8">
       <ErrorState
         headingLevel={1}
         error={error}
         retryLabel="Reload page"
-        action={
-          <Link to="/" className={buttonStyles({ variant: 'ghost' })}>
-            Go to overview
-          </Link>
-        }
+        action={<ArrowLink to="/">Go to overview</ArrowLink>}
       />
     </div>
   )

@@ -17,7 +17,7 @@ const OPTIONS: { value: MockScenario; label: string }[] = [
 export function DemoScenarioSelect() {
   const [scenario, setScenario] = useMockScenario()
   return (
-    <div className="flex flex-wrap items-center gap-3 text-caption text-ink-muted">
+    <div className="flex flex-wrap items-center gap-3 text-small text-ink-2">
       <Select
         label="Demo scenario"
         hideLabel

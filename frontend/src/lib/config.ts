@@ -32,7 +32,7 @@ export const REFERENCE_RESOLUTION_M = 10
 
 /**
  * Grid cell edge for a given image resolution. The cell always spans the same number of
- * pixels (25 x 25), so a 0.1 m drone image uses 2.5 m cells. Unknown resolution uses the default.
+ * pixels (25 x 25), so a 20 m image would use 500 m cells. Unknown resolution uses the default.
  */
 export function gridCellSizeForResolution(resolutionM: number | null | undefined): number {
   if (resolutionM === null || resolutionM === undefined || !(resolutionM > 0)) {
@@ -43,10 +43,10 @@ export function gridCellSizeForResolution(resolutionM: number | null | undefined
 
 /** The model behind the detections. Edit here; every screen and the mock read from this. */
 export const MODEL_CARD = {
-  name: 'UNet++ marine debris segmentation',
-  shortName: 'UNet++',
+  name: 'U-Net marine debris segmentation',
+  shortName: 'U-Net',
   version: '0.1.0',
-  architecture: 'UNet++ semantic segmentation',
+  architecture: 'U-Net semantic segmentation',
   trainingData: 'MARIDA (Sentinel-2)',
   evaluationData: 'MARIDA test split (placeholder figures until the project evaluation is run)',
   /** Where the model is known to struggle, from the problem statement. Shown on the model card. */
@@ -76,11 +76,20 @@ export const PLACEHOLDER_MODEL_METRICS: ModelMetrics = {
 export const MAX_UPLOAD_MB = 100
 export const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024
 
+/**
+ * What the model reads: one Sentinel-2 GeoTIFF holding these bands in this order (MARIDA:
+ * B1 to B8A, B11 and B12). PNG, JPEG, drone imagery and other band counts are refused up front.
+ */
+export const MODEL_INPUT = {
+  bands: 11,
+  wavelengthsNm: [440, 490, 560, 665, 705, 740, 783, 842, 865, 1600, 2200],
+  /** Zero-based band indexes of a true-colour preview: 665, 560 and 490 nm. */
+  trueColourBands: [3, 2, 1],
+} as const
+
 /** Accepted upload MIME types and their file extensions. */
 export const ACCEPTED_TYPES = {
   'image/tiff': ['.tif', '.tiff'],
-  'image/png': ['.png'],
-  'image/jpeg': ['.jpg', '.jpeg'],
 } as const satisfies Record<string, readonly string[]>
 
 export const ACCEPTED_EXTENSIONS: readonly string[] = Object.values(ACCEPTED_TYPES).flat()
@@ -107,9 +116,6 @@ export const PIPELINE_STEP_COPY: Readonly<Record<JobStep, { label: string; descr
     detect: { label: 'Detect', description: `Running ${MODEL_CARD.name}` },
     map: { label: 'Map', description: 'Converting pixel regions to geographic polygons' },
   }
-
-/** After a successful run, open the results on their own if the user does nothing. */
-export const RESULT_AUTO_OPEN_MS = 1000
 
 /** Time limit for reads and job polling. A request that takes longer fails with TIMEOUT. */
 export const REQUEST_TIMEOUT_MS = 20_000

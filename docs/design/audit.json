@@ -1,0 +1,590 @@
+{
+  "generatedAt": "2026-10-09T09:42:24.669Z",
+  "targets": {
+    "fontSizes": 8,
+    "fontWeights": 3,
+    "fontFamilies": 2,
+    "offGridSpacing": 0,
+    "pills": 0,
+    "cards": 0,
+    "gradients": 0,
+    "shadows": 2,
+    "primaryButtons": 1,
+    "contrastFailures": 0,
+    "smallTargets": 0,
+    "leftEdges": 3
+  },
+  "verdicts": {
+    "fontSizes": {
+      "measured": 7,
+      "target": "<= 8",
+      "pass": true
+    },
+    "fontWeights": {
+      "measured": 3,
+      "target": "<= 3",
+      "pass": true
+    },
+    "fontFamilies": {
+      "measured": 2,
+      "target": "<= 2",
+      "pass": true
+    },
+    "offGridSpacing": {
+      "measured": 0,
+      "target": "<= 0",
+      "pass": true
+    },
+    "pills": {
+      "measured": 0,
+      "target": "<= 0",
+      "pass": true
+    },
+    "cards": {
+      "measured": 0,
+      "target": "<= 0",
+      "pass": true
+    },
+    "gradients": {
+      "measured": 0,
+      "target": "<= 0",
+      "pass": true
+    },
+    "shadows": {
+      "measured": 0,
+      "target": "<= 2",
+      "pass": true
+    },
+    "primaryButtons": {
+      "measured": "3 views off 1",
+      "target": "exactly 1 per view",
+      "pass": false
+    },
+    "contrastFailures": {
+      "measured": 0,
+      "target": "<= 0",
+      "pass": true
+    },
+    "smallTargets": {
+      "measured": 0,
+      "target": "<= 0",
+      "pass": true
+    },
+    "leftEdges": {
+      "measured": 2,
+      "target": "<= 3",
+      "pass": true
+    }
+  },
+  "results": [
+    {
+      "route": "analyze-empty",
+      "path": "/analyze",
+      "viewport": "desktop",
+      "width": 1440,
+      "fontSizes": [
+        "11px",
+        "13px",
+        "14px",
+        "16px",
+        "32px"
+      ],
+      "fontWeights": [
+        "400",
+        "500",
+        "600"
+      ],
+      "fontFamilies": [
+        "Instrument Sans Variable",
+        "Geist Mono Variable"
+      ],
+      "offGridSpacing": {
+        "count": 0,
+        "values": {}
+      },
+      "pills": {
+        "count": 0,
+        "examples": []
+      },
+      "cards": {
+        "count": 0,
+        "examples": []
+      },
+      "gradients": {
+        "rules": 0,
+        "elements": 0
+      },
+      "shadows": {
+        "distinct": 0,
+        "values": {},
+        "rings": {}
+      },
+      "primaryButtons": {
+        "count": 1,
+        "examples": [
+          "button \"Run detection\""
+        ]
+      },
+      "contrastFailures": {
+        "count": 0,
+        "examples": []
+      },
+      "smallTargets": {
+        "count": 0,
+        "examples": []
+      },
+      "leftEdges": {
+        "count": 2,
+        "values": [
+          112,
+          781
+        ]
+      }
+    },
+    {
+      "route": "analyze-empty",
+      "path": "/analyze",
+      "viewport": "mobile",
+      "width": 390,
+      "fontSizes": [
+        "11px",
+        "13px",
+        "14px",
+        "16px",
+        "32px"
+      ],
+      "fontWeights": [
+        "400",
+        "500",
+        "600"
+      ],
+      "fontFamilies": [
+        "Instrument Sans Variable"
+      ],
+      "offGridSpacing": {
+        "count": 0,
+        "values": {}
+      },
+      "pills": {
+        "count": 0,
+        "examples": []
+      },
+      "cards": {
+        "count": 0,
+        "examples": []
+      },
+      "gradients": {
+        "rules": 0,
+        "elements": 0
+      },
+      "shadows": {
+        "distinct": 0,
+        "values": {},
+        "rings": {}
+      },
+      "primaryButtons": {
+        "count": 1,
+        "examples": [
+          "button \"Run detection\""
+        ]
+      },
+      "contrastFailures": {
+        "count": 0,
+        "examples": []
+      },
+      "smallTargets": {
+        "count": 0,
+        "examples": []
+      },
+      "leftEdges": {
+        "count": 1,
+        "values": [
+          16
+        ]
+      }
+    },
+    {
+      "route": "analyze-file",
+      "path": "/analyze",
+      "viewport": "desktop",
+      "width": 1440,
+      "fontSizes": [
+        "11px",
+        "12px",
+        "13px",
+        "14px",
+        "16px",
+        "32px"
+      ],
+      "fontWeights": [
+        "400",
+        "500",
+        "600"
+      ],
+      "fontFamilies": [
+        "Instrument Sans Variable",
+        "Geist Mono Variable"
+      ],
+      "offGridSpacing": {
+        "count": 0,
+        "values": {}
+      },
+      "pills": {
+        "count": 0,
+        "examples": []
+      },
+      "cards": {
+        "count": 0,
+        "examples": []
+      },
+      "gradients": {
+        "rules": 0,
+        "elements": 0
+      },
+      "shadows": {
+        "distinct": 0,
+        "values": {},
+        "rings": {}
+      },
+      "primaryButtons": {
+        "count": 1,
+        "examples": [
+          "button \"Run detection\""
+        ]
+      },
+      "contrastFailures": {
+        "count": 0,
+        "examples": []
+      },
+      "smallTargets": {
+        "count": 0,
+        "examples": []
+      },
+      "leftEdges": {
+        "count": 2,
+        "values": [
+          112,
+          781
+        ]
+      }
+    },
+    {
+      "route": "analyze-file",
+      "path": "/analyze",
+      "viewport": "mobile",
+      "width": 390,
+      "fontSizes": [
+        "11px",
+        "12px",
+        "13px",
+        "14px",
+        "16px",
+        "32px"
+      ],
+      "fontWeights": [
+        "400",
+        "500",
+        "600"
+      ],
+      "fontFamilies": [
+        "Instrument Sans Variable",
+        "Geist Mono Variable"
+      ],
+      "offGridSpacing": {
+        "count": 0,
+        "values": {}
+      },
+      "pills": {
+        "count": 0,
+        "examples": []
+      },
+      "cards": {
+        "count": 0,
+        "examples": []
+      },
+      "gradients": {
+        "rules": 0,
+        "elements": 0
+      },
+      "shadows": {
+        "distinct": 0,
+        "values": {},
+        "rings": {}
+      },
+      "primaryButtons": {
+        "count": 0,
+        "examples": []
+      },
+      "contrastFailures": {
+        "count": 0,
+        "examples": []
+      },
+      "smallTargets": {
+        "count": 0,
+        "examples": []
+      },
+      "leftEdges": {
+        "count": 1,
+        "values": [
+          16
+        ]
+      }
+    },
+    {
+      "route": "analyze-processing",
+      "path": "/analyze",
+      "viewport": "desktop",
+      "width": 1440,
+      "fontSizes": [
+        "11px",
+        "12px",
+        "13px",
+        "14px",
+        "16px",
+        "32px"
+      ],
+      "fontWeights": [
+        "400",
+        "500",
+        "600"
+      ],
+      "fontFamilies": [
+        "Instrument Sans Variable",
+        "Geist Mono Variable"
+      ],
+      "offGridSpacing": {
+        "count": 0,
+        "values": {}
+      },
+      "pills": {
+        "count": 0,
+        "examples": []
+      },
+      "cards": {
+        "count": 0,
+        "examples": []
+      },
+      "gradients": {
+        "rules": 0,
+        "elements": 0
+      },
+      "shadows": {
+        "distinct": 0,
+        "values": {},
+        "rings": {}
+      },
+      "primaryButtons": {
+        "count": 0,
+        "examples": []
+      },
+      "contrastFailures": {
+        "count": 0,
+        "examples": []
+      },
+      "smallTargets": {
+        "count": 0,
+        "examples": []
+      },
+      "leftEdges": {
+        "count": 2,
+        "values": [
+          112,
+          432
+        ]
+      }
+    },
+    {
+      "route": "analyze-processing",
+      "path": "/analyze",
+      "viewport": "mobile",
+      "width": 390,
+      "fontSizes": [
+        "11px",
+        "12px",
+        "13px",
+        "14px",
+        "16px",
+        "32px"
+      ],
+      "fontWeights": [
+        "400",
+        "500",
+        "600"
+      ],
+      "fontFamilies": [
+        "Instrument Sans Variable",
+        "Geist Mono Variable"
+      ],
+      "offGridSpacing": {
+        "count": 0,
+        "values": {}
+      },
+      "pills": {
+        "count": 0,
+        "examples": []
+      },
+      "cards": {
+        "count": 0,
+        "examples": []
+      },
+      "gradients": {
+        "rules": 0,
+        "elements": 0
+      },
+      "shadows": {
+        "distinct": 0,
+        "values": {},
+        "rings": {}
+      },
+      "primaryButtons": {
+        "count": 0,
+        "examples": []
+      },
+      "contrastFailures": {
+        "count": 0,
+        "examples": []
+      },
+      "smallTargets": {
+        "count": 0,
+        "examples": []
+      },
+      "leftEdges": {
+        "count": 1,
+        "values": [
+          16
+        ]
+      }
+    },
+    {
+      "route": "analyze-result",
+      "path": "/analyze",
+      "viewport": "desktop",
+      "width": 1440,
+      "fontSizes": [
+        "11px",
+        "12px",
+        "13px",
+        "14px",
+        "16px",
+        "22px",
+        "32px"
+      ],
+      "fontWeights": [
+        "400",
+        "500",
+        "600"
+      ],
+      "fontFamilies": [
+        "Instrument Sans Variable",
+        "Geist Mono Variable"
+      ],
+      "offGridSpacing": {
+        "count": 0,
+        "values": {}
+      },
+      "pills": {
+        "count": 0,
+        "examples": []
+      },
+      "cards": {
+        "count": 0,
+        "examples": []
+      },
+      "gradients": {
+        "rules": 0,
+        "elements": 0
+      },
+      "shadows": {
+        "distinct": 0,
+        "values": {},
+        "rings": {}
+      },
+      "primaryButtons": {
+        "count": 1,
+        "examples": [
+          "button \"Open on the map\""
+        ]
+      },
+      "contrastFailures": {
+        "count": 0,
+        "examples": []
+      },
+      "smallTargets": {
+        "count": 0,
+        "examples": []
+      },
+      "leftEdges": {
+        "count": 2,
+        "values": [
+          112,
+          432
+        ]
+      }
+    },
+    {
+      "route": "analyze-result",
+      "path": "/analyze",
+      "viewport": "mobile",
+      "width": 390,
+      "fontSizes": [
+        "11px",
+        "12px",
+        "13px",
+        "14px",
+        "16px",
+        "22px",
+        "32px"
+      ],
+      "fontWeights": [
+        "400",
+        "500",
+        "600"
+      ],
+      "fontFamilies": [
+        "Instrument Sans Variable",
+        "Geist Mono Variable"
+      ],
+      "offGridSpacing": {
+        "count": 0,
+        "values": {}
+      },
+      "pills": {
+        "count": 0,
+        "examples": []
+      },
+      "cards": {
+        "count": 0,
+        "examples": []
+      },
+      "gradients": {
+        "rules": 0,
+        "elements": 0
+      },
+      "shadows": {
+        "distinct": 0,
+        "values": {},
+        "rings": {}
+      },
+      "primaryButtons": {
+        "count": 1,
+        "examples": [
+          "button \"Open on the map\""
+        ]
+      },
+      "contrastFailures": {
+        "count": 0,
+        "examples": []
+      },
+      "smallTargets": {
+        "count": 0,
+        "examples": []
+      },
+      "leftEdges": {
+        "count": 1,
+        "values": [
+          16
+        ]
+      }
+    }
+  ]
+}

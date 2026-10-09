@@ -55,10 +55,10 @@ describe('filterObservations', () => {
   })
 
   it('filters by source', () => {
-    expect(ids(filterObservations(summaries, filters({ source: 'drone' })))).toEqual([
-      SAMPLE_IDS.mahim,
-    ])
-    expect(filterObservations(summaries, filters({ source: 'satellite' }))).toHaveLength(5)
+    expect(filterObservations(summaries, filters({ source: 'satellite' }))).toHaveLength(6)
+    expect(filterObservations(summaries, filters({ source: 'drone' }))).toEqual([])
+    const drone = summaries.map((s) => ({ ...s, source: 'drone' as const }))
+    expect(filterObservations(drone, filters({ source: 'drone' }))).toHaveLength(6)
   })
 
   it('filters by an inclusive capture date range', () => {

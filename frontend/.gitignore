@@ -4,6 +4,10 @@ dist
 dist-ssr
 coverage
 
+# Playwright
+test-results
+playwright-report
+
 # Environment (keep .env.example tracked)
 .env
 .env.local

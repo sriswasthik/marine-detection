@@ -62,4 +62,23 @@ describe('Drawer', () => {
     await user.tab({ shift: true })
     expect(dialog).toContainElement(focusedElement())
   })
+
+  it('opens the mobile sheet at half height; the handle expands it, and reopening resets it', async () => {
+    const user = userEvent.setup()
+    render(<Harness />)
+    const trigger = screen.getByRole('button', { name: 'Open details' })
+    await user.click(trigger)
+    const handle = screen.getByRole('button', { name: 'Show more of the panel' })
+    expect(handle).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByRole('dialog')).toHaveClass('max-h-[50dvh]')
+    await user.click(handle)
+    expect(screen.getByRole('button', { name: 'Show less of the panel' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+    expect(screen.getByRole('dialog')).toHaveClass('max-h-[85dvh]')
+    await user.keyboard('{Escape}')
+    await user.click(trigger)
+    expect(screen.getByRole('button', { name: 'Show more of the panel' })).toBeInTheDocument()
+  })
 })

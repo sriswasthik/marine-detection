@@ -125,3 +125,48 @@ describe('observationNotices', () => {
     ).toEqual(['low-confidence'])
   })
 })
+
+describe('stripe artefacts', () => {
+  const stripe = {
+    reason: 'stripe' as const,
+    pixels: 698,
+    areaM2: 69_800,
+    confidence: 0.42,
+    rowSpan: 6,
+    colSpan: 246,
+    firstRow: 2,
+    firstCol: 5,
+  }
+
+  it('says what was left out, how big it was and why', () => {
+    const [message] = describeWarnings({
+      warnings: ['STRIPE_ARTEFACT'],
+      suppressedRegions: [stripe],
+    })
+    expect(message?.title).toBe('Image stripe left out')
+    expect(message?.detail).toMatch(/^A straight band along the image rows or columns/)
+    expect(message?.detail).toContain('698 pixels')
+    expect(message?.detail).toMatch(/known to draw such bands near image edges/)
+  })
+
+  it('counts several bands', () => {
+    const [message] = describeWarnings({
+      warnings: ['STRIPE_ARTEFACT'],
+      suppressedRegions: [stripe, { ...stripe, pixels: 2, areaM2: 200 }],
+    })
+    expect(message?.detail).toMatch(/^2 straight bands/)
+    expect(message?.detail).toContain('700 pixels')
+  })
+
+  it('becomes a notice on every result surface', () => {
+    const notices = observationNotices({
+      averageConfidence: 0.9,
+      warnings: ['STRIPE_ARTEFACT'],
+      crs: 'EPSG:32618',
+      bounds: { north: 1, south: 0, east: 1, west: 0 },
+      suppressedRegions: [stripe],
+      detections: [{}],
+    })
+    expect(notices.map((n) => n.id)).toEqual(['stripe-artefact'])
+  })
+})

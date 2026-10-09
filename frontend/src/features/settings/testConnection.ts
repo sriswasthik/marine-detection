@@ -17,7 +17,7 @@ export async function testConnection(
   fetchImpl?: typeof fetch,
 ): Promise<ConnectionResult> {
   try {
-    const api = withResilience(createHttpApi(baseUrl, fetchImpl), {
+    const api = withResilience(createHttpApi(baseUrl, { fetchImpl }), {
       timeoutMs: CONNECTION_TEST_TIMEOUT_MS,
     })
     const health = await api.health()

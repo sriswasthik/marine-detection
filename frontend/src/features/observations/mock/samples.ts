@@ -75,13 +75,13 @@ export const SAMPLE_SCENE_SPECS: readonly SceneSpec[] = [
     seed: 'mahim-bay-v1',
     name: 'Mahim Bay',
     region: 'Mahim Bay, Mumbai',
-    source: 'drone',
+    source: 'satellite',
     capturedAt: '2026-09-29T04:12:00Z',
     status: 'completed',
     crs: 'EPSG:32643',
     center: { lat: 19.043, lng: 72.832 },
     sizePx: [1200, 800],
-    resolutionM: 0.1,
+    resolutionM: 10,
     driftBearingDeg: 235,
     clusters: [
       {
@@ -251,8 +251,7 @@ const FILE_NAME_KEYWORDS: readonly [keyword: string, sampleId: string][] = [
 
 /**
  * Which sample a simulated upload resolves to, in order of precedence:
- * the scenario (nodebris, lowconf, partial), a keyword in the file name,
- * the drone sample for drone uploads, otherwise the hero scene.
+ * the scenario (nodebris, lowconf, partial), a keyword in the file name, otherwise the hero scene.
  */
 export function pickSampleIdForUpload(input: {
   fileName: string
@@ -264,6 +263,5 @@ export function pickSampleIdForUpload(input: {
   const name = input.fileName.toLowerCase()
   const match = FILE_NAME_KEYWORDS.find(([keyword]) => name.includes(keyword))
   if (match) return match[1]
-  if (input.source === 'drone') return SAMPLE_IDS.mahim
   return HERO_SAMPLE_ID
 }

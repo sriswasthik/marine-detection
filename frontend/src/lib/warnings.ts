@@ -1,6 +1,6 @@
 import type { Observation, ObservationWarning } from '@/features/observations/types'
 import { CONFIDENCE_THRESHOLDS } from './config'
-import { formatConfidence, formatCoveragePercent } from './format'
+import { formatArea, formatConfidence, formatCoveragePercent, formatInteger } from './format'
 
 export interface WarningMessage {
   code: ObservationWarning
@@ -13,7 +13,10 @@ export interface WarningMessage {
  * Unknown codes are ignored; the order follows the observation's own list.
  */
 export function describeWarnings(
-  observation: Pick<Observation, 'warnings' | 'cloudCoveragePercent' | 'resolutionM'>,
+  observation: Pick<
+    Observation,
+    'warnings' | 'cloudCoveragePercent' | 'resolutionM' | 'suppressedRegions'
+  >,
 ): WarningMessage[] {
   const messages: Record<ObservationWarning, () => Omit<WarningMessage, 'code'>> = {
     LOW_CONFIDENCE: () => ({
@@ -37,8 +40,26 @@ export function describeWarnings(
       title: 'Coarse resolution',
       detail: 'Small debris may be missed at this image resolution.',
     }),
+    STRIPE_ARTEFACT: () => stripeMessage(observation.suppressedRegions ?? []),
   }
   return [...new Set(observation.warnings ?? [])].map((code) => ({ code, ...messages[code]() }))
+}
+
+function stripeMessage(
+  regions: NonNullable<Observation['suppressedRegions']>,
+): Omit<WarningMessage, 'code'> {
+  const stripes = regions.filter((r) => r.reason === 'stripe')
+  const pixels = stripes.reduce((sum, r) => sum + r.pixels, 0)
+  const area = stripes.reduce((sum, r) => sum + r.areaM2, 0)
+  const what =
+    stripes.length === 1 ? 'A straight band' : `${formatInteger(stripes.length)} straight bands`
+  return {
+    title: 'Image stripe left out',
+    detail:
+      stripes.length > 0
+        ? `${what} along the image rows or columns (${formatArea(area)}, ${formatInteger(pixels)} pixels) was classed as debris but left out of the results. Floating debris does not follow the pixel grid, and this model is known to draw such bands near image edges. Check the image if it matters.`
+        : 'A straight band along the image rows or columns was classed as debris but left out of the results. Floating debris does not follow the pixel grid, and this model is known to draw such bands near image edges.',
+  }
 }
 
 /**
@@ -70,7 +91,12 @@ export function hasApproximatePositions(
 }
 
 export type NoticeId =
-  'low-confidence' | 'approximate-positions' | 'partial-data' | 'cloud-cover' | 'coarse-resolution'
+  | 'low-confidence'
+  | 'approximate-positions'
+  | 'partial-data'
+  | 'cloud-cover'
+  | 'coarse-resolution'
+  | 'stripe-artefact'
 
 export interface ObservationNotice {
   id: NoticeId
@@ -86,7 +112,13 @@ export interface ObservationNotice {
 export function observationNotices(
   observation: Pick<
     Observation,
-    'averageConfidence' | 'warnings' | 'crs' | 'bounds' | 'cloudCoveragePercent' | 'resolutionM'
+    | 'averageConfidence'
+    | 'warnings'
+    | 'crs'
+    | 'bounds'
+    | 'cloudCoveragePercent'
+    | 'resolutionM'
+    | 'suppressedRegions'
   > & { detections: readonly unknown[] },
   options: { partialData?: boolean; only?: readonly NoticeId[] } = {},
 ): ObservationNotice[] {
@@ -131,5 +163,7 @@ export function observationNotices(
   if (resolution) {
     notices.push({ id: 'coarse-resolution', title: resolution.title, message: resolution.detail })
   }
+  const stripe = warning('STRIPE_ARTEFACT')
+  if (stripe) notices.push({ id: 'stripe-artefact', title: stripe.title, message: stripe.detail })
   return options.only ? notices.filter((n) => options.only?.includes(n.id)) : notices
 }

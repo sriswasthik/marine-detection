@@ -26,6 +26,11 @@ export interface PopoverProps {
   label: string
   children: ReactNode
   align?: 'start' | 'end'
+  /** Open below the trigger (default) or above it, for triggers near the bottom of a frame. */
+  side?: 'bottom' | 'top'
+  /** Controlled open state (a keyboard shortcut can open it). Uncontrolled when omitted. */
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   className?: string
   panelClassName?: string
 }
@@ -39,10 +44,19 @@ export function Popover({
   label,
   children,
   align = 'start',
+  side = 'bottom',
+  open: controlledOpen,
+  onOpenChange,
   className,
   panelClassName,
 }: PopoverProps) {
-  const [open, setOpen] = useState(false)
+  const [ownOpen, setOwnOpen] = useState(false)
+  const open = controlledOpen ?? ownOpen
+  const setOpen = (next: boolean | ((current: boolean) => boolean)) => {
+    const value = typeof next === 'function' ? next(open) : next
+    if (controlledOpen === undefined) setOwnOpen(value)
+    onOpenChange?.(value)
+  }
   const panelId = useId()
   const rootRef = useRef<HTMLDivElement | null>(null)
   const panelRef = useRef<HTMLDivElement | null>(null)
@@ -96,7 +110,8 @@ export function Popover({
           tabIndex={-1}
           onKeyDown={onKeyDown}
           className={cn(
-            'absolute top-full z-50 mt-1.5 rounded-card border border-border bg-surface p-3 shadow-popover focus:outline-none',
+            'absolute z-50 rounded-panel border border-hairline bg-white p-4 shadow-popover focus:outline-none',
+            side === 'top' ? 'bottom-full mb-2' : 'top-full mt-2',
             'animate-[tooltip-in_120ms_var(--ease-out)]',
             align === 'end' ? 'right-0' : 'left-0',
             panelClassName,

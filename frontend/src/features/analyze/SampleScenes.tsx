@@ -16,10 +16,10 @@ export function SampleScenes({
   return (
     <section aria-labelledby="samples-title" className="flex flex-col gap-3">
       <div>
-        <h2 id="samples-title" className="text-heading text-ink">
+        <h2 id="samples-title" className="text-lead font-medium text-ink">
           Or try a sample scene
         </h2>
-        <p className="text-small text-ink-muted">
+        <p className="text-small text-ink-2">
           Synthetic sample data. Fills the form so you can run the full flow without a file.
         </p>
       </div>
@@ -33,23 +33,20 @@ export function SampleScenes({
                 aria-pressed={selected}
                 onClick={() => onSelect(scene)}
                 className={cn(
-                  'flex w-full items-start gap-3 rounded-card border bg-surface px-4 py-3 text-left shadow-subtle',
-                  'transition-colors duration-150 ease-out',
+                  'flex w-full items-start gap-3 border px-4 py-3 text-left',
+                  'transition-colors duration-[120ms] ease-out',
                   selected
-                    ? 'border-accent ring-1 ring-accent'
-                    : 'border-border hover:border-border-strong hover:bg-bg',
+                    ? 'border-accent-ink bg-accent-wash'
+                    : 'border-hairline hover:border-ink',
                 )}
               >
-                <SourceIcon
-                  source={scene.source}
-                  className="mt-0.5 size-4 shrink-0 text-ink-muted"
-                />
+                <SourceIcon source={scene.source} className="mt-1 size-4 shrink-0 text-ink-2" />
                 <span className="flex min-w-0 flex-col">
                   <span className="truncate text-small font-medium text-ink">
                     {scene.name ?? scene.region}
                   </span>
-                  <span className="truncate text-caption text-ink-muted">{scene.region}</span>
-                  <span className="text-caption text-ink-muted">{SOURCE_LABELS[scene.source]}</span>
+                  <span className="truncate text-small text-ink-2">{scene.region}</span>
+                  <span className="text-small text-ink-2">{SOURCE_LABELS[scene.source]}</span>
                 </span>
               </button>
             </li>

@@ -1,15 +1,9 @@
 import { useState } from 'react'
-import { Button, SegmentedControl, TextInput } from '@/components/ui'
-import type { ObservationSource } from '@/features/observations/types'
+import { Button, TextInput } from '@/components/ui'
 import type { AnalyzeDraft } from './draft'
 import { useAnalyzeDraft } from './draftContext'
 import type { BoundsInput, BoundsValidation } from './validate'
 import { useFormat } from '@/features/settings/settingsContext'
-
-const SOURCE_OPTIONS: { value: ObservationSource; label: string }[] = [
-  { value: 'satellite', label: 'Satellite (Sentinel-2)' },
-  { value: 'drone', label: 'Drone' },
-]
 
 const BOUND_FIELDS: { key: keyof BoundsInput; label: string; placeholder: string }[] = [
   { key: 'north', label: 'North', placeholder: '13.2430' },
@@ -33,11 +27,11 @@ function BoundsFields({
     <fieldset className="flex flex-col gap-3">
       <legend className="mb-1 text-small font-medium text-ink">
         Geographic bounds{' '}
-        <span className="font-normal text-ink-muted">
+        <span className="font-normal text-ink-2">
           {required ? '(required for this file)' : '(optional)'}
         </span>
       </legend>
-      <p className="text-caption text-ink-muted">
+      <p className="text-small text-ink-2">
         Decimal degrees of the image edges. North and south are latitudes, east and west are
         longitudes.
       </p>
@@ -60,16 +54,19 @@ function BoundsFields({
   )
 }
 
-/** Source, region, capture time and, when the file cannot place itself, its bounds. */
+/** Region, capture time and, when the file cannot place itself, its bounds. The source is fixed. */
 export function MetadataForm({
   draft,
   boundsValidation,
   boundsRequired,
+  boundsHidden = false,
 }: {
   draft: AnalyzeDraft
   boundsValidation: BoundsValidation
   /** The file has no usable embedded georeferencing. */
   boundsRequired: boolean
+  /** The file is refused for its format, so bounds would be wasted effort. */
+  boundsHidden?: boolean
 }) {
   const fmt = useFormat()
   const { dispatch } = useAnalyzeDraft()
@@ -78,25 +75,28 @@ export function MetadataForm({
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-col gap-1.5">
-        <span id="source-label" className="text-small font-medium text-ink">
-          Source
+      <div className="flex flex-col gap-1">
+        <span className="text-small font-medium text-ink">Source</span>
+        <span className="text-small text-ink">Satellite (Sentinel-2)</span>
+        <span className="text-small text-ink-2">
+          The current model reads 11-band Sentinel-2 images only. Drone imagery is not supported.
         </span>
-        <SegmentedControl
-          label="Source"
-          value={draft.source}
-          onChange={(source) => dispatch({ type: 'sourceChanged', source })}
-          options={SOURCE_OPTIONS}
-          className="self-start"
-        />
       </div>
 
       <TextInput
-        label="Region name"
+        label={
+          <>
+            Region name <span className="font-normal text-ink-2">(optional)</span>
+          </>
+        }
         placeholder="For example: Ennore coast, Bay of Bengal"
         value={draft.region}
         onChange={(e) => dispatch({ type: 'regionChanged', region: e.target.value })}
-        hint={draft.regionHint ?? 'Shown on the map and in reports.'}
+        hint={
+          draft.regionHint
+            ? `${draft.regionHint}. Left empty, the result is named after its location.`
+            : 'Shown on the map and in reports. Left empty, the result is named after its location.'
+        }
       />
 
       <TextInput
@@ -107,12 +107,12 @@ export function MetadataForm({
         hint="When the image was taken, in your local time."
       />
 
-      {draft.file ? (
+      {draft.file && !boundsHidden ? (
         embedded && !editBounds ? (
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             <span className="text-small font-medium text-ink">Geographic bounds</span>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <span className="mono-label text-ink-muted">
+              <span className="data text-ink-2">
                 {fmt.coordinates({ lat: embedded.north, lng: embedded.east }, { digits: 4 })} to{' '}
                 {fmt.coordinates({ lat: embedded.south, lng: embedded.west }, { digits: 4 })}
               </span>
@@ -120,7 +120,7 @@ export function MetadataForm({
                 Edit
               </Button>
             </div>
-            <p className="text-caption text-ink-muted">
+            <p className="text-small text-ink-2">
               {draft.file.kind === 'sample' ? 'From the sample scene.' : 'Read from the file.'}
             </p>
           </div>

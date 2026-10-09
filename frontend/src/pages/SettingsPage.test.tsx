@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { AppProviders } from '@/app/providers'
-import { routes } from '@/app/router'
+import { routes } from '@/test/routes'
 import { createMockApi } from '@/features/observations/api/mockApi'
 import { SAMPLE_IDS } from '@/features/observations/mock/samples'
 import { createSettingsStore, type SettingsStore } from '@/features/settings/settingsStore'
@@ -76,7 +76,7 @@ describe('Settings page', { timeout: 15_000 }, () => {
 
   it('tests the live service and switches only after it answers', async () => {
     const fetchMock = vi.fn(() =>
-      Promise.resolve(json({ ok: true, modelName: 'Debris UNet++', modelVersion: '1.2.0' })),
+      Promise.resolve(json({ ok: true, modelName: 'Debris U-Net', modelVersion: '1.2.0' })),
     )
     vi.stubGlobal('fetch', fetchMock)
     const store = freshStore()
@@ -88,7 +88,7 @@ describe('Settings page', { timeout: 15_000 }, () => {
 
     await user.click(screen.getByRole('button', { name: 'Test connection' }))
     expect(
-      await screen.findByText(/Connected. The service runs Debris UNet\+\+ 1\.2\.0/),
+      await screen.findByText(/Connected. The service runs Debris U-Net 1\.2\.0/),
     ).toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:8000/health', expect.anything())
 
@@ -156,8 +156,7 @@ describe('units apply everywhere at once', { timeout: 15_000 }, () => {
     const store = freshStore()
     renderAt(`/observations/${SAMPLE_IDS.mannar}`, store)
     await screen.findByRole('heading', { level: 1, name: 'Gulf of Mannar' })
-    const waterArea = () =>
-      screen.getByText('Water area').closest('div.rounded-card')?.textContent ?? ''
+    const waterArea = () => screen.getByRole('group', { name: 'Water area' }).textContent ?? ''
     expect(waterArea()).toContain('20.0 km²')
 
     act(() => {

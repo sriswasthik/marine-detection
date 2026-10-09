@@ -1,0 +1,210 @@
+{
+ "id": "S2_12-12-20_16PCC_5",
+ "name": "Motagua patch 5",
+ "source": "satellite",
+ "capturedAt": "2020-12-12T12:00:00.000Z",
+ "region": "Motagua (16PCC)",
+ "imageUrl": "/samples/S2_12-12-20_16PCC_5/preview.png",
+ "previewUrl": "/samples/S2_12-12-20_16PCC_5/preview.png",
+ "maskUrl": "/samples/S2_12-12-20_16PCC_5/classes.png",
+ "bounds": {
+  "north": 15.7710526,
+  "south": 15.747777,
+  "east": -88.2375406,
+  "west": -88.2615752
+ },
+ "crs": "EPSG:32616",
+ "status": "completed",
+ "debrisAreaM2": 0.0,
+ "waterAreaM2": 6553600.0,
+ "waterAreaDefinition": "Water surface = every valid pixel the model did not classify as Clouds (class 6). MARIDA has no land class, so any land in the scene is counted as water.",
+ "coveragePercent": 0.0,
+ "averageConfidence": null,
+ "densityLevel": null,
+ "detections": [],
+ "densityGrid": {
+  "method": "Blocks of 25 x 25 source pixels. Coverage = debris pixels of the kept detections / imaged pixels in the block. A detection takes the level of the block holding most of its pixels. Hotspots join 8-adjacent High and Critical blocks (Moderate when there are none).",
+  "cellSizeM": 250.0,
+  "cellSizePx": 25,
+  "rows": 11,
+  "cols": 11,
+  "thresholds": {
+   "moderate": 2.0,
+   "high": 8.0,
+   "critical": 20.0
+  },
+  "cells": []
+ },
+ "hotspots": [],
+ "suppressedRegions": [],
+ "warnings": [],
+ "cloudCoveragePercent": 0.0,
+ "resolutionM": 10.0,
+ "sceneContext": {
+  "validPixels": 65536,
+  "debrisPercent": 0.0,
+  "cloudPercent": 0.0,
+  "shipPercent": 0.0,
+  "foamPercent": 0.3906,
+  "sargassumPercent": 0.0,
+  "naturalOrganicPercent": 0.0,
+  "classPixelCounts": {
+   "1": 0,
+   "2": 0,
+   "3": 0,
+   "4": 0,
+   "5": 0,
+   "6": 0,
+   "7": 4,
+   "8": 9271,
+   "9": 256,
+   "10": 56005,
+   "11": 0
+  }
+ },
+ "classPalette": [
+  {
+   "id": 1,
+   "name": "Marine Debris",
+   "color": "#C4503A",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 2,
+   "name": "Dense Sargassum",
+   "color": "#6FA35A",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 3,
+   "name": "Sparse Sargassum",
+   "color": "#B3CF7B",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 4,
+   "name": "Natural Organic Material",
+   "color": "#B39B78",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 5,
+   "name": "Ship",
+   "color": "#9384C6",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 6,
+   "name": "Clouds",
+   "color": "#BAC4CD",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 7,
+   "name": "Marine Water",
+   "color": null,
+   "opacity": 0.0,
+   "drawn": false
+  },
+  {
+   "id": 8,
+   "name": "Sediment-Laden Water",
+   "color": null,
+   "opacity": 0.0,
+   "drawn": false
+  },
+  {
+   "id": 9,
+   "name": "Foam",
+   "color": "#72C2C8",
+   "opacity": 0.85,
+   "drawn": true
+  },
+  {
+   "id": 10,
+   "name": "Turbid Water",
+   "color": null,
+   "opacity": 0.0,
+   "drawn": false
+  },
+  {
+   "id": 11,
+   "name": "Shallow Water",
+   "color": null,
+   "opacity": 0.0,
+   "drawn": false
+  }
+ ],
+ "overlay": {
+  "crs": "EPSG:4326",
+  "bounds": {
+   "north": 15.7710526,
+   "south": 15.747777,
+   "east": -88.2375406,
+   "west": -88.2615752
+  }
+ },
+ "geospatial": {
+  "width": 256,
+  "height": 256,
+  "bandCount": 11,
+  "dataType": "float32",
+  "crs": "EPSG:32616",
+  "crsName": "WGS 84 / UTM zone 16N",
+  "pixelSizeX": 10.0,
+  "pixelSizeY": 10.0,
+  "pixelSizeUnit": "m",
+  "pixelAreaM2": 100.0,
+  "totalPixels": 65536,
+  "validPixels": 65536,
+  "sceneAreaM2": 6553600.0,
+  "debrisPixels": 0,
+  "debrisAreaM2": 0.0,
+  "debrisCoveragePercent": 0.0,
+  "debrisCentroid": null,
+  "sceneCentre": {
+   "lat": 15.7594151,
+   "lng": -88.2495572
+  }
+ },
+ "processing": {
+  "startedAt": "2026-10-09T09:20:57.332Z",
+  "finishedAt": "2026-10-09T09:20:57.484Z",
+  "modelName": "U-Net marine debris segmentation",
+  "modelVersion": "f19c947d5a0a",
+  "device": "cpu",
+  "stagesMs": {
+   "preprocessMs": 20.5,
+   "detectMs": 115.4,
+   "mapMs": 5.4
+  }
+ },
+ "modelMetrics": {
+  "precision": 0.371,
+  "recall": 0.8793,
+  "f1": 0.5218,
+  "accuracy": 0.8825,
+  "iou": 0.353,
+  "meanIoU": 0.5535,
+  "macroF1": 0.6799,
+  "benchmark": "MARIDA test split (from logs/evaluating_unet.log)",
+  "isPlaceholder": false
+ },
+ "maridaPatch": {
+  "id": "S2_12-12-20_16PCC_5",
+  "tile": "16PCC",
+  "date": "2020-12-12",
+  "split": "test"
+ },
+ "referenceDebrisPixels": 0,
+ "segmentationUrl": "/samples/S2_12-12-20_16PCC_5/segmentation.tif",
+ "segmentationPreviewUrl": "/samples/S2_12-12-20_16PCC_5/segmentation.png",
+ "sceneImageUrl": "/samples/S2_12-12-20_16PCC_5/scene.png",
+ "referenceUrl": "/samples/S2_12-12-20_16PCC_5/reference.png"
+}

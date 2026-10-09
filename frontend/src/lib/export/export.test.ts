@@ -70,7 +70,7 @@ describe('describeFilters', () => {
 describe('report text', () => {
   it('names the model, explains confidence and the configurable thresholds', () => {
     const text = methodAndCaveats({ sampleData: false, cellSizeM: 250 }).join(' ')
-    expect(text).toMatch(/UNet\+\+ marine debris segmentation 0\.1\.0/)
+    expect(text).toMatch(/U-Net marine debris segmentation 0\.1\.0/)
     expect(text).toMatch(/below 60% is low/)
     expect(text).toMatch(/250 m grid cell/)
     expect(text).toMatch(/configurable/)

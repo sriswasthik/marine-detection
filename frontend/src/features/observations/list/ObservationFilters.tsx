@@ -1,6 +1,6 @@
 import { Search, X } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
-import { Button, SegmentedControl, SeveritySwatch } from '@/components/ui'
+import { Button, SeveritySwatch } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { DENSITY_LEVELS } from '@/lib/density'
 import {
@@ -9,14 +9,8 @@ import {
   type DensityFilter,
   type ListQuery,
 } from '@/lib/observationList'
-import { SOURCE_LABELS, STATUS_LABELS } from '../labels'
+import { STATUS_LABELS } from '../labels'
 import { OBSERVATION_STATUSES, type ObservationStatus } from '../types'
-
-const SOURCE_OPTIONS = [
-  { value: 'all' as const, label: 'All' },
-  { value: 'satellite' as const, label: SOURCE_LABELS.satellite },
-  { value: 'drone' as const, label: SOURCE_LABELS.drone },
-]
 
 /** A small on/off chip. Off chips are dashed; none selected means "all". */
 function Chip({
@@ -34,10 +28,10 @@ function Chip({
       aria-pressed={on}
       onClick={onClick}
       className={cn(
-        'inline-flex h-7 items-center gap-1.5 rounded-badge border px-2 text-caption font-medium transition-colors duration-150 ease-out',
+        'inline-flex h-7 items-center gap-2 rounded-tag border px-2 text-small font-medium transition-colors duration-[120ms] ease-out max-sm:h-10 max-sm:px-3',
         on
-          ? 'border-accent bg-accent-soft text-accent'
-          : 'border-dashed border-border bg-surface text-ink-muted hover:text-ink',
+          ? 'border-accent-ink bg-accent-wash text-accent-ink'
+          : 'border-hairline text-ink-2 hover:border-rule hover:text-ink',
       )}
     >
       {children}
@@ -50,7 +44,7 @@ function toggle<T>(list: readonly T[], value: T, order: readonly T[]): T[] {
   return order.filter((item) => next.includes(item))
 }
 
-/** Search, source, status and density filters for the observations table. */
+/** Search, status and density filters for the observations table. */
 export function ObservationFilters({
   query,
   onChange,
@@ -81,14 +75,14 @@ export function ObservationFilters({
           <span className="sr-only">Search by region</span>
           <Search
             aria-hidden
-            className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-ink-muted"
+            className="pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 text-ink-2"
           />
           <input
             type="search"
             value={text}
             onChange={(event) => setText(event.target.value)}
             placeholder="Search by region"
-            className="h-8 w-full rounded-control border border-border-strong bg-surface pr-8 pl-8 text-small text-ink shadow-subtle placeholder:text-ink-muted"
+            className="h-8 w-full border-0 border-b border-rule bg-transparent pr-8 pl-8 text-small text-ink placeholder:text-ink-2 hover:border-ink max-sm:h-10"
           />
           {text ? (
             <button
@@ -98,19 +92,12 @@ export function ObservationFilters({
                 setText('')
                 onChange({ search: '' }, { replace: true })
               }}
-              className="absolute top-1/2 right-1.5 inline-flex size-6 -translate-y-1/2 items-center justify-center rounded-control text-ink-muted hover:text-ink"
+              className="absolute top-1/2 right-2 inline-flex size-6 -translate-y-1/2 items-center justify-center rounded-control text-ink-2 hover:text-ink"
             >
-              <X aria-hidden className="size-3.5" />
+              <X aria-hidden className="size-4" />
             </button>
           ) : null}
         </label>
-        <SegmentedControl
-          label="Source"
-          size="sm"
-          options={SOURCE_OPTIONS}
-          value={query.source}
-          onChange={(source) => onChange({ source })}
-        />
         {isFiltered(query) ? (
           <Button variant="ghost" size="sm" onClick={onReset}>
             Reset filters
@@ -119,7 +106,7 @@ export function ObservationFilters({
       </div>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
         <div role="group" aria-label="Status" className="flex flex-wrap items-center gap-1">
-          <span className="mr-1 text-caption text-ink-muted">Status</span>
+          <span className="mr-1 text-small text-ink-2">Status</span>
           {OBSERVATION_STATUSES.map((status: ObservationStatus) => (
             <Chip
               key={status}
@@ -133,7 +120,7 @@ export function ObservationFilters({
           ))}
         </div>
         <div role="group" aria-label="Density level" className="flex flex-wrap items-center gap-1">
-          <span className="mr-1 text-caption text-ink-muted">Density</span>
+          <span className="mr-1 text-small text-ink-2">Density</span>
           {DENSITY_FILTERS.map((level: DensityFilter) => (
             <Chip
               key={level}

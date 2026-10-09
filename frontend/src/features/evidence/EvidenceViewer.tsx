@@ -4,7 +4,7 @@ import {
   EmptyState,
   IconButton,
   SegmentedControl,
-  SeverityBadge,
+  SeverityTag,
   Slider,
   Switch,
 } from '@/components/ui'
@@ -44,20 +44,20 @@ function SelectionReadout({ detection, onClose }: { detection: Detection; onClos
     <div
       role="status"
       aria-label="Selected detection"
-      className="flex items-center gap-3 rounded-control border border-border bg-surface px-3 py-2 shadow-popover"
+      className="flex items-center gap-3 border border-hairline bg-sheet px-3 py-2 shadow-popover"
     >
-      <span className="mono-label text-ink" title={detection.id}>
+      <span className="data text-ink" title={detection.id}>
         {shortId(detection.id)}
       </span>
-      <SeverityBadge level={detection.densityLevel} variant="plain" />
-      <dl className="flex items-center gap-3 text-caption">
+      <SeverityTag level={detection.densityLevel} variant="plain" />
+      <dl className="flex items-center gap-3 text-small">
         <div className="flex gap-1">
-          <dt className="text-ink-muted">Confidence</dt>
-          <dd className="num font-medium text-ink">{formatConfidence(detection.confidence)}</dd>
+          <dt className="text-ink-2">Confidence</dt>
+          <dd className="data text-ink">{formatConfidence(detection.confidence)}</dd>
         </div>
         <div className="flex gap-1">
-          <dt className="text-ink-muted">Area</dt>
-          <dd className="num font-medium text-ink">{fmt.area(detection.areaM2)}</dd>
+          <dt className="text-ink-2">Area</dt>
+          <dd className="data text-ink">{fmt.area(detection.areaM2)}</dd>
         </div>
       </dl>
       <IconButton
@@ -159,7 +159,7 @@ export function EvidenceViewer({
           wheelZoom={false}
           className="h-full w-full"
         />
-        <div className="absolute top-3 right-3 z-[600] flex flex-col overflow-hidden rounded-control border border-border bg-surface shadow-subtle">
+        <div className="absolute top-3 right-3 z-[600] flex flex-col overflow-hidden border border-rule bg-sheet">
           <IconButton
             label="Zoom in"
             icon={<Plus aria-hidden />}
@@ -171,13 +171,13 @@ export function EvidenceViewer({
             label="Zoom out"
             icon={<Minus aria-hidden />}
             onClick={() => mapRef.current?.zoomOut()}
-            className="rounded-none border-t border-border"
+            className="rounded-none border-t border-hairline"
           />
           <IconButton
             label="Fit to image"
             icon={<Maximize aria-hidden />}
             onClick={() => mapRef.current?.resetView()}
-            className="rounded-none border-t border-border"
+            className="rounded-none border-t border-hairline"
           />
         </div>
       </>
@@ -223,7 +223,7 @@ export function EvidenceViewer({
 
       <div
         style={frameStyle}
-        className="mwi-evidence-frame relative isolate h-[380px] overflow-hidden rounded-card border border-border bg-map-fallback md:h-[520px]"
+        className="mwi-evidence-frame relative isolate h-[380px] overflow-hidden border border-rule bg-map-fallback md:h-[520px]"
       >
         {content}
         {selected ? (
@@ -242,7 +242,7 @@ export function EvidenceViewer({
         ) : null}
       </div>
 
-      <div className={cn('flex flex-col gap-0.5 text-caption text-ink-muted')}>
+      <div className={cn('flex flex-col gap-1 text-small text-ink-2')}>
         <p>{EVIDENCE_MODE_DESCRIPTIONS[mode]}</p>
         {source.caption ? <p>{source.caption}</p> : null}
       </div>

@@ -20,6 +20,8 @@ interface TooltipProps {
   /** Hover delay in ms. Keyboard focus shows the tooltip at once. */
   delay?: number
   className?: string
+  /** Classes for the wrapper around the trigger, for example `flex w-full` for list rows. */
+  wrapperClassName?: string
 }
 
 const SIDE = { top: 'bottom-full mb-2', bottom: 'top-full mt-2' } as const
@@ -29,7 +31,10 @@ const ALIGN = {
   end: 'right-0',
 } as const
 
-/** White, bordered tooltip on hover and focus. Escape hides it. */
+/**
+ * A label plate on hover and focus: sheet, hairline, popover shadow. Put figures in `.data` so they
+ * read in mono. Escape hides it.
+ */
 export function Tooltip({
   content,
   children,
@@ -37,6 +42,7 @@ export function Tooltip({
   align = 'center',
   delay = 250,
   className,
+  wrapperClassName,
 }: TooltipProps) {
   const id = useId()
   const [open, setOpen] = useState(false)
@@ -68,7 +74,7 @@ export function Tooltip({
 
   return (
     <span
-      className="relative inline-flex"
+      className={cn('relative inline-flex', wrapperClassName)}
       onPointerEnter={(e) => e.pointerType === 'mouse' && show(false)}
       onPointerLeave={hide}
       onFocus={() => show(true)}
@@ -80,8 +86,8 @@ export function Tooltip({
         role="tooltip"
         hidden={!open}
         className={cn(
-          'pointer-events-none absolute z-50 w-max max-w-64 rounded-control border border-border bg-surface px-2.5 py-1.5',
-          'text-left text-caption font-normal whitespace-normal text-ink shadow-popover',
+          'pointer-events-none absolute z-50 w-max max-w-64 rounded-panel border border-hairline bg-sheet px-3 py-2',
+          'text-left text-small font-normal tracking-normal whitespace-normal text-ink normal-case shadow-popover',
           'animate-[tooltip-in_120ms_var(--ease-out)]',
           SIDE[side],
           ALIGN[align],

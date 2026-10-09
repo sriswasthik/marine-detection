@@ -6,13 +6,13 @@
 .mwi-map.leaflet-container {
   background: var(--color-map-fallback);
   font-family: var(--font-sans);
-  font-size: var(--text-caption);
+  font-size: var(--text-small);
   color: var(--color-ink);
   outline: none;
 }
 
 .mwi-map.leaflet-container:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-tar);
   outline-offset: -2px;
 }
 
@@ -24,27 +24,27 @@
 /* Compact attribution */
 .mwi-map .leaflet-control-attribution {
   margin: 0 !important;
-  padding: 1px 6px;
-  border-top-left-radius: var(--radius-badge);
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--color-ink-muted);
-  font-size: 10px;
+  padding: 0 4px;
+  border-top-left-radius: var(--radius-tag);
+  background: rgba(251, 251, 249, 0.92);
+  color: var(--color-ink-2);
+  font-size: var(--text-label);
   line-height: 16px;
 }
 
 .mwi-map .leaflet-control-attribution a {
-  color: var(--color-ink-muted);
+  color: var(--color-ink-2);
 }
 
-/* Tooltips: white, bordered, compact. */
+/* Tooltips: a label plate. Sheet, hairline, mono figures. */
 .mwi-map .leaflet-tooltip.mwi-tooltip {
-  padding: 6px 8px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-control);
-  background: var(--color-surface);
+  padding: 8px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-panel);
+  background: var(--color-sheet);
   color: var(--color-ink);
   box-shadow: var(--shadow-popover);
-  font-size: var(--text-caption);
+  font-size: var(--text-small);
   line-height: 16px;
   white-space: nowrap;
 }
@@ -61,56 +61,78 @@
   display: flex;
   gap: 8px;
   justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
   font-variant-numeric: tabular-nums;
 }
 
 .mwi-tooltip__muted {
-  color: var(--color-ink-muted);
+  color: var(--color-ink-2);
+  font-family: var(--font-sans);
 }
 
-/* Hotspot markers: white circle with the rank, border in the level colour. */
+/*
+ * Hotspot markers: a 22px ring with a transparent centre (HotspotsLayer), the rank in a small mono
+ * label at the top right. Selected: a thicker Tar Black ring that settles in 150ms.
+ */
 .mwi-hotspot {
   background: none;
   border: none;
 }
 
-.mwi-hotspot__badge {
+.mwi-hotspot__target {
   position: relative;
-  display: flex;
-  width: 28px;
-  height: 28px;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid var(--level-color);
-  border-radius: 9999px;
-  background: var(--color-surface);
-  color: var(--color-ink);
-  box-shadow: var(--shadow-subtle);
-  font-size: 12px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  transition: box-shadow 150ms var(--ease-out);
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.mwi-hotspot__badge.is-selected {
-  box-shadow:
-    0 0 0 2px var(--color-surface),
-    0 0 0 4px var(--color-accent);
-}
-
-.mwi-hotspot__flag {
+.mwi-hotspot__target svg {
   position: absolute;
-  top: -6px;
-  right: -7px;
-  display: flex;
-  width: 16px;
-  height: 16px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-critical-stroke);
-  border-radius: 4px;
-  background: var(--color-critical);
+  inset: 0;
+  overflow: visible;
+}
+
+.mwi-hotspot__casing {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 4;
+}
+
+.mwi-hotspot__ring {
+  fill: none;
+  stroke: var(--level-color);
+  stroke-width: 1.5;
+  transition:
+    stroke-width 150ms var(--ease-out),
+    stroke 150ms var(--ease-out);
+}
+
+.mwi-hotspot__target.is-selected .mwi-hotspot__ring,
+.mwi-hotspot:focus-visible .mwi-hotspot__ring {
+  stroke: var(--color-tar);
+  stroke-width: 3;
+}
+
+.mwi-hotspot__rank {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 14px;
+  padding: 0 2px;
+  border: 1px solid var(--color-rule);
+  background: var(--color-sheet);
+  color: var(--color-tar);
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-variant-numeric: tabular-nums;
+  line-height: 12px;
+  text-align: center;
+}
+
+.mwi-hotspot__rank.is-first {
+  border-color: var(--color-tar);
+  background: var(--color-tar);
   color: var(--color-white);
 }
 
@@ -118,10 +140,52 @@
   outline: none;
 }
 
-.mwi-hotspot:focus-visible .mwi-hotspot__badge {
-  box-shadow:
-    0 0 0 2px var(--color-surface),
-    0 0 0 4px var(--color-accent);
+/*
+ * Low-zoom centroid markers: 6px squares in the level colour with a 1px white outline, and counted
+ * clusters when more than 40 are in view (DetectionsLayer, lib/map/cluster.ts).
+ */
+.mwi-point,
+.mwi-cluster {
+  background: none;
+  border: none;
+}
+
+.mwi-point span {
+  display: block;
+  width: 6px;
+  height: 6px;
+  margin: 1px;
+  outline: 1px solid var(--color-white);
+  background: var(--level-color);
+}
+
+/* Low confidence: a dashed outline, the same signal as the polygons (no fading on dark water). */
+.mwi-point.is-low span {
+  outline-style: dashed;
+}
+
+.mwi-point.is-selected span {
+  outline: 2px solid var(--color-tar);
+}
+
+/*
+ * A cluster is a solid square in its most severe level's colour with the count on it: unlike the
+ * hotspot rank labels (neutral plates), so the two kinds of number never read alike. It sits under
+ * the hotspot rings, which stay transparent around it.
+ */
+.mwi-cluster span {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  outline: 1px solid var(--color-white);
+  background: var(--level-color);
+  color: var(--cluster-ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 
 /* Footprint label */
@@ -132,11 +196,12 @@
 
 .mwi-footprint-label span {
   display: inline-block;
-  padding: 1px 6px;
-  border-radius: var(--radius-badge);
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--color-accent);
-  font-size: 11px;
+  padding: 0 4px;
+  border-radius: var(--radius-tag);
+  background: rgba(251, 251, 249, 0.92);
+  color: var(--color-accent-ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
   font-weight: 500;
   line-height: 16px;
   white-space: nowrap;
@@ -149,12 +214,91 @@
 }
 
 .mwi-readout .leaflet-control-scale-line {
-  border: 1px solid var(--color-ink-muted);
+  border: 1px solid var(--color-ink);
   border-top: none;
   background: transparent;
   color: var(--color-ink);
-  font-size: 11px;
-  line-height: 14px;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: 16px;
   padding: 0 4px;
   font-variant-numeric: tabular-nums;
+}
+
+/*
+ * The Map page: a strict grid, no floating page-level panels (pages/MapPage.tsx).
+ *   toolbar  48px strip across the top
+ *   notices  the result's caveats (low confidence, approximate positions), only when there are
+ *            any: always in view, never inside a panel that can be closed
+ *   side     288px panel (a 40px rail when collapsed), from 1100px; a slide-over below
+ *   map      the canvas
+ *   status   28px strip under the canvas
+ *   drawer   360px panel while something is selected, else no width; a sheet under 768px
+ */
+.mwi-map-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 48px auto minmax(0, 1fr) 28px auto;
+  grid-template-areas:
+    'toolbar'
+    'notices'
+    'map'
+    'status'
+    'drawer';
+}
+
+@media (min-width: 768px) {
+  .mwi-map-page {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 48px auto minmax(0, 1fr) 28px;
+    grid-template-areas:
+      'toolbar toolbar'
+      'notices drawer'
+      'map drawer'
+      'status drawer';
+  }
+}
+
+@media (min-width: 1100px) {
+  .mwi-map-page {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'toolbar toolbar toolbar'
+      'side notices drawer'
+      'side map drawer'
+      'side status drawer';
+  }
+}
+
+.mwi-area-toolbar {
+  grid-area: toolbar;
+  min-width: 0;
+}
+.mwi-area-notices {
+  grid-area: notices;
+  min-width: 0;
+}
+.mwi-area-side {
+  grid-area: side;
+  min-height: 0;
+}
+.mwi-area-map {
+  grid-area: map;
+  min-height: 0;
+  min-width: 0;
+}
+.mwi-area-status {
+  grid-area: status;
+  min-width: 0;
+}
+.mwi-area-drawer {
+  grid-area: drawer;
+  min-height: 0;
+}
+
+/* Leaflet's own zoom buttons (the analysis report map) in the app's type, not Lucida Console bold. */
+.mwi-map .leaflet-control-zoom a {
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-ink);
 }

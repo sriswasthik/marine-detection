@@ -1,14 +1,12 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 
-/** Placeholder block shown while content loads. Decorative: hidden from assistive tech. */
+/**
+ * Placeholder bar shown while content loads: hairline-coloured, square, a slow opacity pulse that
+ * stops under reduced motion. Decorative: hidden from assistive tech.
+ */
 export function Skeleton({ className }: { className?: string }) {
-  return (
-    <span
-      aria-hidden
-      className={cn('block animate-pulse rounded-control bg-border/70', className)}
-    />
-  )
+  return <span aria-hidden className={cn('skeleton-pulse block bg-hairline', className)} />
 }
 
 /** Lines of text-height skeletons, the last one shorter. */
@@ -62,48 +60,48 @@ export function SkeletonPageHeader({
   return (
     <div aria-hidden className={cn('flex flex-col gap-2', className)}>
       {breadcrumb ? <Skeleton className="h-4 w-44" /> : null}
-      <Skeleton className="h-7 w-72 max-w-full" />
+      <Skeleton className="h-8 w-72 max-w-full" />
       <Skeleton className="h-4 w-80 max-w-full" />
     </div>
   )
 }
 
-/** A Card: bordered surface with a title line and text lines, or custom content. */
-export function SkeletonCard({
-  title = true,
+/** A section on the paper: its section label and rule, then text lines or custom content. */
+export function SkeletonSection({
   lines = 3,
   className,
   children,
 }: {
-  title?: boolean
   lines?: number
   className?: string
   children?: ReactNode
 }) {
   return (
-    <div
-      aria-hidden
-      className={cn(
-        'flex flex-col gap-4 rounded-card border border-border bg-surface p-4 shadow-subtle',
-        className,
-      )}
-    >
-      {title ? <Skeleton className="h-5 w-40" /> : null}
+    <div aria-hidden className={cn('flex flex-col gap-4', className)}>
+      <span className="flex items-center gap-3">
+        <Skeleton className="h-3 w-24" />
+        <span className="h-px flex-1 bg-rule" />
+      </span>
       {children ?? <SkeletonText lines={lines} />}
     </div>
   )
 }
 
-/** A grid of MetricCards: label, figure and footnote, in the same box as the real card. */
-export function SkeletonMetricCards({ count, className }: { count: number; className?: string }) {
+/** Headline figures: label, a figure-height bar and a footnote each, ruled like the real row. */
+export function SkeletonFigures({
+  count,
+  className,
+  itemClassName,
+}: {
+  count: number
+  className?: string
+  itemClassName?: string
+}) {
   return (
     <div aria-hidden className={className}>
       {Array.from({ length: count }, (_, index) => (
-        <div
-          key={index}
-          className="flex flex-col gap-2 rounded-card border border-border bg-surface p-4 shadow-subtle"
-        >
-          <Skeleton className="h-4 w-24" />
+        <div key={index} className={cn('flex flex-col gap-2', itemClassName)}>
+          <Skeleton className="h-3 w-24" />
           <Skeleton className="h-8 w-28" />
           <Skeleton className="h-3 w-20" />
         </div>
@@ -112,7 +110,7 @@ export function SkeletonMetricCards({ count, className }: { count: number; class
   )
 }
 
-/** A table: header row and body rows at the real row height (about 37px). */
+/** A ledger: header row on a rule, then body rows at the real 40px row height. */
 export function SkeletonTable({
   rows = 6,
   columns = 5,
@@ -125,16 +123,13 @@ export function SkeletonTable({
   const widths = ['w-16', 'w-20', 'w-14', 'w-24', 'w-32', 'w-12']
   return (
     <div aria-hidden className={cn('flex flex-col', className)}>
-      <div className="flex gap-4 border-b border-border py-2.5">
+      <div className="flex gap-4 border-b border-rule py-3">
         {Array.from({ length: columns }, (_, c) => (
           <Skeleton key={c} className={cn('h-3 flex-1', c === 0 && 'max-w-24')} />
         ))}
       </div>
       {Array.from({ length: rows }, (_, r) => (
-        <div
-          key={r}
-          className="flex h-[37px] items-center gap-4 border-b border-border last:border-0"
-        >
+        <div key={r} className="flex h-10 items-center gap-4 border-b border-hairline">
           {Array.from({ length: columns }, (_, c) => (
             <span key={c} className="flex-1">
               <Skeleton className={cn('h-3', widths[(r + c) % widths.length])} />
@@ -160,12 +155,11 @@ export function SkeletonMap({
 }) {
   return (
     <div aria-hidden className={cn('relative overflow-hidden bg-map-fallback', className)}>
-      <span className="absolute inset-0 animate-pulse bg-border/30" />
-      <span className="absolute top-1/2 left-1/2 h-1/3 w-1/3 -translate-x-1/2 -translate-y-1/2 rounded-control border border-dashed border-border-strong" />
+      <span className="absolute top-1/2 left-1/2 h-1/3 w-1/3 -translate-x-1/2 -translate-y-1/2 border border-dashed border-rule" />
       {controls ? (
         <span className="absolute top-3 right-3 flex flex-col gap-1">
-          <Skeleton className="size-8 bg-surface" />
-          <Skeleton className="size-8 bg-surface" />
+          <span className="block size-8 border border-hairline bg-sheet" />
+          <span className="block size-8 border border-hairline bg-sheet" />
         </span>
       ) : null}
     </div>

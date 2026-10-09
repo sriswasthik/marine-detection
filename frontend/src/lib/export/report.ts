@@ -17,13 +17,22 @@ const percent = (value: number) => `${value}%`
  * thresholds are configurable), and the sample-data disclaimer. The result's own caveats are
  * listed separately at the top of the report.
  */
-export function methodAndCaveats(options: { sampleData: boolean; cellSizeM: number }): string[] {
+export function methodAndCaveats(options: {
+  sampleData: boolean
+  cellSizeM: number
+  /** Set for real model output on a MARIDA patch. */
+  modelOutput?: { label: string; note: string | null }
+}): string[] {
   const t = DENSITY_THRESHOLDS
   const sentences = [
     `Detections come from ${MODEL_CARD.name} ${MODEL_CARD.version}, a ${MODEL_CARD.architecture} model trained on ${MODEL_CARD.trainingData}.`,
     `Confidence is the model's certainty that a region is floating debris: ${formatConfidence(CONFIDENCE_THRESHOLDS.high)} or more is high, below ${formatConfidence(CONFIDENCE_THRESHOLDS.low)} is low and worth checking against the image.`,
     `Density levels grade the share of each ${formatLength(options.cellSizeM)} grid cell covered by debris (Moderate from ${percent(t.moderate)}, High from ${percent(t.high)}, Critical from ${percent(t.critical)}); these thresholds are configurable placeholders, not calibrated values.`,
   ]
+  if (options.modelOutput) {
+    sentences.push(`${options.modelOutput.label}.`)
+    if (options.modelOutput.note) sentences.push(options.modelOutput.note)
+  }
   if (options.sampleData) {
     sentences.push(
       'Sample data: this report was produced from synthetic sample data for demonstration. It does not describe a real observation.',

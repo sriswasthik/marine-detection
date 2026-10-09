@@ -2,7 +2,7 @@ import { act, render, screen } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { AppProviders } from '@/app/providers'
-import { routes } from '@/app/router'
+import { routes } from '@/test/routes'
 import { createMockApi } from '@/features/observations/api/mockApi'
 import { SAMPLE_IDS } from '@/features/observations/mock/samples'
 
@@ -41,7 +41,7 @@ describe('Report page', { timeout: 15_000 }, () => {
     ]) {
       expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument()
     }
-    expect(screen.getByText(/UNet\+\+ marine debris segmentation 0\.1\.0/)).toBeInTheDocument()
+    expect(screen.getByText(/U-Net marine debris segmentation 0\.1\.0/)).toBeInTheDocument()
     expect(screen.getByText(/synthetic sample data/)).toBeInTheDocument()
     expect(screen.getByText(/OpenStreetMap contributors/)).toBeInTheDocument()
     expect(screen.getByText(/^Generated/)).toBeInTheDocument()

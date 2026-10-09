@@ -1,13 +1,14 @@
 import { ArrowDown, ArrowUp, ArrowUpDown, FileSearch, Map as MapIcon } from 'lucide-react'
 import { useRef, useState, type KeyboardEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Badge, SeverityBadge, Tooltip } from '@/components/ui'
+import { SeverityTag, Tag, Tooltip } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { formatConfidence, formatCoveragePercent, formatDate, formatInteger } from '@/lib/format'
 import { nextListSort, type ListQuery, type ListSortKey } from '@/lib/observationList'
 import { hasApproximatePositions, isLowConfidenceResult } from '@/lib/warnings'
 import { SOURCE_LABELS, STATUS_LABELS, STATUS_TONES } from '../labels'
 import type { ObservationSummary } from '../types'
+import { ObservationGlyphById } from '../components/ObservationGlyphById'
 import { SourceIcon } from '../components/SourceIcon'
 import { RowExportMenu } from './RowExportMenu'
 
@@ -18,7 +19,8 @@ const COLUMNS: readonly {
   className?: string
 }[] = [
   { key: 'region', label: 'Region', className: 'min-w-56' },
-  { key: 'source', label: 'Source' },
+  // Every current scene is satellite imagery: the column gives way first on narrower screens.
+  { key: 'source', label: 'Source', className: 'hidden xl:table-cell' },
   { key: 'captured', label: 'Captured' },
   { key: 'status', label: 'Status' },
   { key: 'density', label: 'Density' },
@@ -28,11 +30,11 @@ const COLUMNS: readonly {
 ]
 
 function SortIcon({ active, direction }: { active: boolean; direction: 'asc' | 'desc' }) {
-  if (!active) return <ArrowUpDown aria-hidden className="size-3.5 opacity-40" />
+  if (!active) return <ArrowUpDown aria-hidden className="size-3 opacity-40" />
   return direction === 'asc' ? (
-    <ArrowUp aria-hidden className="size-3.5" />
+    <ArrowUp aria-hidden className="size-3" />
   ) : (
-    <ArrowDown aria-hidden className="size-3.5" />
+    <ArrowDown aria-hidden className="size-3" />
   )
 }
 
@@ -97,14 +99,15 @@ export function ObservationsTable({
   }
 
   return (
-    <div className="max-md:overflow-x-auto">
+    // Scrolls inside its own box below 1024px. Not above: a scrolling box would unstick the header.
+    <div className="max-lg:overflow-x-auto">
       <table className="w-full min-w-[56rem] border-separate border-spacing-0 text-small">
         <caption className="sr-only">
           Observations. Use the arrow keys to move between rows, Enter to open one, M to open it on
           the map.
         </caption>
         <thead>
-          <tr className="text-left text-caption text-ink-muted">
+          <tr className="text-left">
             {COLUMNS.map((column) => {
               const active = query.sort === column.key
               return (
@@ -116,7 +119,7 @@ export function ObservationsTable({
                   }
                   className={cn(
                     // Sticky under the top bar while the page scrolls.
-                    'sticky top-[calc(var(--spacing-topbar)+var(--offline-bar-height,0px))] z-10 border-b border-border bg-bg px-2 py-2 font-medium first:pl-0',
+                    'label sticky top-[calc(var(--spacing-topbar)+var(--offline-bar-height,0px))] z-10 h-10 border-b border-rule bg-paper px-3 font-medium text-ink-2 first:pl-0',
                     column.numeric && 'text-right',
                     column.className,
                   )}
@@ -125,7 +128,7 @@ export function ObservationsTable({
                     type="button"
                     onClick={() => onSort(nextListSort(query, column.key))}
                     className={cn(
-                      '-mx-1 inline-flex items-center gap-1 rounded-[4px] px-1 py-0.5 hover:text-ink',
+                      'label inline-flex h-8 items-center gap-1 hover:text-ink',
                       active && 'text-ink',
                       column.numeric && 'flex-row-reverse',
                     )}
@@ -138,7 +141,7 @@ export function ObservationsTable({
             })}
             <th
               scope="col"
-              className="sticky top-[calc(var(--spacing-topbar)+var(--offline-bar-height,0px))] z-10 border-b border-border bg-bg py-2 pr-0 pl-2 text-right font-medium"
+              className="sticky top-[calc(var(--spacing-topbar)+var(--offline-bar-height,0px))] z-10 border-b border-rule bg-paper pr-0 pl-3 text-right font-medium"
             >
               <span className="sr-only">Actions</span>
             </th>
@@ -164,76 +167,81 @@ export function ObservationsTable({
                   if ((event.target as HTMLElement).closest('a, button')) return
                   navigate(detailPath(o.id))
                 }}
-                className="group cursor-pointer outline-none hover:bg-surface focus-visible:bg-accent-soft"
+                className="group cursor-pointer outline-none hover:bg-ink/[0.03] focus-visible:bg-accent-wash"
               >
-                <td className="border-b border-border py-2 pr-2">
-                  <span className="flex min-w-0 flex-col gap-0.5">
-                    <Link
-                      to={detailPath(o.id)}
-                      tabIndex={-1}
-                      className="truncate font-medium text-ink group-hover:underline"
-                    >
-                      {o.region}
-                    </Link>
-                    {(o.detectionCount > 0 && isLowConfidenceResult(o)) ||
-                    hasApproximatePositions(o) ? (
-                      <span className="flex flex-wrap gap-1">
-                        {o.detectionCount > 0 && isLowConfidenceResult(o) ? (
-                          <Badge tone="warning" className="h-5">
-                            Low confidence
-                          </Badge>
-                        ) : null}
-                        {hasApproximatePositions(o) ? (
-                          <Badge tone="warning" className="h-5">
-                            Approximate positions
-                          </Badge>
-                        ) : null}
-                      </span>
-                    ) : null}
+                <td className="border-b border-hairline py-2 pr-3">
+                  <span className="flex min-w-0 items-start gap-3 transition-transform duration-[120ms] ease-out group-hover:translate-x-[2px]">
+                    <ObservationGlyphById id={o.id} size={24} />
+                    <span className="flex min-w-0 flex-col gap-1">
+                      <Link
+                        to={detailPath(o.id)}
+                        tabIndex={-1}
+                        className="truncate text-body font-medium text-ink underline-offset-4 group-hover:underline pointer-coarse:inline-flex pointer-coarse:min-h-10 pointer-coarse:items-center"
+                      >
+                        {o.region}
+                      </Link>
+                      {o.maridaPatch ? (
+                        <span className="truncate text-small text-ink-2">
+                          Model output on MARIDA patch{' '}
+                          <span className="data">{o.maridaPatch.id}</span>
+                        </span>
+                      ) : null}
+                      {(o.detectionCount > 0 && isLowConfidenceResult(o)) ||
+                      hasApproximatePositions(o) ? (
+                        <span className="flex flex-wrap gap-1">
+                          {o.detectionCount > 0 && isLowConfidenceResult(o) ? (
+                            <Tag tone="warning">Low confidence</Tag>
+                          ) : null}
+                          {hasApproximatePositions(o) ? (
+                            <Tag tone="warning">Approximate positions</Tag>
+                          ) : null}
+                        </span>
+                      ) : null}
+                    </span>
                   </span>
                 </td>
-                <td className="border-b border-border px-2 py-2 text-ink-muted">
-                  <span className="inline-flex items-center gap-1.5">
+                <td className="hidden border-b border-hairline px-3 py-2 text-ink-2 xl:table-cell">
+                  <span className="inline-flex items-center gap-2">
                     <SourceIcon source={o.source} className="size-4" />
                     {SOURCE_LABELS[o.source]}
                   </span>
                 </td>
-                <td className="num border-b border-border px-2 py-2 whitespace-nowrap text-ink">
+                <td className="data border-b border-hairline px-3 py-2 whitespace-nowrap text-ink">
                   {formatDate(o.capturedAt)}
                 </td>
-                <td className="border-b border-border px-2 py-2">
+                <td className="border-b border-hairline px-3 py-2">
                   {o.status === 'completed' ? (
-                    <span className="inline-flex items-center gap-1.5 text-ink-muted">
-                      <span aria-hidden className="size-1.5 rounded-full bg-success" />
+                    <span className="inline-flex items-center gap-2 text-ink-2">
+                      <span aria-hidden className="size-1.5 bg-success" />
                       {STATUS_LABELS.completed}
                     </span>
                   ) : (
-                    <Badge tone={STATUS_TONES[o.status]}>{STATUS_LABELS[o.status]}</Badge>
+                    <Tag tone={STATUS_TONES[o.status]}>{STATUS_LABELS[o.status]}</Tag>
                   )}
                 </td>
-                <td className="border-b border-border px-2 py-2">
+                <td className="border-b border-hairline px-3 py-2">
                   {noDebris || !o.densityLevel ? (
-                    <Badge>No debris</Badge>
+                    <span className="text-ink-2">No debris</span>
                   ) : (
-                    <SeverityBadge level={o.densityLevel} variant="plain" />
+                    <SeverityTag level={o.densityLevel} variant="plain" />
                   )}
                 </td>
-                <td className="num border-b border-border px-2 py-2 text-right text-ink">
+                <td className="data border-b border-hairline px-3 py-2 text-right text-ink">
                   {formatCoveragePercent(o.coveragePercent)}
                 </td>
-                <td className="num border-b border-border px-2 py-2 text-right text-ink">
+                <td className="data border-b border-hairline px-3 py-2 text-right text-ink">
                   {formatInteger(o.detectionCount)}
                 </td>
-                <td className="num border-b border-border px-2 py-2 text-right text-ink">
+                <td className="data border-b border-hairline px-3 py-2 text-right text-ink">
                   {formatConfidence(o.averageConfidence)}
                 </td>
-                <td className="border-b border-border py-1.5 pl-2">
-                  <span className="flex items-center justify-end gap-0.5">
+                <td className="border-b border-hairline py-2 pl-3">
+                  <span className="flex items-center justify-end gap-1">
                     <Tooltip content="Open detail">
                       <Link
                         to={detailPath(o.id)}
                         aria-label={`Open detail for ${o.region}`}
-                        className="inline-flex size-7 items-center justify-center rounded-control text-ink-muted hover:bg-bg hover:text-ink"
+                        className="inline-flex size-8 items-center justify-center rounded-control text-ink-2 hover:bg-ink/5 hover:text-ink"
                       >
                         <FileSearch aria-hidden className="size-4" />
                       </Link>
@@ -242,7 +250,7 @@ export function ObservationsTable({
                       <Link
                         to={mapPath(o.id)}
                         aria-label={`Open ${o.region} on the map`}
-                        className="inline-flex size-7 items-center justify-center rounded-control text-ink-muted hover:bg-bg hover:text-ink"
+                        className="inline-flex size-8 items-center justify-center rounded-control text-ink-2 hover:bg-ink/5 hover:text-ink"
                       >
                         <MapIcon aria-hidden className="size-4" />
                       </Link>

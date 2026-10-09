@@ -1,5 +1,5 @@
 export { DensityLegend } from './DensityLegend'
-export { MapControls, type MapControlsProps } from './MapControls'
-export { MapLegend, type MapLegendProps } from './MapLegend'
+export { LegendLine, type LegendLineProps } from './LegendLine'
+export { MapControlGroup } from './MapControlGroup'
 export { MapPreview } from './MapPreview'
 export { MapView, type MapHandle, type MapViewProps } from './MapView'

@@ -7,12 +7,15 @@ export interface CheckboxProps extends Omit<ComponentPropsWithRef<'input'>, 'typ
   description?: ReactNode
   /** Mixed state, for example "some layers visible". */
   indeterminate?: boolean
+  /** `sm`: a 13px label, for dense panels. */
+  size?: 'md' | 'sm'
 }
 
 export function Checkbox({
   label,
   description,
   indeterminate = false,
+  size = 'md',
   className,
   id,
   disabled,
@@ -28,8 +31,12 @@ export function Checkbox({
   }, [indeterminate])
 
   return (
-    <div className={cn('flex items-start gap-2.5', className)}>
-      <span className="relative mt-0.5 inline-flex size-4 shrink-0">
+    <div className={cn('flex items-start gap-3', className)}>
+      {/* A second label for the same input, so its 40px touch hit area toggles it. */}
+      <label
+        htmlFor={inputId}
+        className="hit-area relative inline-flex h-5 w-4 shrink-0 items-center"
+      >
         <input
           ref={inputRef}
           id={inputId}
@@ -38,9 +45,9 @@ export function Checkbox({
           aria-describedby={descriptionId}
           aria-checked={indeterminate ? 'mixed' : undefined}
           className={cn(
-            'peer size-4 cursor-pointer appearance-none rounded-[4px] border border-border-strong bg-surface',
-            'transition-colors duration-150 ease-out hover:border-ink-muted',
-            'checked:border-accent checked:bg-accent indeterminate:border-accent indeterminate:bg-accent',
+            'peer size-4 cursor-pointer appearance-none rounded-tag border border-rule bg-white',
+            'transition-colors duration-[120ms] ease-out hover:border-ink',
+            'checked:border-ink checked:bg-ink indeterminate:border-ink indeterminate:bg-ink',
             'disabled:cursor-not-allowed disabled:opacity-50',
           )}
           {...rest}
@@ -48,26 +55,26 @@ export function Checkbox({
         <Check
           aria-hidden
           strokeWidth={3}
-          className="pointer-events-none absolute inset-0.5 size-3 text-white opacity-0 peer-checked:opacity-100 peer-indeterminate:opacity-0"
+          className="pointer-events-none absolute inset-0 m-auto size-3 text-white opacity-0 peer-checked:opacity-100 peer-indeterminate:opacity-0"
         />
         <Minus
           aria-hidden
           strokeWidth={3}
-          className="pointer-events-none absolute inset-0.5 size-3 text-white opacity-0 peer-indeterminate:opacity-100"
+          className="pointer-events-none absolute inset-0 m-auto size-3 text-white opacity-0 peer-indeterminate:opacity-100"
         />
-      </span>
+      </label>
       <span className="flex min-w-0 flex-col">
         <label
           htmlFor={inputId}
           className={cn(
-            'text-body text-ink',
-            disabled ? 'cursor-not-allowed text-ink-muted' : 'cursor-pointer',
+            size === 'sm' ? 'text-small text-ink' : 'text-body text-ink',
+            disabled ? 'cursor-not-allowed text-ink-2' : 'cursor-pointer',
           )}
         >
           {label}
         </label>
         {description ? (
-          <span id={descriptionId} className="text-caption text-ink-muted">
+          <span id={descriptionId} className="text-small text-ink-2">
             {description}
           </span>
         ) : null}

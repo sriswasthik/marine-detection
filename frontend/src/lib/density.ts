@@ -2,10 +2,11 @@ import type { Position } from 'geojson'
 import {
   DENSITY_LEVEL_IDS,
   type DensityLevel,
+  type DensityThresholds,
   type Detection,
   type GeoBounds,
 } from '@/features/observations/types'
-import { DENSITY_THRESHOLDS, GRID_CELL_SIZE_M } from '@/lib/config'
+import { DENSITY_THRESHOLDS, GRID_CELL_SIZE_M, gridCellSizeForResolution } from '@/lib/config'
 import { createLocalProjection } from '@/lib/geo'
 import { clipRingToRect, openRing, ringArea, ringBBox, type Point } from '@/lib/polygon'
 
@@ -64,10 +65,13 @@ export const DENSITY_LEVELS: Readonly<Record<DensityLevel, DensityLevelMeta>> = 
 export const DENSITY_LEVEL_ORDER: readonly DensityLevel[] = DENSITY_LEVEL_IDS
 
 /** Level for a grid cell's debris coverage, in percent. See DENSITY_THRESHOLDS. */
-export function levelForCoverage(coveragePercent: number): DensityLevel {
-  if (coveragePercent >= DENSITY_THRESHOLDS.critical) return 'critical'
-  if (coveragePercent >= DENSITY_THRESHOLDS.high) return 'high'
-  if (coveragePercent >= DENSITY_THRESHOLDS.moderate) return 'moderate'
+export function levelForCoverage(
+  coveragePercent: number,
+  thresholds: DensityThresholds = DENSITY_THRESHOLDS,
+): DensityLevel {
+  if (coveragePercent >= thresholds.critical) return 'critical'
+  if (coveragePercent >= thresholds.high) return 'high'
+  if (coveragePercent >= thresholds.moderate) return 'moderate'
   return 'low'
 }
 
@@ -104,6 +108,11 @@ export interface DensityCell {
 }
 
 export interface DensityGrid {
+  /**
+   * service: measured by the analysis service from the model's pixels (src/lib/serviceDensity.ts).
+   * browser: computed here from the detection polygons (synthetic sample data).
+   */
+  source: 'service' | 'browser'
   bounds: GeoBounds
   cellSizeM: number
   rows: number
@@ -230,7 +239,7 @@ export function computeDensityGrid(
     if (level) detectionLevels[detectionId] = level
   }
 
-  return { bounds, cellSizeM, rows, cols, cells, detectionLevels }
+  return { source: 'browser', bounds, cellSizeM, rows, cols, cells, detectionLevels }
 }
 
 export function getCell(grid: DensityGrid, row: number, col: number): DensityCell | undefined {
@@ -244,4 +253,43 @@ export function getCell(grid: DensityGrid, row: number, col: number): DensityCel
  */
 export function observationDensityLevel(grid: DensityGrid): DensityLevel | null {
   return maxDensityLevel(grid.cells.map((cell) => cell.level))
+}
+
+/** A detection as a service may send it: the density level can be left to this module. */
+export type UnresolvedDetection = Omit<Detection, 'densityLevel'> & {
+  densityLevel: DensityLevel | null
+}
+
+interface DensitySubject<D> {
+  bounds: GeoBounds | null
+  resolutionM?: number
+  densityLevel: DensityLevel | null
+  detections: D[]
+}
+
+/**
+ * Fills in density levels a service left null, using the browser grid. Levels that were sent are
+ * kept: the Python pipeline sends them all, so this only matters for observations stored before it
+ * graded density. Without bounds there is no grid; such detections fall back to Low.
+ */
+export function resolveDensityLevels<T extends DensitySubject<UnresolvedDetection>>(
+  observation: T,
+): Omit<T, 'detections'> & { detections: Detection[] } {
+  const missing = observation.detections.some((d) => d.densityLevel === null)
+  if (!missing) return observation as Omit<T, 'detections'> & { detections: Detection[] }
+  const grid = observation.bounds
+    ? computeDensityGrid(
+        observation.detections,
+        observation.bounds,
+        gridCellSizeForResolution(observation.resolutionM),
+      )
+    : null
+  const detections: Detection[] = observation.detections.map((d) => ({
+    ...d,
+    densityLevel: d.densityLevel ?? grid?.detectionLevels[d.id] ?? 'low',
+  }))
+  const level =
+    observation.densityLevel ??
+    (grid ? observationDensityLevel(grid) : maxDensityLevel(detections.map((d) => d.densityLevel)))
+  return { ...observation, densityLevel: level, detections }
 }

@@ -1,0 +1,27 @@
+# Root ignore rules for the whole project. frontend/.gitignore keeps its own, more specific rules.
+# Deliberately NOT ignored: data/, *.log under logs/, the trained models (*.pth), frontend/public/samples.
+
+# Node (frontend)
+node_modules/
+dist/
+dist-ssr/
+coverage/
+
+# Environment files (keep *.env.example tracked)
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+.pytest_cache/
+
+# Backend runtime storage (uploads, job results)
+backend/store/
+
+# Editors and OS
+.idea/
+.DS_Store

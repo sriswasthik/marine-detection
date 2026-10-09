@@ -7,7 +7,7 @@ import { render, screen, within } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { AppProviders } from '@/app/providers'
-import { routes } from '@/app/router'
+import { routes } from '@/test/routes'
 import { networkError } from '@/features/observations/api/errors'
 import { createMockApi } from '@/features/observations/api/mockApi'
 import { withResilience } from '@/features/observations/api/resilientApi'
@@ -150,10 +150,16 @@ describe('empty', { timeout: 20_000 }, () => {
   ])('%s explains there is nothing yet and how to start', async (_surface, path, title) => {
     renderAt(path, emptyApi())
     expect(await screen.findByRole('heading', { name: title }, OPTS)).toBeInTheDocument()
+    // One way in from the page itself, and the top bar's primary action.
     const main = screen.getByRole('main')
-    expect(
-      within(main).getAllByRole('link', { name: /Analyze new imagery/ }).length,
-    ).toBeGreaterThan(0)
+    expect(within(main).getByRole('link', { name: 'Load a sample scene' })).toHaveAttribute(
+      'href',
+      '/analyze?sample=1',
+    )
+    expect(screen.getAllByRole('link', { name: 'Analyze new imagery' })[0]).toHaveAttribute(
+      'href',
+      '/analyze',
+    )
   })
 
   it.each([

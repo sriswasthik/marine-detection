@@ -36,7 +36,28 @@ const SOURCE_CODES: Readonly<Record<string, AppErrorCode>> = {
   INVALID_IMAGE: 'INVALID_IMAGE',
   MODEL_ERROR: 'MODEL_FAILED',
   NOT_IMPLEMENTED: 'NOT_IMPLEMENTED',
+  // The processing service (docs/BACKEND_CONTRACT.md).
+  INVALID_BANDS: 'INVALID_IMAGE',
+  NO_GEOREF: 'INVALID_IMAGE',
+  UNREADABLE: 'INVALID_IMAGE',
+  TOO_LARGE: 'FILE_TOO_LARGE',
+  UNSUPPORTED_SOURCE: 'UNSUPPORTED_FILE',
+  INVALID_REQUEST: 'BAD_REQUEST',
+  QUEUE_FULL: 'SERVICE_UNAVAILABLE',
+  MODEL_FAILURE: 'MODEL_FAILED',
 }
+
+/** Service codes more specific than the app code they map to: kept as the reference. */
+const SPECIFIC_SOURCE_CODES: ReadonlySet<string> = new Set([
+  'INVALID_BANDS',
+  'NO_GEOREF',
+  'UNREADABLE',
+  'TOO_LARGE',
+  'UNSUPPORTED_SOURCE',
+  'INVALID_REQUEST',
+  'QUEUE_FULL',
+  'MODEL_FAILURE',
+])
 
 /** HTTP status to app code. Anything else in 4xx is BAD_REQUEST and in 5xx is SERVER. */
 export function codeForStatus(status: number): AppErrorCode {
@@ -168,7 +189,11 @@ export function toAppError(input: unknown, options: ToAppErrorOptions = {}): App
   if (isRecord(input)) {
     const status = typeof input.status === 'number' ? input.status : null
     const sourceCode = typeof input.code === 'string' ? SOURCE_CODES[input.code] : undefined
-    const reference = status !== null ? `HTTP ${status}` : undefined
+    const httpReference = status !== null ? `HTTP ${status}` : undefined
+    const reference =
+      typeof input.code === 'string' && SPECIFIC_SOURCE_CODES.has(input.code)
+        ? [input.code, httpReference].filter(Boolean).join(', ')
+        : httpReference
     if (sourceCode) return make(sourceCode, reference)
     if (status !== null && status >= 400) return make(codeForStatus(status), reference)
     if ('status' in input && input.status === null && typeof input.code === 'string') {

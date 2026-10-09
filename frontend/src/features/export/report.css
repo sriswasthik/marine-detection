@@ -5,8 +5,9 @@
 .mwi-report-sheet {
   width: 210mm;
   min-height: 297mm;
-  padding: 12mm 13mm;
-  background: var(--color-surface);
+  /* About 12.7mm: on the 4px grid on screen, a comfortable print margin on paper. */
+  padding: 48px;
+  background: var(--color-white);
 }
 
 @page {

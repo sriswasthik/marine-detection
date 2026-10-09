@@ -132,13 +132,26 @@ export interface FactRow {
   value: string
   /** Coordinates and ids use the monospace face. */
   mono?: boolean
+  /** Plain-language explanation of the label (see lib/glossary.ts). */
+  hint?: string
 }
 
 const NOT_RECORDED = 'Not recorded'
 
+/** Where density levels and hotspots were computed, for the provenance rows. */
+export function densitySourceText(observation: Pick<Observation, 'densityGrid'>): string {
+  const grid = observation.densityGrid
+  if (!grid) return 'Computed in this browser from the detection outlines'
+  const cell = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(grid.cellSizeM)
+  return `Measured by the analysis service on ${cell} m cells of model pixels`
+}
+
 /** Model, timing, resolution and source facts. Missing fields read "Not recorded". */
 export function provenanceRows(
-  observation: Pick<Observation, 'id' | 'processing' | 'resolutionM' | 'cloudCoveragePercent'>,
+  observation: Pick<
+    Observation,
+    'id' | 'processing' | 'resolutionM' | 'cloudCoveragePercent' | 'densityGrid'
+  >,
 ): FactRow[] {
   const processing = observation.processing
   const started = processing ? Date.parse(processing.startedAt) : Number.NaN
@@ -177,6 +190,7 @@ export function provenanceRows(
           ? NOT_RECORDED
           : formatCoveragePercent(observation.cloudCoveragePercent),
     },
+    { label: 'Density and hotspots', value: densitySourceText(observation) },
     { label: 'Source ID', value: observation.id, mono: true },
   ]
 }

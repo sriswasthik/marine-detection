@@ -1,3 +1,4 @@
+import { NextStep } from '@/app/shell/NextStep'
 import { ErrorBoundary, PageSkeleton } from '@/components/ui'
 import { LoadError, NoObservations } from '@/features/observations/components/ObservationStates'
 import { useCurrentObservationId } from '@/features/observations/currentObservationContext'
@@ -24,10 +25,10 @@ export function OverviewPage() {
   const latestId = observations?.[0]?.id ?? null
 
   return (
-    <div className="mx-auto flex w-full max-w-[75rem] flex-col gap-14 px-4 py-10 sm:px-6 lg:py-14">
+    <div className="mx-auto flex w-full max-w-page flex-col gap-12 px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
       <IntroBand latestMapPath={currentId ? `/map/${encodeURIComponent(currentId)}` : null} />
 
-      <div className="h-px bg-border" aria-hidden />
+      <div className="h-px bg-rule" aria-hidden />
 
       {list.isPending ? (
         <PageSkeleton label="Loading observations" className="flex flex-col gap-14">
@@ -60,6 +61,7 @@ export function OverviewPage() {
           </ErrorBoundary>
         </>
       )}
+      <NextStep page="overview" observationId={currentId} />
     </div>
   )
 }

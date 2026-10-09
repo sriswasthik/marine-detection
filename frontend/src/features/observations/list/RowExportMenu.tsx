@@ -93,7 +93,7 @@ export function RowExportMenu({ observation }: { observation: ObservationSummary
           type="button"
           {...props}
           aria-label={`Export ${observation.region}`}
-          className="inline-flex size-7 items-center justify-center rounded-control text-ink-muted hover:bg-bg hover:text-ink aria-expanded:bg-bg"
+          className="inline-flex size-8 items-center justify-center rounded-control text-ink-2 hover:bg-ink/5 hover:text-ink aria-expanded:bg-ink/5"
         >
           <Download aria-hidden className="size-4" />
         </button>

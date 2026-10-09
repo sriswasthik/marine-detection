@@ -74,7 +74,7 @@ export function SegmentedControl<T extends string>({
       role="radiogroup"
       aria-label={label}
       className={cn(
-        'inline-flex max-w-full gap-0.5 rounded-control border border-border bg-bg p-0.5',
+        'inline-flex max-w-full overflow-hidden rounded-control border border-hairline',
         className,
       )}
     >
@@ -94,13 +94,16 @@ export function SegmentedControl<T extends string>({
             onClick={() => select(index)}
             onKeyDown={(event) => onKeyDown(event, index)}
             className={cn(
-              'inline-flex min-w-0 items-center justify-center gap-1.5 rounded-[6px] font-medium whitespace-nowrap',
-              'transition-colors duration-150 ease-out [&_svg]:size-4 [&_svg]:shrink-0',
+              'inline-flex min-w-0 items-center justify-center gap-2 font-medium whitespace-nowrap',
+              'border-l border-hairline first:border-l-0',
+              'transition-colors duration-[120ms] ease-out [&_svg]:size-4 [&_svg]:shrink-0',
               'disabled:cursor-not-allowed disabled:opacity-50',
-              size === 'sm' ? 'h-7 px-2.5 text-small' : 'h-8 px-3 text-body',
+              // Inside the 1px frame: 32px and 36px overall, like buttons; 40px on phones.
+              size === 'sm' ? 'h-[30px] px-3 text-small' : 'h-[34px] px-3 text-body',
+              'max-sm:h-[38px]',
               checked
-                ? 'bg-surface text-ink shadow-subtle ring-1 ring-border'
-                : 'text-ink-muted hover:text-ink',
+                ? 'bg-accent-wash text-accent-ink'
+                : 'text-ink-2 hover:bg-ink/5 hover:text-ink',
             )}
           >
             {option.icon}

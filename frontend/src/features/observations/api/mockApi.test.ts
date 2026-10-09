@@ -85,7 +85,7 @@ describe('mock api reads', () => {
   it('returns one observation with detections', async () => {
     const { api } = setup()
     const { data } = await settle(api.getObservation(SAMPLE_IDS.mahim))
-    expect(data.source).toBe('drone')
+    expect(data.source).toBe('satellite')
     expect(data.detections.length).toBeGreaterThan(0)
   })
 
@@ -121,6 +121,14 @@ describe('mock pipeline', () => {
     expect(progress[0]).toBe(0)
     expect(progress[progress.length - 1]).toBe(100)
     expect([...progress].sort((a, b) => a - b)).toEqual(progress)
+  })
+
+  it('keeps the place name of the scene when the region is left empty', async () => {
+    const { api } = setup()
+    const { jobId } = await startJob(api, input({ region: '   ' }))
+    const jobs = await pollUntilDone(api, jobId)
+    const { data } = await settle(api.getObservation(jobs[jobs.length - 1]?.observationId ?? ''))
+    expect(data.region).toBe('Ennore coast, Bay of Bengal')
   })
 
   it('runs to completion and stores a new observation with the user metadata', async () => {

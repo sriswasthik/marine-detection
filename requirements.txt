@@ -1,0 +1,19 @@
+pip==25.0.1
+
+# Core dependencies
+numpy==1.23.5
+pandas==1.5.3
+scikit-learn==1.2.2
+tqdm==4.66.1
+matplotlib==3.6.3
+tensorboard==2.12.3
+pillow==9.5.0
+python-magic==0.4.27
+
+# GDAL and related packages
+rasterio==1.3.6
+
+# Machine learning dependencies
+torch==1.13.1
+torchvision==0.14.1
+albumentations==1.3.1

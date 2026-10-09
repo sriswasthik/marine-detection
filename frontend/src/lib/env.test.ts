@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { readEnv } from './env'
 
 describe('readEnv', () => {
-  it('defaults to mock mode with standard settings', () => {
+  it('defaults to the live service with standard settings', () => {
     expect(readEnv({})).toEqual({
-      useMock: true,
+      useMock: false,
       apiBaseUrl: 'http://localhost:8000',
-      appName: 'Marine Waste Intelligence',
+      appName: 'A.W.A.R.E.',
       demoFast: false,
     })
   })
@@ -27,7 +27,7 @@ describe('readEnv', () => {
   })
 
   it('falls back on unrecognised values', () => {
-    expect(readEnv({ VITE_USE_MOCK: 'maybe', VITE_DEMO_FAST: '' }).useMock).toBe(true)
-    expect(readEnv({ VITE_USE_MOCK: '0' }).useMock).toBe(false)
+    expect(readEnv({ VITE_USE_MOCK: 'maybe', VITE_DEMO_FAST: '' }).useMock).toBe(false)
+    expect(readEnv({ VITE_USE_MOCK: '1' }).useMock).toBe(true)
   })
 })

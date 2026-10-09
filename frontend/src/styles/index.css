@@ -6,13 +6,36 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Coordinates and IDs only. */
-@utility mono-label {
+/* Data: coordinates, IDs, ticks and ledger figures. Geist Mono, 12px, tabular. */
+@utility data {
   font-family: var(--font-mono);
-  font-size: var(--text-mono-label);
-  line-height: var(--text-mono-label--line-height);
+  font-size: var(--text-mono);
+  line-height: var(--text-mono--line-height);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
+}
+
+/* Small-caps label: section labels, ledger headers, field labels on the map. Colour is ink-2. */
+@utility label {
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--text-label--letter-spacing);
+  text-transform: uppercase;
+}
+
+/* Lines: hairline for structure, rule for emphasis. */
+@utility hairline-t {
+  border-top: 1px solid var(--color-hairline);
+}
+@utility hairline-b {
+  border-bottom: 1px solid var(--color-hairline);
+}
+@utility rule-t {
+  border-top: 1px solid var(--color-rule);
+}
+@utility rule-b {
+  border-bottom: 1px solid var(--color-rule);
 }
 
 @keyframes tooltip-in {
@@ -21,6 +44,35 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+/* Skeletons: a slow opacity pulse, no shimmer. Stops under reduced motion (below). */
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* One sweep of the processing scan line: top to bottom, then it fades. */
+@keyframes scan-sweep {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(var(--scan-distance, 100%));
+    opacity: 0;
   }
 }
 
@@ -37,16 +89,28 @@
 @layer base {
   :root {
     color-scheme: light;
+    /* Room the phone tab bar takes at the bottom; none from 900px, where the top bar navigates. */
+    --tabbar-offset: var(--spacing-tabbar);
+  }
+
+  @media (min-width: 56.25rem) {
+    :root {
+      --tabbar-offset: 0px;
+    }
+  }
+
+  @media print {
+    :root {
+      --tabbar-offset: 0px;
+    }
   }
 
   html,
   body {
-    background-color: var(--color-bg);
+    background-color: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-size: var(--text-body);
     line-height: var(--text-body--line-height);
-    font-feature-settings: 'cv11';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -54,15 +118,19 @@
 
   body {
     min-height: 100dvh;
+    /* On body only: the root stays at the browser's 16px, so rem sizes (the type scale, the 4px
+       spacing grid) mean what the tokens say. Base type is 14/20. */
+    font-size: var(--text-body);
   }
 
+  /* Visible focus everywhere: a 2px Tar Black outline with a 2px offset (yellow would not show). */
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-tar);
     outline-offset: 2px;
   }
 
   ::selection {
-    background-color: var(--color-accent-soft);
+    background-color: var(--color-accent-wash);
     color: var(--color-ink);
   }
 
@@ -78,7 +146,44 @@
   }
 }
 
-/* Range inputs (Slider). Native inputs keep keyboard and screen reader support. */
+/*
+ * Touch screens: small inline controls (info icons, switches, checkboxes, map markers) keep their
+ * size but get a 40px hit area, centred on them.
+ */
+@layer utilities {
+  @media (pointer: coarse) {
+    /*
+     * Touch baseline: every button and labelled link is at least 40px tall, and icon buttons and
+     * segmented options at least 40px wide. Switches and .hit-area controls keep their size and
+     * use the invisible hit area below instead. Mouse and trackpad layouts are unchanged.
+     */
+    :where(button:not([role='switch']):not(.hit-area), a[aria-label]:not(.hit-area)) {
+      min-height: 40px;
+      min-width: 40px;
+    }
+    /* Doubled attribute: wins over the segmented control's own min-w-0. */
+    [role='radio'][role='radio'] {
+      min-width: 40px;
+    }
+    .hit-area {
+      position: relative;
+    }
+    .hit-area::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: max(100%, 40px);
+      height: max(100%, 40px);
+      transform: translate(-50%, -50%);
+    }
+  }
+}
+
+/*
+ * Range inputs (Slider): a hairline track drawn by the component, and a square thumb.
+ * Native inputs keep keyboard and screen reader support.
+ */
 @layer components {
   .range-input {
     appearance: none;
@@ -91,6 +196,24 @@
   .range-input:focus-visible {
     outline: none;
   }
+  /* Touch screens: a 40px tall input with a larger thumb (doubled class: wins over the rules below). */
+  @media (pointer: coarse) {
+    .range-input.range-input {
+      height: 40px;
+    }
+    .range-input.range-input::-webkit-slider-runnable-track {
+      height: 40px;
+    }
+    .range-input.range-input::-webkit-slider-thumb {
+      width: 20px;
+      height: 20px;
+      margin-top: 10px;
+    }
+    .range-input.range-input::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+    }
+  }
   .range-input::-webkit-slider-runnable-track {
     height: 20px;
     background: transparent;
@@ -99,42 +222,46 @@
     height: 20px;
     background: transparent;
   }
+  /* A small solid square: a handle, not a checkbox. */
   .range-input::-webkit-slider-thumb {
     appearance: none;
     pointer-events: auto;
-    width: 16px;
-    height: 16px;
-    margin-top: 2px;
-    border-radius: 9999px;
-    background: var(--color-surface);
-    border: 1.5px solid var(--color-accent);
-    box-shadow: var(--shadow-subtle);
+    width: 10px;
+    height: 10px;
+    margin-top: 5px;
+    border-radius: 0;
+    background: var(--color-ink);
+    border: 0;
     cursor: pointer;
   }
   .range-input::-moz-range-thumb {
     pointer-events: auto;
-    width: 13px;
-    height: 13px;
-    border-radius: 9999px;
-    background: var(--color-surface);
-    border: 1.5px solid var(--color-accent);
-    box-shadow: var(--shadow-subtle);
+    width: 10px;
+    height: 10px;
+    border-radius: 0;
+    background: var(--color-ink);
+    border: 0;
     cursor: pointer;
   }
   .range-input:focus-visible::-webkit-slider-thumb {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-tar);
     outline-offset: 2px;
   }
   .range-input:focus-visible::-moz-range-thumb {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-tar);
     outline-offset: 2px;
   }
   .range-input:disabled::-webkit-slider-thumb {
-    border-color: var(--color-border-strong);
+    background: var(--color-rule);
     cursor: not-allowed;
   }
   .range-input:disabled::-moz-range-thumb {
-    border-color: var(--color-border-strong);
+    background: var(--color-rule);
     cursor: not-allowed;
+  }
+
+  /* Skeleton bars: hairline-coloured, a slow pulse. */
+  .skeleton-pulse {
+    animation: skeleton-pulse 1.6s var(--ease-out) infinite;
   }
 }

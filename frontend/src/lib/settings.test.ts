@@ -94,6 +94,14 @@ describe('sanitizeSettings', () => {
     )
     expect(sanitizeSettings({ defaultMinConfidence: -1 }, defaults).defaultMinConfidence).toBe(0)
   })
+
+  it('keeps sample data only where the environment turns the mock on', () => {
+    const live = defaultSettings({ useMock: false, apiBaseUrl: 'http://localhost:8000' })
+    expect(sanitizeSettings({ dataSource: 'mock' }, live).dataSource).toBe('live')
+    const mock = defaultSettings({ useMock: true, apiBaseUrl: 'http://localhost:8000' })
+    expect(sanitizeSettings({ dataSource: 'live' }, mock).dataSource).toBe('live')
+    expect(sanitizeSettings({ dataSource: 'mock' }, mock).dataSource).toBe('mock')
+  })
 })
 
 describe('validateApiBaseUrl', () => {

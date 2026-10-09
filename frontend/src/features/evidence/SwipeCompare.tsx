@@ -18,7 +18,7 @@ import {
 function SideLabel({ children, side }: { children: ReactNode; side: 'left' | 'right' }) {
   return (
     <span
-      className={`pointer-events-none absolute top-3 z-[520] rounded-badge border border-border bg-surface/95 px-2 py-0.5 text-caption font-medium text-ink shadow-subtle ${
+      className={`pointer-events-none absolute top-3 z-[520] border border-hairline bg-sheet px-2 py-1 text-small font-medium text-ink ${
         side === 'left' ? 'left-3' : 'right-3'
       }`}
     >
@@ -104,7 +104,7 @@ export function SwipeCompare({
       >
         <span
           aria-hidden
-          className="h-full w-0.5 bg-surface shadow-[0_0_0_1px_rgba(24,33,43,0.25)]"
+          className="h-full w-0.5 bg-white shadow-[0_0_0_1px_rgba(24,33,43,0.25)]"
         />
         <div
           ref={handleRef}
@@ -117,7 +117,7 @@ export function SwipeCompare({
           aria-valuenow={shown}
           aria-valuetext={`${formatInteger(shown)}% ${beforeLabel.toLowerCase()}, ${formatInteger(100 - shown)}% ${afterLabel.toLowerCase()}`}
           onKeyDown={onKeyDown}
-          className="absolute top-1/2 left-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border-strong bg-surface text-ink shadow-popover outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+          className="absolute top-1/2 left-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-control border border-ink bg-white text-ink outline-none focus-visible:ring-2 focus-visible:ring-tar focus-visible:ring-offset-2"
         >
           <ChevronsLeftRight aria-hidden className="size-4" />
         </div>

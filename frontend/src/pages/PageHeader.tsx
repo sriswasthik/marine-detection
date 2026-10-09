@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
-/** Page title (the page's only h1) with one supporting line. Also sets the tab title. */
+/** Page title (the page's only h1, 32px) with one lead line. Also sets the tab title. */
 export function PageHeader({
   title,
   description,
@@ -14,15 +14,17 @@ export function PageHeader({
 }) {
   useDocumentTitle(title)
   return (
-    <header className="flex flex-col gap-1">
-      {meta ? <p className="mono-label text-ink-muted">{meta}</p> : null}
-      <h1 className="text-title text-ink">{title}</h1>
-      <p className="max-w-prose text-body text-ink-muted">{description}</p>
+    <header className="flex flex-col gap-2">
+      {meta ? <p className="data text-ink-2">{meta}</p> : null}
+      <h1 className="text-page text-ink">{title}</h1>
+      <p className="max-w-[68ch] text-lead text-ink-2">{description}</p>
     </header>
   )
 }
 
-/** Standard page width and padding. */
+/** Document page frame: 1280px content on the 12-column grid, 16, 24 or 32px margins. */
 export function PageContainer({ children }: { children: ReactNode }) {
-  return <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:py-10">{children}</div>
+  return (
+    <div className="mx-auto w-full max-w-page px-4 py-8 sm:px-6 lg:px-8 lg:py-12">{children}</div>
+  )
 }

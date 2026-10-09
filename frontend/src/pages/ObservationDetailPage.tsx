@@ -1,14 +1,21 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { Card, ErrorBoundary } from '@/components/ui'
+import { ContextLine } from '@/app/shell/ContextLine'
+import { NextStep } from '@/app/shell/NextStep'
+import { ErrorBoundary, ObservationGlyph, SectionLabel } from '@/components/ui'
 import { DensitySummary } from '@/features/evidence/DensitySummary'
 import { DetailSkeleton } from '@/features/evidence/DetailSkeleton'
 import { DetectionsTable } from '@/features/evidence/DetectionsTable'
 import { EvidenceMetrics } from '@/features/evidence/EvidenceMetrics'
 import { EvidenceViewer } from '@/features/evidence/EvidenceViewer'
 import { DEFAULT_EVIDENCE_MODE, type EvidenceMode } from '@/features/evidence/modes'
-import { ExtentCard, ModelQualityCard, ProvenanceCard } from '@/features/evidence/ObservationFacts'
+import {
+  ExtentSection,
+  ModelQualitySection,
+  ProvenanceSection,
+} from '@/features/evidence/ObservationFacts'
 import { ObservationHeader } from '@/features/evidence/ObservationHeader'
+import { ExportMenu } from '@/features/export/ExportMenu'
 import { TraceabilityStrip } from '@/features/evidence/TraceabilityStrip'
 import { isMockMode } from '@/features/observations/api'
 import { ObservationNotices } from '@/features/observations/components/ObservationNotices'
@@ -87,16 +94,18 @@ function ObservationDetail({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <ObservationHeader
-        observation={observation}
-        exportSource={{
-          observation,
-          detections: observation.detections,
-          analysis,
-          filters: null,
-        }}
+    <div className="flex flex-col gap-8">
+      <ContextLine
+        region={observation.region}
+        glyph={<ObservationGlyph observation={observation} size={16} />}
+        action={
+          <ExportMenu
+            size="sm"
+            source={{ observation, detections: observation.detections, analysis, filters: null }}
+          />
+        }
       />
+      <ObservationHeader observation={observation} />
       <ObservationNotices observation={observation} partialData={partialData} />
 
       <div ref={viewerRef} className="scroll-mt-20">
@@ -127,8 +136,8 @@ function ObservationDetail({
         <EvidenceMetrics observation={observation} hotspotCount={analysis.hotspots.length} />
       </ErrorBoundary>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="flex min-w-0 flex-col gap-6">
+      <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-6">
+        <div className="flex min-w-0 flex-col gap-12">
           <ErrorBoundary label="The density summary">
             <DensitySummary
               observation={observation}
@@ -146,26 +155,28 @@ function ObservationDetail({
               />
             </ErrorBoundary>
           ) : (
-            <Card title="Detections" headingLevel={2}>
-              <p className="text-small text-ink-muted">
+            <section aria-labelledby="detections-title" className="flex flex-col gap-4">
+              <SectionLabel id="detections-title">Detections</SectionLabel>
+              <p className="text-body text-ink-2">
                 The model checked the whole image and outlined no debris, so there is nothing to
                 list.
               </p>
-            </Card>
+            </section>
           )}
         </div>
-        <div className="flex min-w-0 flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-12">
           <ErrorBoundary label="The geographic extent">
-            <ExtentCard observation={observation} analysis={analysis} />
+            <ExtentSection observation={observation} analysis={analysis} />
           </ErrorBoundary>
           <ErrorBoundary label="Provenance">
-            <ProvenanceCard observation={observation} />
+            <ProvenanceSection observation={observation} />
           </ErrorBoundary>
           <ErrorBoundary label="Model quality">
-            <ModelQualityCard observation={observation} />
+            <ModelQualitySection observation={observation} />
           </ErrorBoundary>
         </div>
       </div>
+      <NextStep page="detail" observationId={observation.id} />
     </div>
   )
 }
@@ -173,10 +184,11 @@ function ObservationDetail({
 /** Failed, queued or still processing: the header, what is going on, and provenance if any. */
 function ObservationWithoutResult({ observation }: { observation: Observation }) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
+      <ContextLine region={observation.region} />
       <ObservationHeader observation={observation} actions={false} />
       <ObservationStatusState observation={observation} />
-      {observation.status === 'failed' ? <ProvenanceCard observation={observation} /> : null}
+      {observation.status === 'failed' ? <ProvenanceSection observation={observation} /> : null}
     </div>
   )
 }
@@ -212,5 +224,5 @@ export function ObservationDetailPage() {
     body = <DetailSkeleton />
   }
 
-  return <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-8">{body}</div>
+  return <div className="mx-auto w-full max-w-page px-4 pt-2 pb-12 sm:px-6 lg:px-8">{body}</div>
 }

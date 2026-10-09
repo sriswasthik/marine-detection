@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { AppProviders } from '@/app/providers'
-import { routes } from '@/app/router'
+import { routes } from '@/test/routes'
 import { networkError } from '@/features/observations/api/errors'
 import { createMockApi } from '@/features/observations/api/mockApi'
 import type { ObservationsApi } from '@/features/observations/api/types'
@@ -43,9 +43,8 @@ async function kpiValues() {
     { timeout: 5000 },
   )
   const read = (label: string) => {
-    const card = within(section).getByText(label).closest('div.rounded-card')
-    if (!card) throw new Error(`No card for ${label}`)
-    return card.textContent ?? ''
+    // Each figure is a group named by its label.
+    return within(section).getByRole('group', { name: label }).textContent ?? ''
   }
   return {
     area: read('Debris area'),
@@ -84,7 +83,7 @@ describe('Overview page', { timeout: 15_000 }, () => {
       screen.getByRole('link', { name: `Open the map for ${observation.region}` }),
     ).toHaveAttribute('href', `/map/${SAMPLE_IDS.ennore}`)
 
-    const recent = screen.getByRole('region', { name: 'Recent observations' })
+    const recent = screen.getByRole('region', { name: /^Recent observations/ })
     expect(within(recent).getAllByRole('listitem')).toHaveLength(5)
     expect(within(recent).getByRole('link', { name: 'View all' })).toHaveAttribute(
       'href',
@@ -126,11 +125,13 @@ describe('Overview page', { timeout: 15_000 }, () => {
     }
     renderOverview(api)
     expect(await screen.findByRole('heading', { name: 'No observations yet' })).toBeInTheDocument()
+    // The top bar carries "Analyze new imagery"; the page offers a sample scene as the way in.
+    expect(screen.getAllByRole('link', { name: 'Analyze new imagery' })[0]).toHaveAttribute(
+      'href',
+      '/analyze',
+    )
     const main = screen.getByRole('main')
-    expect(
-      within(main).getAllByRole('link', { name: /Analyze new imagery/ }).length,
-    ).toBeGreaterThan(0)
-    expect(screen.getByRole('link', { name: 'Load a sample scene' })).toHaveAttribute(
+    expect(within(main).getByRole('link', { name: 'Load a sample scene' })).toHaveAttribute(
       'href',
       '/analyze?sample=1',
     )
@@ -164,6 +165,6 @@ describe('Overview page', { timeout: 15_000 }, () => {
         <RouterProvider router={createMemoryRouter(routes, { initialEntries: ['/'] })} />
       </AppProviders>,
     )
-    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(10)
+    expect(container.querySelectorAll('.skeleton-pulse').length).toBeGreaterThan(10)
   })
 })

@@ -1,7 +1,7 @@
 import { Upload } from 'lucide-react'
 import { useId, useRef, useState, type DragEvent, type KeyboardEvent } from 'react'
 import { cn } from '@/lib/cn'
-import { ACCEPTED_EXTENSIONS, ACCEPTED_TYPES, MAX_UPLOAD_MB } from '@/lib/config'
+import { ACCEPTED_EXTENSIONS, ACCEPTED_TYPES, MAX_UPLOAD_MB, MODEL_INPUT } from '@/lib/config'
 
 const ACCEPT = [...Object.keys(ACCEPTED_TYPES), ...ACCEPTED_EXTENSIONS].join(',')
 
@@ -40,48 +40,49 @@ export function UploadDropzone({
   }
 
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      aria-describedby={helpId}
-      onClick={browse}
-      onKeyDown={onKeyDown}
-      onDragOver={(event) => {
-        event.preventDefault()
-        setDragging(true)
-      }}
-      onDragLeave={() => setDragging(false)}
-      onDrop={onDrop}
-      className={cn(
-        'flex min-h-72 cursor-pointer flex-col items-center justify-center gap-4 rounded-card border border-dashed px-6 py-10 text-center',
-        'transition-colors duration-150 ease-out',
-        dragging
-          ? 'border-accent bg-accent-soft'
-          : 'border-border-strong bg-surface hover:border-ink-muted hover:bg-bg',
-        className,
-      )}
-    >
-      <span
-        aria-hidden
+    <>
+      <div
+        role="button"
+        tabIndex={0}
+        aria-describedby={helpId}
+        onClick={browse}
+        onKeyDown={onKeyDown}
+        onDragOver={(event) => {
+          event.preventDefault()
+          setDragging(true)
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={onDrop}
         className={cn(
-          'flex size-11 items-center justify-center rounded-full border bg-surface',
-          dragging ? 'border-accent text-accent' : 'border-border text-ink-muted',
+          'flex min-h-72 cursor-pointer flex-col items-center justify-center gap-4 border border-dashed px-6 py-10 text-center',
+          'transition-colors duration-[120ms] ease-out',
+          dragging ? 'border-accent-ink bg-accent-wash' : 'border-rule bg-sheet hover:border-ink',
+          className,
         )}
       >
-        <Upload className="size-5" strokeWidth={1.75} />
-      </span>
-      <div className="flex flex-col gap-1">
-        <p className="text-heading text-ink">
-          {dragging ? 'Drop the image to use it' : 'Drop an image here, or browse'}
-        </p>
-        <p id={helpId} className="max-w-sm text-small text-ink-muted">
-          GeoTIFF with embedded georeferencing is best. PNG/JPG needs the geographic bounds entered
-          below.
+        <span
+          aria-hidden
+          className={cn(
+            'flex size-12 items-center justify-center border bg-paper',
+            dragging ? 'border-accent-ink text-accent-ink' : 'border-hairline text-ink-2',
+          )}
+        >
+          <Upload className="size-5" strokeWidth={1.75} />
+        </span>
+        <div className="flex flex-col gap-1">
+          <p className="text-lead font-medium text-ink">
+            {dragging ? 'Drop the image to use it' : 'Drop an image here, or browse'}
+          </p>
+          <p id={helpId} className="max-w-sm text-small text-ink-2">
+            An {MODEL_INPUT.bands}-band Sentinel-2 GeoTIFF, such as a MARIDA patch. PNG, JPEG and
+            drone images cannot be analysed by this model.
+          </p>
+        </div>
+        <p className="text-small text-ink-2">
+          {ACCEPTED_EXTENSIONS.join(', ')} up to {MAX_UPLOAD_MB} MB
         </p>
       </div>
-      <p className="text-caption text-ink-muted">
-        .tif, .tiff, .png, .jpg up to {MAX_UPLOAD_MB} MB
-      </p>
+      {/* Outside the button role: a control must not contain another one. */}
       <input
         ref={inputRef}
         type="file"
@@ -95,6 +96,6 @@ export function UploadDropzone({
         }}
         onClick={(event) => event.stopPropagation()}
       />
-    </div>
+    </>
   )
 }

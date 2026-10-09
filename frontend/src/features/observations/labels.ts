@@ -1,4 +1,4 @@
-import type { BadgeTone } from '@/components/ui'
+import type { TagTone } from '@/components/ui'
 import type { ObservationSource, ObservationStatus } from './types'
 
 export const SOURCE_LABELS: Readonly<Record<ObservationSource, string>> = {
@@ -14,7 +14,7 @@ export const STATUS_LABELS: Readonly<Record<ObservationStatus, string>> = {
   failed: 'Failed',
 }
 
-export const STATUS_TONES: Readonly<Record<ObservationStatus, BadgeTone>> = {
+export const STATUS_TONES: Readonly<Record<ObservationStatus, TagTone>> = {
   queued: 'neutral',
   processing: 'accent',
   completed: 'success',

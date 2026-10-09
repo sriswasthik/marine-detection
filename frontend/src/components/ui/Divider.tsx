@@ -14,18 +14,18 @@ export function Divider({ orientation = 'horizontal', label, className }: Divide
       <span
         role="separator"
         aria-orientation="vertical"
-        className={cn('w-px self-stretch bg-border', className)}
+        className={cn('w-px self-stretch bg-hairline', className)}
       />
     )
   }
   if (label) {
     return (
       <div role="separator" className={cn('flex items-center gap-3', className)}>
-        <span className="h-px flex-1 bg-border" />
-        <span className="text-caption font-medium text-ink-muted">{label}</span>
-        <span className="h-px flex-1 bg-border" />
+        <span className="h-px flex-1 bg-hairline" />
+        <span className="text-small font-medium text-ink-2">{label}</span>
+        <span className="h-px flex-1 bg-hairline" />
       </div>
     )
   }
-  return <hr className={cn('h-px border-0 bg-border', className)} />
+  return <hr className={cn('h-px border-0 bg-hairline', className)} />
 }

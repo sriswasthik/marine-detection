@@ -2,7 +2,7 @@
  * Every error the app can show, in plain words: what went wrong and what to do next.
  * This is the only place error copy lives. Keep titles short; messages always end with a next step.
  */
-import { MAX_UPLOAD_MB } from '@/lib/config'
+import { MAX_UPLOAD_MB, MODEL_INPUT } from '@/lib/config'
 
 export const APP_ERROR_CODES = [
   'OFFLINE',
@@ -76,12 +76,12 @@ export const ERROR_COPY: Readonly<Record<AppErrorCode, ErrorCopy>> = {
   },
   UNSUPPORTED_FILE: {
     title: 'This file type is not supported',
-    message: 'Upload a GeoTIFF, PNG or JPEG image instead.',
+    message: `Upload an ${MODEL_INPUT.bands}-band Sentinel-2 GeoTIFF (.tif) instead. PNG and JPEG images do not carry the bands the model needs.`,
     recoverable: false,
   },
   INVALID_IMAGE: {
     title: "This image can't be analysed",
-    message: `The file could not be read as an image with location data. Upload a GeoTIFF, PNG or JPEG under ${MAX_UPLOAD_MB} MB, or add the image bounds manually.`,
+    message: `The file could not be read as an ${MODEL_INPUT.bands}-band Sentinel-2 GeoTIFF with location data. Upload one under ${MAX_UPLOAD_MB} MB, or add the image bounds manually.`,
     recoverable: false,
   },
   BAD_REQUEST: {

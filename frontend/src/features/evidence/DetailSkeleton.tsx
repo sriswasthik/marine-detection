@@ -1,38 +1,35 @@
 import {
   PageSkeleton,
   Skeleton,
-  SkeletonCard,
+  SkeletonFigures,
   SkeletonMap,
-  SkeletonMetricCards,
   SkeletonPageHeader,
+  SkeletonSection,
   SkeletonTable,
 } from '@/components/ui'
+import { KPI_CELL_3, KPI_ROW_3 } from '@/features/overview/kpiLayout'
 
 /** The detail page's own shape, so nothing jumps when the observation arrives. */
 export function DetailSkeleton() {
   return (
-    <PageSkeleton label="Loading observation" className="flex flex-col gap-6">
-      <SkeletonPageHeader breadcrumb />
-      <Skeleton className="h-8 w-96 max-w-full" />
-      <SkeletonMap className="h-[380px] w-full rounded-card border border-border md:h-[520px]" />
-      <div className="flex gap-3">
-        <Skeleton className="h-28 flex-1" />
-        <Skeleton className="h-28 flex-1" />
-        <Skeleton className="h-28 flex-1" />
-      </div>
-      <SkeletonMetricCards count={6} className="grid grid-cols-2 gap-3 lg:grid-cols-3" />
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="flex flex-col gap-6">
-          <SkeletonCard lines={4} />
-          <SkeletonCard>
+    <PageSkeleton label="Loading observation" className="flex flex-col gap-8">
+      <Skeleton className="mt-4 h-4 w-64 max-w-full" />
+      <SkeletonPageHeader />
+      <SkeletonMap className="h-[380px] w-full border border-rule md:h-[520px]" />
+      <Skeleton className="h-28 w-full" />
+      <SkeletonFigures count={6} className={KPI_ROW_3} itemClassName={KPI_CELL_3} />
+      <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-6">
+        <div className="flex flex-col gap-12">
+          <SkeletonSection lines={4} />
+          <SkeletonSection>
             <SkeletonTable rows={8} />
-          </SkeletonCard>
+          </SkeletonSection>
         </div>
-        <div className="flex flex-col gap-6">
-          <SkeletonCard>
-            <SkeletonMap controls={false} className="h-40 rounded-card" />
-          </SkeletonCard>
-          <SkeletonCard lines={6} />
+        <div className="flex flex-col gap-12">
+          <SkeletonSection>
+            <SkeletonMap controls={false} className="h-40" />
+          </SkeletonSection>
+          <SkeletonSection lines={6} />
         </div>
       </div>
     </PageSkeleton>

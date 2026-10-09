@@ -1,3 +1,4 @@
+import { MAX_UPLOAD_MB, MODEL_INPUT } from '@/lib/config'
 import type { JobError, JobStatus, JobStep } from '../api/types'
 import type { MockScenario } from './scenario'
 
@@ -42,8 +43,7 @@ export const MOCK_FAILURES: Readonly<
     step: 'upload',
     error: {
       code: 'INVALID_IMAGE',
-      message:
-        'The file could not be read as an image with location data. Upload a GeoTIFF, PNG or JPEG under 100 MB, or add the image bounds manually.',
+      message: `The file could not be read as an ${MODEL_INPUT.bands}-band Sentinel-2 GeoTIFF with location data. Upload one under ${MAX_UPLOAD_MB} MB, or add the image bounds manually.`,
       recoverable: true,
     },
   },

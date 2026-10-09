@@ -55,10 +55,6 @@ export function setDisplayPreferences(next: DisplayPreferences): void {
   displayPreferences = next
 }
 
-export function getDisplayPreferences(): DisplayPreferences {
-  return displayPreferences
-}
-
 const M2_PER_HA = 10_000
 const M2_PER_KM2 = 1_000_000
 

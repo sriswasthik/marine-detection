@@ -13,7 +13,7 @@ export interface SwitchProps {
   id?: string
 }
 
-/** On/off setting that applies immediately. */
+/** On/off setting that applies immediately. A squared track with a square thumb. */
 export function Switch({
   label,
   description,
@@ -28,29 +28,32 @@ export function Switch({
   const switchId = id ?? generated
   const descriptionId = description ? `${switchId}-description` : undefined
 
+  // Centred on the label's first 20px line.
   const control = (
-    <button
-      id={switchId}
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-describedby={descriptionId}
-      disabled={disabled}
-      onClick={() => onCheckedChange(!checked)}
-      className={cn(
-        'relative mt-0.5 inline-flex h-[18px] w-8 shrink-0 cursor-pointer items-center rounded-full',
-        'transition-colors duration-150 ease-out disabled:cursor-not-allowed disabled:opacity-50',
-        checked ? 'bg-accent' : 'bg-border-strong',
-      )}
-    >
-      <span
-        aria-hidden
+    <span className="flex h-5 shrink-0 items-center">
+      <button
+        id={switchId}
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        aria-describedby={descriptionId}
+        disabled={disabled}
+        onClick={() => onCheckedChange(!checked)}
         className={cn(
-          'absolute top-[2px] left-[2px] size-[14px] rounded-full bg-surface shadow-subtle transition-transform duration-150 ease-out',
-          checked && 'translate-x-[14px]',
+          'hit-area relative inline-flex h-4 w-7 shrink-0 cursor-pointer items-center rounded-tag border',
+          'transition-colors duration-[120ms] ease-out disabled:cursor-not-allowed disabled:opacity-50',
+          checked ? 'border-ink bg-ink' : 'border-rule bg-hairline',
         )}
-      />
-    </button>
+      >
+        <span
+          aria-hidden
+          className={cn(
+            'absolute top-px left-px size-3 rounded-[1px] bg-white transition-transform duration-[120ms] ease-out',
+            checked ? 'translate-x-3' : 'border border-rule',
+          )}
+        />
+      </button>
+    </span>
   )
 
   const text = (
@@ -59,13 +62,13 @@ export function Switch({
         htmlFor={switchId}
         className={cn(
           'text-body text-ink',
-          disabled ? 'cursor-not-allowed text-ink-muted' : 'cursor-pointer',
+          disabled ? 'cursor-not-allowed text-ink-2' : 'cursor-pointer',
         )}
       >
         {label}
       </label>
       {description ? (
-        <span id={descriptionId} className="text-caption text-ink-muted">
+        <span id={descriptionId} className="text-small text-ink-2">
           {description}
         </span>
       ) : null}
@@ -73,7 +76,7 @@ export function Switch({
   )
 
   return (
-    <div className={cn('flex items-start gap-2.5', className)}>
+    <div className={cn('flex items-start gap-3', className)}>
       {labelPosition === 'end' ? control : text}
       {labelPosition === 'end' ? text : control}
     </div>

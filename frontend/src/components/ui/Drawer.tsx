@@ -5,6 +5,7 @@ import {
   useEffectEvent,
   useId,
   useRef,
+  useState,
   type KeyboardEvent,
   type ReactNode,
   type RefObject,
@@ -29,12 +30,14 @@ export interface DrawerProps {
   className?: string
 }
 
-const EASE = [0.16, 1, 0.3, 1] as const
+/** The one easing curve (tokens.css --ease-out). */
+const EASE = [0.2, 0.7, 0.2, 1] as const
 
 /**
  * Right-side panel that becomes a bottom sheet under 768px. No dimming backdrop, so the map
- * stays visible. Focus moves in on open, Tab stays inside, Escape closes, and focus returns
- * to the element that opened it.
+ * stays visible. The sheet opens at half height (lib/map/occlusion.ts SHEET_PEEK_FRACTION) and
+ * its handle expands it. Focus moves in on open, Tab stays inside, Escape closes, and focus
+ * returns to the element that opened it.
  */
 export function Drawer({
   open,
@@ -52,6 +55,13 @@ export function Drawer({
   const titleId = useId()
   const descriptionId = useId()
   const requestClose = useEffectEvent(() => onClose())
+  const [expanded, setExpanded] = useState(false)
+  // Every opening starts at half height, so the map above stays in view.
+  const [openedFor, setOpenedFor] = useState(open)
+  if (open !== openedFor) {
+    setOpenedFor(open)
+    if (open) setExpanded(false)
+  }
 
   // Move focus in on open; give it back on close.
   useEffect(() => {
@@ -96,7 +106,7 @@ export function Drawer({
     }
   }
 
-  const offset = isDesktop ? { x: 24, y: 0 } : { x: 0, y: 32 }
+  const offset = isDesktop ? { x: 16, y: 0 } : { x: 0, y: 16 }
 
   return createPortal(
     <AnimatePresence>
@@ -113,33 +123,41 @@ export function Drawer({
           initial={{ opacity: 0, ...offset }}
           animate={{ opacity: 1, x: 0, y: 0 }}
           exit={{ opacity: 0, ...offset }}
-          transition={{ duration: 0.18, ease: EASE }}
+          transition={{ duration: 0.2, ease: EASE }}
           className={cn(
-            'fixed z-50 flex flex-col bg-surface shadow-popover focus:outline-none',
+            'fixed z-50 flex flex-col rounded-none bg-white shadow-popover focus:outline-none',
             isDesktop
               ? cn(
-                  'right-0 bottom-0 w-drawer max-w-full border-l border-border',
+                  'right-0 bottom-0 w-drawer max-w-full border-l border-hairline',
                   placement === 'below-topbar'
                     ? 'top-[calc(var(--spacing-topbar)+var(--offline-bar-height,0px))]'
                     : 'top-0',
                 )
-              : 'inset-x-0 bottom-0 max-h-[85dvh] rounded-t-card border-t border-border',
+              : cn(
+                  'inset-x-0 bottom-0 border-t border-hairline',
+                  expanded ? 'max-h-[85dvh]' : 'max-h-[50dvh]',
+                ),
             className,
           )}
         >
           {isDesktop ? null : (
-            <span
-              aria-hidden
-              className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-border-strong"
-            />
+            <button
+              type="button"
+              aria-expanded={expanded}
+              aria-label={expanded ? 'Show less of the panel' : 'Show more of the panel'}
+              onClick={() => setExpanded((value) => !value)}
+              className="group mx-auto flex h-6 w-16 shrink-0 items-center justify-center"
+            >
+              <span aria-hidden className="h-1 w-8 bg-rule group-hover:bg-ink-2" />
+            </button>
           )}
-          <header className="flex shrink-0 items-start gap-3 border-b border-border px-4 py-3">
+          <div className="flex shrink-0 items-start gap-3 border-b border-hairline px-6 py-4">
             <div className="min-w-0 flex-1">
-              <h2 id={titleId} className="text-heading text-ink">
+              <h2 id={titleId} className="text-title text-ink">
                 {title}
               </h2>
               {description ? (
-                <p id={descriptionId} className="mt-0.5 text-small text-ink-muted">
+                <p id={descriptionId} className="mt-1 text-small text-ink-2">
                   {description}
                 </p>
               ) : null}
@@ -151,10 +169,10 @@ export function Drawer({
               onClick={onClose}
               tooltip={false}
             />
-          </header>
-          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">{children}</div>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6">{children}</div>
           {footer ? (
-            <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-border px-4 py-3">
+            <footer className="flex shrink-0 items-center justify-end gap-2 border-t border-hairline px-6 py-3">
               {footer}
             </footer>
           ) : null}

@@ -1,0 +1,361 @@
+{
+  "1440x900": {
+    "viewport": "1440x900",
+    "boxCount": 6,
+    "boxes": [
+      {
+        "label": "Observation: Ennore coast3 Oct 2026Min conf.0%Lo",
+        "x": 0,
+        "y": 53,
+        "width": 1440,
+        "height": 48
+      },
+      {
+        "label": "Map panel",
+        "x": 0,
+        "y": 101,
+        "width": 288,
+        "height": 799
+      },
+      {
+        "label": "Map view",
+        "x": 1030,
+        "y": 117,
+        "width": 34,
+        "height": 133
+      },
+      {
+        "label": "Map legend",
+        "x": 304,
+        "y": 824,
+        "width": 295,
+        "height": 32
+      },
+      {
+        "label": "500 mMap centre: 13.22000° N, 80.36800° ELightTi",
+        "x": 288,
+        "y": 872,
+        "width": 792,
+        "height": 28
+      },
+      {
+        "label": "Hotspot 1CriticalEnnore coastPriority for inspec",
+        "x": 1080,
+        "y": 101,
+        "width": 360,
+        "height": 799
+      }
+    ],
+    "intersections": [],
+    "attribution": null,
+    "textSizes": [
+      "13px"
+    ]
+  },
+  "1440x900-idle": {
+    "viewport": "1440x900",
+    "boxCount": 5,
+    "boxes": [
+      {
+        "label": "Observation: Ennore coast3 Oct 2026Min conf.0%Lo",
+        "x": 0,
+        "y": 53,
+        "width": 1440,
+        "height": 48
+      },
+      {
+        "label": "Map panel",
+        "x": 0,
+        "y": 101,
+        "width": 288,
+        "height": 799
+      },
+      {
+        "label": "Map view",
+        "x": 1390,
+        "y": 117,
+        "width": 34,
+        "height": 133
+      },
+      {
+        "label": "Map legend",
+        "x": 304,
+        "y": 824,
+        "width": 295,
+        "height": 32
+      },
+      {
+        "label": "500 mMap centre: 13.21998° N, 80.36799° ELightTi",
+        "x": 288,
+        "y": 872,
+        "width": 1152,
+        "height": 28
+      }
+    ],
+    "intersections": [],
+    "attribution": null,
+    "textSizes": [
+      "13px"
+    ]
+  },
+  "1280x720": {
+    "viewport": "1280x720",
+    "boxCount": 6,
+    "boxes": [
+      {
+        "label": "Observation: Ennore coast3 Oct 2026Min conf.0%Lo",
+        "x": 0,
+        "y": 53,
+        "width": 1280,
+        "height": 48
+      },
+      {
+        "label": "Map panel",
+        "x": 0,
+        "y": 101,
+        "width": 288,
+        "height": 619
+      },
+      {
+        "label": "Map view",
+        "x": 870,
+        "y": 117,
+        "width": 34,
+        "height": 133
+      },
+      {
+        "label": "Map legend",
+        "x": 304,
+        "y": 644,
+        "width": 295,
+        "height": 32
+      },
+      {
+        "label": "1 kmMap centre: 13.22000° N, 80.36800° ELightTil",
+        "x": 288,
+        "y": 692,
+        "width": 632,
+        "height": 28
+      },
+      {
+        "label": "Hotspot 1CriticalEnnore coastPriority for inspec",
+        "x": 920,
+        "y": 101,
+        "width": 360,
+        "height": 619
+      }
+    ],
+    "intersections": [],
+    "attribution": null,
+    "textSizes": [
+      "13px"
+    ]
+  },
+  "1280x720-idle": {
+    "viewport": "1280x720",
+    "boxCount": 5,
+    "boxes": [
+      {
+        "label": "Observation: Ennore coast3 Oct 2026Min conf.0%Lo",
+        "x": 0,
+        "y": 53,
+        "width": 1280,
+        "height": 48
+      },
+      {
+        "label": "Map panel",
+        "x": 0,
+        "y": 101,
+        "width": 288,
+        "height": 619
+      },
+      {
+        "label": "Map view",
+        "x": 1230,
+        "y": 117,
+        "width": 34,
+        "height": 133
+      },
+      {
+        "label": "Map legend",
+        "x": 304,
+        "y": 644,
+        "width": 295,
+        "height": 32
+      },
+      {
+        "label": "500 mMap centre: 13.22002° N, 80.36799° ELightTi",
+        "x": 288,
+        "y": 692,
+        "width": 992,
+        "height": 28
+      }
+    ],
+    "intersections": [],
+    "attribution": null,
+    "textSizes": [
+      "13px"
+    ]
+  },
+  "1024x768": {
+    "viewport": "1024x768",
+    "boxCount": 5,
+    "boxes": [
+      {
+        "label": "Inspect next and layersObservation: Ennore coast",
+        "x": 0,
+        "y": 53,
+        "width": 1024,
+        "height": 48
+      },
+      {
+        "label": "Map view",
+        "x": 614,
+        "y": 117,
+        "width": 34,
+        "height": 133
+      },
+      {
+        "label": "Map legend",
+        "x": 16,
+        "y": 692,
+        "width": 295,
+        "height": 32
+      },
+      {
+        "label": "500 mMap centre: 13.22000° N, 80.36800° ELightTi",
+        "x": 0,
+        "y": 740,
+        "width": 664,
+        "height": 28
+      },
+      {
+        "label": "Hotspot 1CriticalEnnore coastPriority for inspec",
+        "x": 664,
+        "y": 101,
+        "width": 360,
+        "height": 667
+      }
+    ],
+    "intersections": [],
+    "attribution": null,
+    "textSizes": [
+      "13px"
+    ]
+  },
+  "1024x768-idle": {
+    "viewport": "1024x768",
+    "boxCount": 4,
+    "boxes": [
+      {
+        "label": "Inspect next and layersObservation: Ennore coast",
+        "x": 0,
+        "y": 53,
+        "width": 1024,
+        "height": 48
+      },
+      {
+        "label": "Map view",
+        "x": 974,
+        "y": 117,
+        "width": 34,
+        "height": 133
+      },
+      {
+        "label": "Map legend",
+        "x": 16,
+        "y": 692,
+        "width": 295,
+        "height": 32
+      },
+      {
+        "label": "500 mMap centre: 13.22002° N, 80.36799° ELightTi",
+        "x": 0,
+        "y": 740,
+        "width": 1024,
+        "height": 28
+      }
+    ],
+    "intersections": [],
+    "attribution": null,
+    "textSizes": [
+      "13px"
+    ]
+  },
+  "390x844": {
+    "viewport": "390x844",
+    "boxCount": 4,
+    "boxes": [
+      {
+        "label": "Inspect next and layersObservation: Ennore coast",
+        "x": 0,
+        "y": 53,
+        "width": 390,
+        "height": 48
+      },
+      {
+        "label": "Map view",
+        "x": 332,
+        "y": 117,
+        "width": 42,
+        "height": 165
+      },
+      {
+        "label": "2 kmMap centre: 13.22000° N, 80.36800° E61 detec",
+        "x": 0,
+        "y": 380,
+        "width": 390,
+        "height": 28
+      },
+      {
+        "label": "Hotspot 1CriticalEnnore coastPriority for inspec",
+        "x": 0,
+        "y": 408,
+        "width": 390,
+        "height": 380
+      }
+    ],
+    "intersections": [],
+    "attribution": null,
+    "textSizes": []
+  },
+  "390x844-idle": {
+    "viewport": "390x844",
+    "boxCount": 4,
+    "boxes": [
+      {
+        "label": "Inspect next and layersObservation: Ennore coast",
+        "x": 0,
+        "y": 53,
+        "width": 390,
+        "height": 48
+      },
+      {
+        "label": "Map view",
+        "x": 332,
+        "y": 117,
+        "width": 42,
+        "height": 165
+      },
+      {
+        "label": "Map legend",
+        "x": 16,
+        "y": 704,
+        "width": 307,
+        "height": 40
+      },
+      {
+        "label": "1 kmMap centre: 13.21995° N, 80.36808° E61 detec",
+        "x": 0,
+        "y": 760,
+        "width": 390,
+        "height": 28
+      }
+    ],
+    "intersections": [],
+    "attribution": null,
+    "textSizes": [
+      "13px"
+    ]
+  }
+}

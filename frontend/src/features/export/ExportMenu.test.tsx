@@ -103,6 +103,17 @@ describe('ExportMenu', () => {
     ).toBeInTheDocument()
   })
 
+  it('saves a file once when it is chosen twice in quick succession', async () => {
+    Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:test'), revokeObjectURL: vi.fn() })
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined)
+    const { user } = renderMenu(full)
+    for (let i = 0; i < 2; i++) {
+      await user.click(screen.getByRole('button', { name: 'Export' }))
+      await user.click(screen.getByRole('menuitem', { name: /Detections table \(CSV\)/ }))
+    }
+    expect(click).toHaveBeenCalledOnce()
+  })
+
   it('explains a failed export', async () => {
     Object.assign(URL, {
       createObjectURL: () => {

@@ -23,25 +23,28 @@ function token(name: string): string {
 
 /** [text, background, where it is used]. Every pair must reach AA for normal text. */
 const TEXT_PAIRS: readonly (readonly [string, string, string])[] = [
-  ['ink', 'bg', 'body text on the page'],
-  ['ink', 'surface', 'body text on cards and panels'],
-  ['ink-muted', 'bg', 'secondary text on the page'],
-  ['ink-muted', 'surface', 'secondary text on cards'],
-  ['accent', 'surface', 'links and accent text'],
-  ['accent', 'bg', 'links on the page'],
+  ['ink', 'paper', 'Graphite body text on Concrete'],
+  ['ink', 'sheet', 'body text on docked panels and map plates'],
+  ['ink', 'white', 'text in inputs, the drawer and dialogs'],
+  ['tar', 'paper', 'the wordmark'],
+  ['ink-2', 'paper', 'Slate Grey secondary and small text on the page'],
+  ['ink-2', 'sheet', 'secondary text on panels and tooltips'],
+  ['ink-2', 'white', 'secondary text in the drawer and dialogs'],
+  ['accent-ink', 'paper', 'Olive Ink links and tertiary actions'],
+  ['accent-ink', 'white', 'links in the drawer and dialogs'],
+  ['accent-ink', 'accent-wash', 'selected segment and accent tag'],
+  ['ink', 'accent-wash', 'selected ledger row'],
   ['white', 'accent', 'primary button label'],
   ['white', 'accent-hover', 'primary button label on hover'],
-  ['accent', 'accent-soft', 'accent badge'],
-  ['success', 'surface', 'success text'],
-  ['success', 'success-soft', 'success badge'],
-  ['warning', 'surface', 'warning text'],
-  ['warning', 'warning-soft', 'warning badge and banner icon'],
-  ['danger', 'surface', 'danger text and quiet danger button'],
-  ['danger', 'danger-soft', 'danger badge'],
-  ['ink', 'warning-soft', 'low confidence badge text'],
-  ['ink', 'info-soft', 'info banner text'],
-  ['ink', 'danger-soft', 'danger banner text'],
-  ...DENSITY_LEVEL_IDS.map((level) => ['ink', `${level}-soft`, `${level} severity badge`] as const),
+  ['white', 'ink', 'done step and checked box'],
+  ['success', 'paper', 'success text and saved notes'],
+  ['warning', 'paper', 'warning text'],
+  ['danger', 'paper', 'danger text and quiet danger button'],
+  ['danger', 'danger-soft', 'quiet danger button on hover'],
+  ['ink', 'success-soft', 'success tag'],
+  ['ink', 'warning-soft', 'warning tag and low confidence tag'],
+  ['ink', 'danger-soft', 'danger tag'],
+  ...DENSITY_LEVEL_IDS.map((level) => ['ink', `${level}-soft`, `${level} severity tag`] as const),
 ]
 
 describe('design token contrast', () => {
@@ -54,5 +57,43 @@ describe('design token contrast', () => {
     expect(ratio, `${text} on ${background} is ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(
       AA_TEXT,
     )
+  })
+
+  it('keeps ink-3 for large or decorative text only: it fails small text on Concrete', () => {
+    const ratio = contrastRatio(token('ink-3'), token('paper'))
+    expect(ratio).toBeLessThan(AA_TEXT)
+    expect(ratio).toBeGreaterThanOrEqual(3)
+  })
+
+  it('keeps Signal Yellow out of the interface: it is the logomark colour only', () => {
+    // 1.3:1 on Concrete, and next to the Low severity fill: never an action, text or line.
+    expect(contrastRatio(token('signal'), token('paper'))).toBeLessThan(3)
+    expect(token('accent')).not.toBe(token('signal'))
+    expect(token('accent-wash')).not.toBe(token('low-soft'))
+  })
+
+  it('uses the deck palette', () => {
+    expect(token('paper')).toBe('#e7e4dc')
+    expect(token('tar')).toBe('#15171a')
+    expect(token('ink')).toBe('#3a3b3d')
+    expect(token('ink-2')).toBe('#5a5a55')
+    expect(token('accent')).toBe('#15171a')
+    expect(token('signal')).toBe('#f4c51d')
+    expect(token('accent-ink')).toBe('#3b3420')
+  })
+
+  it('matches the measured values in docs/DESIGN_SYSTEM.md', () => {
+    const on = (text: string, background: string) =>
+      Math.round(contrastRatio(token(text), token(background)) * 100) / 100
+    expect(on('ink', 'paper')).toBeCloseTo(8.83, 1)
+    expect(on('ink-2', 'paper')).toBeCloseTo(5.46, 1)
+    expect(on('accent-ink', 'paper')).toBeCloseTo(9.73, 1)
+    expect(on('white', 'accent')).toBeCloseTo(17.96, 1)
+  })
+
+  it('has no old token names left', () => {
+    for (const old of ['bg', 'surface', 'border', 'border-strong', 'ink-muted', 'accent-soft']) {
+      expect(tokens.has(old), `--color-${old}`).toBe(false)
+    }
   })
 })

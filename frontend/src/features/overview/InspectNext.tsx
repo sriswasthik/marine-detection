@@ -1,7 +1,7 @@
 import { ChevronRight, CircleCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { SeverityBadge } from '@/components/ui'
-import { RankDot } from '@/features/map/monitoring/InspectionPriority'
+import { SectionLabel, SeverityTag } from '@/components/ui'
+import { RankDot } from '@/features/map/monitoring/InspectNextLedger'
 import type { Observation } from '@/features/observations/types'
 import type { Hotspot } from '@/lib/hotspots'
 import { useFormat } from '@/features/settings/settingsContext'
@@ -23,48 +23,44 @@ export function InspectNext({
 
   return (
     <section aria-labelledby="inspect-next-title" className="flex flex-col gap-3">
-      <div className="flex h-8 items-center justify-between gap-3">
-        <h3 id="inspect-next-title" className="text-heading text-ink">
-          Inspect next
-        </h3>
-        <p className="text-caption text-ink-muted">Ranked by priority score</p>
-      </div>
+      <SectionLabel
+        id="inspect-next-title"
+        as="h3"
+        action={<span className="text-small text-ink-2">Ranked by priority score</span>}
+      >
+        Inspect next
+      </SectionLabel>
 
       {top.length > 0 ? (
-        <ol className="flex flex-col border-t border-border">
+        <ol className="flex flex-col border-t border-hairline">
           {top.map((hotspot) => (
-            <li key={hotspot.id} className="border-b border-border">
+            <li key={hotspot.id} className="border-b border-hairline">
               <Link
                 to={mapPath(hotspot.id)}
-                className="group flex items-center gap-3 py-3 transition-colors duration-150 ease-out hover:bg-surface md:-mx-2 md:px-2"
+                className="group flex items-center gap-3 py-3 transition-transform duration-[120ms] ease-out hover:translate-x-[2px]"
               >
                 <RankDot hotspot={hotspot} />
                 <span className="flex min-w-0 flex-1 flex-col gap-1">
                   <span className="flex items-center gap-2">
                     <span className="sr-only">Hotspot {hotspot.rank}, </span>
-                    <SeverityBadge level={hotspot.level} />
-                    <span className="num ml-auto text-small font-medium text-ink">
-                      {fmt.area(hotspot.totalAreaM2)}
-                    </span>
+                    <SeverityTag level={hotspot.level} />
+                    <span className="data ml-auto text-ink">{fmt.area(hotspot.totalAreaM2)}</span>
                   </span>
-                  <span className="mono-label truncate text-ink-muted">
+                  <span className="data truncate text-ink-2">
                     {fmt.coordinates(hotspot.centroid, { digits: 4 })}
                   </span>
                 </span>
-                <ChevronRight
-                  aria-hidden
-                  className="size-4 shrink-0 text-ink-muted transition-transform duration-150 ease-out group-hover:translate-x-0.5"
-                />
+                <ChevronRight aria-hidden className="size-4 shrink-0 text-ink-2" />
               </Link>
             </li>
           ))}
         </ol>
       ) : (
-        <div className="flex items-start gap-3 border-y border-border py-4">
-          <CircleCheck aria-hidden className="mt-0.5 size-4 shrink-0 text-success" />
+        <div className="flex items-start gap-3 border-y border-hairline py-4">
+          <CircleCheck aria-hidden className="mt-1 size-4 shrink-0 text-success" />
           <div>
             <p className="text-small font-medium text-ink">Nothing to inspect</p>
-            <p className="text-small text-ink-muted">
+            <p className="text-small text-ink-2">
               {observation.detections.length === 0
                 ? 'No debris was detected in this observation.'
                 : 'Debris here is scattered at low density. No area stands out for a visit.'}

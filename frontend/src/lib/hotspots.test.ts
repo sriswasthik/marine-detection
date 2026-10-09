@@ -74,6 +74,7 @@ function gridFromPicture(
     cols,
     cells,
     detectionLevels: {},
+    source: 'browser',
   }
   return { grid, detections }
 }

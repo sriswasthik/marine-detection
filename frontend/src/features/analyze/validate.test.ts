@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { MAX_UPLOAD_BYTES, MIN_IMAGE_PX } from '@/lib/config'
+import { MAX_UPLOAD_BYTES, MIN_IMAGE_PX, MODEL_INPUT } from '@/lib/config'
+import { previewBands } from './inspectFile'
 import {
   EMPTY_BOUNDS_INPUT,
   estimateResolutionM,
@@ -16,9 +17,10 @@ import {
 const facts = (name: string, type = '', size = 1024) => ({ name, type, size })
 
 const inspection = (patch: Partial<FileInspection> = {}): FileInspection => ({
-  kind: 'png',
+  kind: 'geotiff',
   width: 1000,
   height: 800,
+  bands: 11,
   georeferenced: false,
   embeddedBounds: null,
   epsg: null,
@@ -31,18 +33,34 @@ const inspection = (patch: Partial<FileInspection> = {}): FileInspection => ({
 const VALID_BOUNDS = { north: '13.243', south: '13.197', east: '80.396', west: '80.34' }
 
 describe('fileKind and validateFile', () => {
-  it('recognises supported extensions, case-insensitively', () => {
+  it('recognises GeoTIFF extensions, case-insensitively', () => {
     expect(fileKind(facts('scene.tif'))).toBe('geotiff')
     expect(fileKind(facts('scene.TIFF', 'image/tiff'))).toBe('geotiff')
-    expect(fileKind(facts('scene.png', 'image/png'))).toBe('png')
-    expect(fileKind(facts('scene.JPG', 'image/jpeg'))).toBe('jpeg')
-    expect(fileKind(facts('scene.jpeg'))).toBe('jpeg')
+  })
+
+  it('refuses PNG and JPEG up front, saying the model needs 11 bands', () => {
+    for (const [name, type] of [
+      ['photo.png', 'image/png'],
+      ['flight-07.JPG', 'image/jpeg'],
+      ['scene.jpeg', ''],
+    ] as const) {
+      expect(fileKind(facts(name, type))).toBeNull()
+      const [issue] = validateFile(facts(name, type))
+      expect(issue?.code).toBe('UNSUPPORTED_FORMAT')
+      expect(issue?.message).toMatch(
+        /3 colour bands\. The model needs an 11-band Sentinel-2 GeoTIFF/,
+      )
+      expect(issue?.fix).toMatch(/GeoTIFF \(\.tif\)/)
+    }
   })
 
   it('refuses other extensions and contradicting MIME types', () => {
     expect(fileKind(facts('scene.bmp', 'image/bmp'))).toBeNull()
     expect(fileKind(facts('scene'))).toBeNull()
-    expect(fileKind(facts('scene.png', 'application/pdf'))).toBeNull()
+    expect(fileKind(facts('scene.tif', 'application/pdf'))).toBeNull()
+    expect(validateFile(facts('scene.bmp'))[0]?.message).toBe(
+      '.bmp files are not supported. Supported: .tif, .tiff.',
+    )
     expect(validateFile(facts('scene.bmp'))[0]).toMatchObject({ code: 'UNSUPPORTED_FORMAT' })
     expect(validateFile(facts('scene'))[0]?.message).toMatch(/no extension/)
   })
@@ -137,6 +155,7 @@ describe('qualityChecks', () => {
     })
     expect(checks.map((c) => c.id)).toEqual([
       'format',
+      'bands',
       'dimensions',
       'georeferencing',
       'cloud',
@@ -148,9 +167,48 @@ describe('qualityChecks', () => {
     expect(status(checks, 'cloud')).toBe('pending')
   })
 
-  it('fails a PNG without bounds and says how to fix it', () => {
+  it('fails a PNG at the format check, before anything is uploaded', () => {
     const checks = qualityChecks({
       facts: facts('photo.png', 'image/png'),
+      inspection: null,
+      inspecting: false,
+      bounds: validateBounds(VALID_BOUNDS),
+    })
+    expect(checks.map((c) => c.id)).toEqual(['format'])
+    expect(status(checks, 'format')).toBe('fail')
+    expect(
+      runReadiness({
+        hasFile: true,
+        inspecting: false,
+        checks,
+        capturedAtIso: '2026-10-03T05:00:00Z',
+      }).reason,
+    ).toMatch(/^Format: Choose an 11-band Sentinel-2 GeoTIFF/)
+  })
+
+  it('passes 11 bands and fails any other count with a fix', () => {
+    const bands = (count: number | null, inspecting = false) =>
+      qualityChecks({
+        facts: facts('s2.tif', 'image/tiff'),
+        inspection: count === undefined ? null : inspection({ bands: count }),
+        inspecting,
+        bounds: validateBounds(VALID_BOUNDS),
+      }).find((c) => c.id === 'bands')
+    expect(bands(MODEL_INPUT.bands)?.status).toBe('pass')
+    for (const count of [1, 3, 4, 10, 12, 13]) {
+      const check = bands(count)
+      expect(check?.status).toBe('fail')
+      expect(check?.detail).toContain(`has ${count} band`)
+      expect(check?.fix).toMatch(/B1 to B8A, B11 and B12/)
+    }
+    expect(bands(1)?.detail).toBe('The image has 1 band. The model needs 11.')
+    expect(bands(null)?.status).toBe('warning')
+    expect(bands(null, true)?.status).toBe('pending')
+  })
+
+  it('fails a GeoTIFF without bounds and says how to fix it', () => {
+    const checks = qualityChecks({
+      facts: facts('scene.tif', 'image/tiff'),
       inspection: inspection(),
       inspecting: false,
       bounds: validateBounds(EMPTY_BOUNDS_INPUT),
@@ -163,7 +221,7 @@ describe('qualityChecks', () => {
   it('estimates resolution from typed bounds', () => {
     const bounds = validateBounds(VALID_BOUNDS)
     const checks = qualityChecks({
-      facts: facts('photo.png', 'image/png'),
+      facts: facts('scene.tif', 'image/tiff'),
       inspection: inspection({ width: 600 }),
       inspecting: false,
       bounds,
@@ -193,7 +251,7 @@ describe('qualityChecks', () => {
   it('shows dimensions as pending, unknown or too small', () => {
     const dims = (patch: Partial<FileInspection> | null, inspecting = false) =>
       qualityChecks({
-        facts: facts('p.png'),
+        facts: facts('p.tif'),
         inspection: patch === null ? null : inspection(patch),
         inspecting,
         bounds: validateBounds(VALID_BOUNDS),
@@ -220,12 +278,11 @@ describe('qualityChecks', () => {
 const VALID_BOUNDS_GEO = { north: 13.243, south: 13.197, east: 80.396, west: 80.34 }
 
 describe('runReadiness', () => {
-  const pass: QualityCheck = { id: 'format', label: 'Format', status: 'pass', detail: 'PNG' }
+  const pass: QualityCheck = { id: 'format', label: 'Format', status: 'pass', detail: 'GeoTIFF' }
   const base = {
     hasFile: true,
     inspecting: false,
     checks: [pass],
-    region: 'Ennore',
     capturedAtIso: '2026-10-03T05:00:00Z',
   }
 
@@ -250,7 +307,6 @@ describe('runReadiness', () => {
         ],
       }).reason,
     ).toBe('Georeferencing: Enter the bounds.')
-    expect(runReadiness({ ...base, region: '   ' }).reason).toBe('Enter a region name.')
     expect(runReadiness({ ...base, capturedAtIso: null }).reason).toBe(
       'Enter when the image was captured.',
     )
@@ -258,7 +314,9 @@ describe('runReadiness', () => {
       "You're offline. Reconnect to run detection.",
     )
     // Offline is reported last, so the form can be completed first.
-    expect(runReadiness({ ...base, region: '', online: false }).reason).toBe('Enter a region name.')
+    expect(runReadiness({ ...base, capturedAtIso: null, online: false }).reason).toBe(
+      'Enter when the image was captured.',
+    )
   })
 
   it('does not block on warnings or pending checks', () => {
@@ -267,5 +325,20 @@ describe('runReadiness', () => {
       { ...pass, id: 'cloud', status: 'pending' },
     ]
     expect(runReadiness({ ...base, checks }).ready).toBe(true)
+  })
+})
+
+describe('previewBands', () => {
+  it('uses true colour (665, 560, 490 nm) for a model-ready image', () => {
+    expect(previewBands(MODEL_INPUT.bands)).toEqual([3, 2, 1])
+    expect(MODEL_INPUT.trueColourBands.map((i) => MODEL_INPUT.wavelengthsNm[i])).toEqual([
+      665, 560, 490,
+    ])
+    expect(MODEL_INPUT.wavelengthsNm).toHaveLength(MODEL_INPUT.bands)
+  })
+
+  it('falls back to the first three bands, or one', () => {
+    expect(previewBands(4)).toEqual([0, 1, 2])
+    expect(previewBands(1)).toEqual([0])
   })
 })

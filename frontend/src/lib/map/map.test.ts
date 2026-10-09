@@ -17,6 +17,7 @@ import {
   getSelectionHaloStyle,
   HOVER_STROKE_WEIGHT,
   IMAGERY_FILL_OPACITY,
+  IMAGERY_STROKE_WEIGHT,
   IMAGERY_LOW_CONFIDENCE_FILL_OPACITY,
   isLowConfidence,
   LOW_CONFIDENCE_DASH,
@@ -76,9 +77,9 @@ describe('getDetectionStyle', () => {
     expect(style.fill).toBe(true)
     // Confidence: dashed and lighter below the threshold, in every state.
     expect(style.dashArray).toBe(low ? LOW_CONFIDENCE_DASH : undefined)
-    // Stroke: accent when selected, white over imagery, level stroke otherwise.
+    // Stroke: the Tar Black mark when selected, white over imagery, level stroke otherwise.
     expect(style.color).toBe(
-      state.selected ? MAP_COLORS.accent : state.onImagery ? MAP_COLORS.halo : meta.stroke,
+      state.selected ? MAP_COLORS.mark : state.onImagery ? MAP_COLORS.halo : meta.stroke,
     )
     expect(style.opacity).toBe(low && !state.selected ? LOW_CONFIDENCE_STROKE_OPACITY : 1)
     // Weight: selected beats hovered beats default.
@@ -87,7 +88,9 @@ describe('getDetectionStyle', () => {
         ? SELECTED_STROKE_WEIGHT
         : state.hovered
           ? HOVER_STROKE_WEIGHT
-          : DETECTION_STROKE_WEIGHT,
+          : state.onImagery
+            ? IMAGERY_STROKE_WEIGHT
+            : DETECTION_STROKE_WEIGHT,
     )
     expect(style.fillOpacity).toBeCloseTo(
       state.selected || state.hovered ? base + EMPHASIS_FILL_BOOST : base,
@@ -125,7 +128,7 @@ describe('getDetectionStyle', () => {
   it('draws the footprint dashed, or dotted and relabelled when approximate', () => {
     expect(getFootprintStyle(false)).toMatchObject({ weight: 1, fill: false, dashArray: '6 4' })
     expect(getFootprintStyle(true).dashArray).toBe('1 4')
-    expect(getFootprintStyle(false).color).toBe(MAP_COLORS.accent)
+    expect(getFootprintStyle(false).color).toBe(MAP_COLORS.muted)
     expect(getFootprintStyle(false, true).color).toBe(MAP_COLORS.halo)
     expect(footprintLabel(false)).toBe('Source image footprint')
     expect(footprintLabel(true)).toBe('Approximate footprint')
@@ -133,7 +136,8 @@ describe('getDetectionStyle', () => {
 
   it('mirrors the design tokens', () => {
     const css = tokensCss.toLowerCase()
-    expect(css).toContain(`--color-accent: ${MAP_COLORS.accent.toLowerCase()};`)
+    expect(css).toContain(`--color-tar: ${MAP_COLORS.mark.toLowerCase()};`)
+    expect(css).toContain(`--color-ink-2: ${MAP_COLORS.muted.toLowerCase()};`)
     expect(css).toContain(`--color-map-fallback: ${MAP_COLORS.fallback.toLowerCase()};`)
   })
 })

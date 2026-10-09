@@ -30,5 +30,7 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  /* Reads files from disk with Node APIs; type-checked by tsconfig.samples.json. */
+  "exclude": ["src/features/observations/realSamples.test.ts"]
 }

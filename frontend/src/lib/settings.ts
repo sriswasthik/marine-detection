@@ -85,7 +85,12 @@ export function sanitizeSettings(input: unknown, defaults: AppSettings): AppSett
         typeof layersInput[id] === 'boolean' ? layersInput[id] : defaults.defaultLayers[id],
       ]),
     ) as unknown as VisibleLayers,
-    dataSource: oneOf(DATA_SOURCES, input.dataSource, defaults.dataSource),
+    // Sample data only where the environment turns the mock on; a choice stored earlier does not
+    // bring it back.
+    dataSource:
+      defaults.dataSource === 'mock'
+        ? oneOf(DATA_SOURCES, input.dataSource, defaults.dataSource)
+        : 'live',
     apiBaseUrl: url?.ok ? url.url : defaults.apiBaseUrl,
   }
 }

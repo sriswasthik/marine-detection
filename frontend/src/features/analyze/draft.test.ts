@@ -11,6 +11,7 @@ const inspection = (patch: Partial<FileInspection> = {}): FileInspection => ({
   kind: 'geotiff',
   width: 1000,
   height: 800,
+  bands: 11,
   georeferenced: true,
   embeddedBounds: { north: 13.24, south: 13.2, east: 80.39, west: 80.34 },
   epsg: 32644,

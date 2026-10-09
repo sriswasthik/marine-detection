@@ -10,6 +10,7 @@ import {
 import {
   useCallback,
   useEffect,
+  useEffectEvent,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -22,9 +23,10 @@ import { Banner } from '@/components/ui'
 import type { Observation } from '@/features/observations/types'
 import { analyzeObservation, type ObservationAnalysis } from '@/lib/analysis'
 import { cn } from '@/lib/cn'
-import { boundsOfGeometries, boundsToLeaflet, geometryBounds } from '@/lib/geo'
+import { boundsOfGeometries, boundsToLeaflet, geometryBounds, latLngToTuple } from '@/lib/geo'
 import { MAP_MAX_ZOOM, MAP_MIN_ZOOM, type BasemapId } from '@/lib/map/basemaps'
 import type { VisibleLayers } from '@/lib/map/layers'
+import { NOTHING_OCCLUDED, visiblePadding, type OccludedEdges } from '@/lib/map/occlusion'
 import { BasemapLayer } from './layers/BasemapLayer'
 import { DensityLayer } from './layers/DensityLayer'
 import { DetectionsLayer } from './layers/DetectionsLayer'
@@ -51,8 +53,22 @@ export interface MapViewProps {
   onSelectHotspot?: (id: string | null) => void
   /** False for small previews: no panning, zooming, hover or selection. */
   interactive?: boolean
-  /** Shown over the map, for example the "No debris detected" state. */
+  /** Shown centred over the map, for example the "No debris detected" state. */
   overlay?: ReactNode
+  /**
+   * Positioned overlays drawn inside the map frame (the Map page's control group and legend line).
+   * The caller places them; they sit above the map and its centred overlay.
+   */
+  overlays?: ReactNode
+  /**
+   * `full` draws Leaflet's attribution and the scale and coordinate readout inside the map.
+   * `bare` leaves them out: the Map page shows both in its status strip below the map.
+   */
+  chrome?: 'full' | 'bare'
+  /** The Leaflet map once it exists, for chrome outside the map (the status strip). */
+  onMap?: (map: LeafletMap) => void
+  /** Whether the chosen basemap failed to load (shown in the status strip in `bare` mode). */
+  onBasemapUnavailableChange?: (unavailable: boolean) => void
   /** Grid and hotspots computed by the page, so both use the same filtered result. */
   analysis?: ObservationAnalysis
   /** Hotspot to emphasise from outside the map (hovering a list row). */
@@ -72,6 +88,13 @@ export interface MapViewProps {
   introAnimation?: boolean
   /** Space kept around the observation when fitting, in pixels. Small previews use less. */
   fitPadding?: number
+  /**
+   * Pixels of the map the detail drawer hides while something is selected. Flights to a
+   * detection or hotspot, and selections, keep the target in the visible part (see
+   * lib/map/occlusion.ts). Flights always accompany a selection, so they use it even when called
+   * in the same event that opens the drawer.
+   */
+  drawerOcclusion?: OccludedEdges
   className?: string
   ref?: Ref<MapHandle>
 }
@@ -116,6 +139,10 @@ export function MapView({
   onSelectHotspot = noop,
   interactive = true,
   overlay,
+  overlays,
+  chrome = 'full',
+  onMap,
+  onBasemapUnavailableChange,
   analysis: providedAnalysis,
   highlightedHotspotId = null,
   highlightedDetectionId = null,
@@ -124,6 +151,7 @@ export function MapView({
   focusRequest = null,
   introAnimation = false,
   fitPadding = DEFAULT_FIT_PADDING,
+  drawerOcclusion = NOTHING_OCCLUDED,
   className,
   ref,
 }: MapViewProps) {
@@ -150,6 +178,15 @@ export function MapView({
     () => ({ padding: [fitPadding, fitPadding] }),
     [fitPadding],
   )
+  // Like FIT_PADDING, but clear of what the drawer covers while something is selected.
+  const VISIBLE_PADDING = useMemo<FitBoundsOptions>(
+    () => visiblePadding(fitPadding, drawerOcclusion),
+    [fitPadding, drawerOcclusion],
+  )
+  const selectedId = selectedHotspotId ?? selectedDetectionId
+  const viewPadding = selectedId ? VISIBLE_PADDING : FIT_PADDING
+  /** The target of the last fly, so the "keep the selection visible" pan does not cut it short. */
+  const flownTo = useRef<string | null>(null)
 
   // Result arrival: one fit-to-detections flight once the map is ready.
   const introPlayed = useRef(false)
@@ -168,12 +205,13 @@ export function MapView({
     (id: string) => {
       const detection = observation.detections.find((d) => d.id === id)
       if (!map || !detection) return
-      const target = latLngBounds(boundsToLeaflet(geometryBounds(detection.geometry)))
-      const zoom = Math.min(map.getBoundsZoom(target.pad(4)), FOCUS_MAX_ZOOM)
-      if (animate) map.flyTo(target.getCenter(), zoom, { duration: 0.6 })
-      else map.setView(target.getCenter(), zoom)
+      flownTo.current = id
+      const target = latLngBounds(boundsToLeaflet(geometryBounds(detection.geometry))).pad(4)
+      const options = { ...VISIBLE_PADDING, maxZoom: FOCUS_MAX_ZOOM }
+      if (animate) map.flyToBounds(target, { ...options, duration: 0.6 })
+      else map.fitBounds(target, options)
     },
-    [map, observation.detections, animate],
+    [map, observation.detections, animate, VISIBLE_PADDING],
   )
 
   const focusDetectionId = focusRequest?.detectionId ?? null
@@ -188,35 +226,95 @@ export function MapView({
     () => ({
       fitToDetections: () =>
         map?.fitBounds(detectionBounds ? boundsToLeaflet(detectionBounds) : homeBounds, {
-          ...FIT_PADDING,
+          ...viewPadding,
           animate,
         }),
-      resetView: () => map?.fitBounds(homeBounds, { ...FIT_PADDING, animate }),
+      resetView: () => map?.fitBounds(homeBounds, { ...viewPadding, animate }),
       flyToDetection: focusDetection,
       flyToHotspot: (id) => {
         const hotspot = analysis.hotspots.find((h) => h.id === id)
         if (!map || !hotspot) return
+        flownTo.current = id
         const target = latLngBounds(boundsToLeaflet(hotspot.bounds))
-        const options = { ...FIT_PADDING, maxZoom: HOTSPOT_MAX_ZOOM }
+        const options = { ...VISIBLE_PADDING, maxZoom: HOTSPOT_MAX_ZOOM }
         if (animate) map.flyToBounds(target, { ...options, duration: 0.6 })
         else map.fitBounds(target, options)
       },
       zoomIn: () => map?.zoomIn(),
       zoomOut: () => map?.zoomOut(),
     }),
-    [map, focusDetection, analysis.hotspots, detectionBounds, homeBounds, animate, FIT_PADDING],
+    [
+      map,
+      focusDetection,
+      analysis.hotspots,
+      detectionBounds,
+      homeBounds,
+      animate,
+      VISIBLE_PADDING,
+      viewPadding,
+    ],
   )
+
+  // A selection made on the map (or from the URL) stays in view when the drawer opens over it.
+  const selectedPoint = useMemo(() => {
+    if (selectedHotspotId) {
+      return analysis.hotspots.find((h) => h.id === selectedHotspotId)?.centroid ?? null
+    }
+    if (selectedDetectionId) {
+      return observation.detections.find((d) => d.id === selectedDetectionId)?.centroid ?? null
+    }
+    return null
+  }, [selectedHotspotId, selectedDetectionId, analysis.hotspots, observation.detections])
+  useEffect(() => {
+    if (!selectedId) flownTo.current = null
+    if (!map || !interactive || !selectedId || !selectedPoint) return
+    if (flownTo.current === selectedId) return // a flight is already bringing it into view
+    map.panInside(latLngToTuple(selectedPoint), { ...VISIBLE_PADDING, animate })
+  }, [map, interactive, selectedId, selectedPoint, VISIBLE_PADDING, animate])
 
   const onMapReady = useCallback(
     (instance: LeafletMap | null) => {
       if (!instance) return
       setMap(instance)
+      onMap?.(instance)
       const container = instance.getContainer()
       container.setAttribute('aria-roledescription', 'map')
       container.setAttribute('aria-label', `Map of ${observation.region}`)
     },
-    [observation.region],
+    [observation.region, onMap],
   )
+
+  // Docked panels open and close beside the map: keep Leaflet's size in step with the frame.
+  // Until the person moves the map or selects something, a resize also refits the scene, so a
+  // map that mounted before its grid cell reached full size still frames the whole image.
+  const frameRef = useRef<HTMLDivElement | null>(null)
+  const touched = useRef(false)
+  const onFrameResize = useEffectEvent((instance: LeafletMap) => {
+    instance.invalidateSize({ pan: false })
+    if (!touched.current && !selectedId)
+      instance.fitBounds(homeBounds, { ...FIT_PADDING, animate: false })
+  })
+  useEffect(() => {
+    const frame = frameRef.current
+    if (!map || !frame || typeof ResizeObserver === 'undefined') return
+    const markTouched = () => {
+      touched.current = true
+    }
+    const container = map.getContainer()
+    for (const type of ['pointerdown', 'wheel', 'keydown'] as const)
+      container.addEventListener(type, markTouched, { passive: true })
+    const observer = new ResizeObserver(() => onFrameResize(map))
+    observer.observe(frame)
+    return () => {
+      observer.disconnect()
+      for (const type of ['pointerdown', 'wheel', 'keydown'] as const)
+        container.removeEventListener(type, markTouched)
+    }
+  }, [map])
+
+  useEffect(() => {
+    onBasemapUnavailableChange?.(basemapUnavailable)
+  }, [basemapUnavailable, onBasemapUnavailableChange])
 
   const clearSelection = useCallback(() => {
     onSelectDetection(null)
@@ -230,6 +328,8 @@ export function MapView({
   return (
     // The basemap state class lives here: react-leaflet applies MapContainer's className only once.
     <div
+      ref={frameRef}
+      data-map-canvas=""
       className={cn(
         'relative isolate overflow-hidden bg-map-fallback',
         basemapUnavailable && 'mwi-map--no-basemap',
@@ -244,6 +344,9 @@ export function MapView({
         boundsOptions={FIT_PADDING}
         minZoom={MAP_MIN_ZOOM}
         maxZoom={MAP_MAX_ZOOM}
+        // Quarter steps: a fit fills the frame instead of dropping a whole zoom level (half size).
+        zoomSnap={0.25}
+        zoomDelta={0.5}
         preferCanvas
         zoomControl={false}
         attributionControl={false}
@@ -255,7 +358,7 @@ export function MapView({
         keyboard={interactive}
         className="mwi-map h-full w-full"
       >
-        <AttributionControl position="bottomright" prefix={false} />
+        {chrome === 'full' ? <AttributionControl position="bottomright" prefix={false} /> : null}
         <BasemapLayer
           key={basemap}
           basemap={basemap}
@@ -280,6 +383,8 @@ export function MapView({
             onImagery={onImagery}
             onSelect={onSelectDetection}
             highlightedId={highlightedDetectionId}
+            // A fresh result fades in once; `animate` is off for reduced motion and previews.
+            reveal={introAnimation && animate}
           />
         ) : null}
         {visibleLayers.hotspots ? (
@@ -294,9 +399,9 @@ export function MapView({
         {interactive ? <ClearSelectionOnMapClick onClear={clearSelection} /> : null}
       </MapContainer>
 
-      {basemapUnavailable ? (
+      {basemapUnavailable && chrome === 'full' ? (
         <div className="pointer-events-none absolute inset-x-0 top-3 z-[500] flex justify-center px-3">
-          <Banner tone="info" className="pointer-events-auto py-2 shadow-subtle">
+          <Banner tone="info" className="pointer-events-auto py-2">
             Basemap unavailable, detections are still shown
           </Banner>
         </div>
@@ -308,11 +413,13 @@ export function MapView({
         </div>
       ) : null}
 
-      {interactive && map ? (
+      {interactive && map && chrome === 'full' ? (
         <div className="pointer-events-none absolute right-2 bottom-6 z-[500]">
           <ReadoutStrip map={map} />
         </div>
       ) : null}
+
+      {overlays}
     </div>
   )
 }

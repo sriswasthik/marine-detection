@@ -1,17 +1,27 @@
 import { z } from 'zod'
 import {
   DENSITY_LEVEL_IDS,
+  MARIDA_SPLITS,
   OBSERVATION_SOURCES,
   OBSERVATION_STATUSES,
   OBSERVATION_WARNINGS,
-  type Detection,
+  type ClassPaletteEntry,
+  type DensityThresholds,
   type GeoBounds,
+  type GeospatialSummary,
+  type Hotspot,
   type LatLng,
+  type MaridaPatch,
   type ModelMetrics,
   type Observation,
   type ObservationSummary,
   type ProcessingInfo,
+  type SceneContext,
+  type ServiceDensityCell,
+  type ServiceDensityGrid,
+  type SuppressedRegion,
 } from './types'
+import { resolveDensityLevels, type UnresolvedDetection } from '@/lib/density'
 
 const finite = z.number()
 const nonNegative = finite.min(0)
@@ -78,15 +88,20 @@ export const GeoBoundsSchema = z
     message: 'North must be greater than south',
   }) satisfies z.ZodType<GeoBounds>
 
+/**
+ * A detection as the service sends it. The Python pipeline grades every detection; densityLevel
+ * may still be null on observations stored before it did, and src/lib/density.ts fills those in
+ * after parsing (see resolveDensityLevels).
+ */
 export const DetectionSchema = z.object({
   id: z.string().min(1),
   geometry: DetectionGeometrySchema,
   areaM2: nonNegative,
   confidence: unitInterval,
-  densityLevel: z.enum(DENSITY_LEVEL_IDS),
+  densityLevel: z.enum(DENSITY_LEVEL_IDS).nullable(),
   centroid: LatLngSchema,
   sourcePixelCount: z.number().int().min(0),
-}) satisfies z.ZodType<Detection>
+}) satisfies z.ZodType<UnresolvedDetection>
 
 export const ModelMetricsSchema = z.object({
   precision: unitInterval,
@@ -95,6 +110,9 @@ export const ModelMetricsSchema = z.object({
   accuracy: unitInterval,
   benchmark: z.string(),
   isPlaceholder: z.boolean(),
+  iou: unitInterval.optional(),
+  meanIoU: unitInterval.optional(),
+  macroF1: unitInterval.optional(),
 }) satisfies z.ZodType<ModelMetrics>
 
 export const ProcessingInfoSchema = z.object({
@@ -102,7 +120,118 @@ export const ProcessingInfoSchema = z.object({
   finishedAt: isoDateTime,
   modelName: z.string(),
   modelVersion: z.string(),
+  device: z.string().optional(),
+  stagesMs: z.record(z.string(), nonNegative).optional(),
 }) satisfies z.ZodType<ProcessingInfo>
+
+export const MaridaPatchSchema = z.object({
+  id: z.string().min(1),
+  tile: z.string(),
+  date: z.iso.date(),
+  split: z.enum(MARIDA_SPLITS).nullable(),
+}) satisfies z.ZodType<MaridaPatch>
+
+export const SceneContextSchema = z.object({
+  validPixels: z.number().int().min(0),
+  debrisPercent: percent,
+  cloudPercent: percent,
+  shipPercent: percent,
+  foamPercent: percent,
+  sargassumPercent: percent,
+  naturalOrganicPercent: percent,
+  classPixelCounts: z.record(z.string(), z.number().int().min(0)),
+}) satisfies z.ZodType<SceneContext>
+
+export const ClassPaletteEntrySchema = z.object({
+  id: z.number().int().min(1),
+  name: z.string(),
+  color: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/)
+    .nullable(),
+  opacity: unitInterval,
+  drawn: z.boolean(),
+}) satisfies z.ZodType<ClassPaletteEntry>
+
+export const SuppressedRegionSchema = z.object({
+  reason: z.literal('stripe'),
+  pixels: z.number().int().min(1),
+  areaM2: nonNegative,
+  confidence: unitInterval,
+  rowSpan: z.number().int().min(1),
+  colSpan: z.number().int().min(1),
+  firstRow: z.number().int().min(0),
+  firstCol: z.number().int().min(0),
+}) satisfies z.ZodType<SuppressedRegion>
+
+const DensityLevelSchema = z.enum(DENSITY_LEVEL_IDS)
+const gridIndex = z.number().int().min(0)
+
+export const DensityThresholdsSchema = z
+  .object({ moderate: percent, high: percent, critical: percent })
+  .refine((t) => t.moderate < t.high && t.high < t.critical, {
+    message: 'Thresholds must rise from moderate to critical',
+  }) satisfies z.ZodType<DensityThresholds>
+
+export const ServiceDensityCellSchema = z.object({
+  id: z.string().min(1),
+  row: gridIndex,
+  col: gridIndex,
+  bounds: GeoBoundsSchema,
+  areaM2: finite.positive(),
+  debrisAreaM2: nonNegative,
+  coveragePercent: percent,
+  level: DensityLevelSchema,
+  detectionAreasM2: z.record(z.string(), nonNegative),
+}) satisfies z.ZodType<ServiceDensityCell>
+
+export const ServiceDensityGridSchema = z
+  .object({
+    method: z.string(),
+    cellSizeM: finite.positive(),
+    cellSizePx: z.number().int().positive().optional(),
+    rows: z.number().int().min(1),
+    cols: z.number().int().min(1),
+    thresholds: DensityThresholdsSchema,
+    cells: z.array(ServiceDensityCellSchema),
+  })
+  .refine((g) => g.cells.every((c) => c.row < g.rows && c.col < g.cols), {
+    message: 'Every cell must lie inside the grid',
+  }) satisfies z.ZodType<ServiceDensityGrid>
+
+export const HotspotSchema = z.object({
+  id: z.string().min(1),
+  rank: z.number().int().min(1),
+  level: DensityLevelSchema,
+  bounds: GeoBoundsSchema,
+  centroid: LatLngSchema,
+  cellIds: z.array(z.string()),
+  detectionIds: z.array(z.string()),
+  totalAreaM2: nonNegative,
+  meanConfidence: unitInterval,
+  priorityScore: nonNegative,
+}) satisfies z.ZodType<Hotspot>
+
+export const GeospatialSummarySchema = z.object({
+  width: z.number().int().min(1),
+  height: z.number().int().min(1),
+  bandCount: z.number().int().min(1),
+  dataType: z.string(),
+  crs: z.string().min(1),
+  crsName: z.string(),
+  pixelSizeX: finite.positive(),
+  pixelSizeY: finite.positive(),
+  pixelSizeUnit: z.string(),
+  pixelAreaM2: finite.positive(),
+  totalPixels: z.number().int().min(1),
+  validPixels: z.number().int().min(0),
+  sceneAreaM2: finite.positive(),
+  debrisPixels: z.number().int().min(0),
+  debrisAreaM2: nonNegative,
+  debrisCoveragePercent: percent,
+  debrisCentroid: LatLngSchema.nullable(),
+  sceneCentre: LatLngSchema,
+}) satisfies z.ZodType<GeospatialSummary>
 
 const observationFields = {
   id: z.string().min(1),
@@ -126,12 +255,26 @@ const observationFields = {
   cloudCoveragePercent: percent.optional(),
   resolutionM: finite.positive().optional(),
   processing: ProcessingInfoSchema.optional(),
+  maridaPatch: MaridaPatchSchema.optional(),
+  sceneContext: SceneContextSchema.optional(),
+  classPalette: z.array(ClassPaletteEntrySchema).optional(),
+  referenceUrl: z.string().optional(),
+  referenceDebrisPixels: z.number().int().min(0).optional(),
+  waterAreaDefinition: z.string().optional(),
+  suppressedRegions: z.array(SuppressedRegionSchema).optional(),
+  hotspots: z.array(HotspotSchema).optional(),
+  geospatial: GeospatialSummarySchema.optional(),
+  segmentationUrl: z.string().optional(),
+  segmentationPreviewUrl: z.string().optional(),
+  sceneImageUrl: z.string().optional(),
 }
 
+/** The wire shape. Detection density levels may still be null here; parseObservation fills them. */
 export const ObservationSchema = z.object({
   ...observationFields,
+  densityGrid: ServiceDensityGridSchema.optional(),
   detections: z.array(DetectionSchema),
-}) satisfies z.ZodType<Observation>
+})
 
 export const ObservationSummarySchema = z.object({
   ...observationFields,
@@ -141,6 +284,7 @@ export const ObservationSummarySchema = z.object({
 /** Observation fields with detections left unchecked, used to salvage partial data. */
 const ObservationShellSchema = z.object({
   ...observationFields,
+  densityGrid: ServiceDensityGridSchema.optional(),
   detections: z.array(z.unknown()),
 })
 
@@ -177,19 +321,23 @@ function toIssues(error: z.ZodError, prefix: readonly PropertyKey[] = []): Parse
  */
 export function parseObservation(input: unknown): ParseResult<Observation> {
   const full = ObservationSchema.safeParse(input)
-  if (full.success) return { status: 'valid', data: full.data, issues: [] }
+  if (full.success) return { status: 'valid', data: resolveDensityLevels(full.data), issues: [] }
 
   const shell = ObservationShellSchema.safeParse(input)
   if (!shell.success) return { status: 'invalid', data: null, issues: toIssues(shell.error) }
 
   const issues: ParseIssue[] = []
-  const detections: Detection[] = []
+  const detections: UnresolvedDetection[] = []
   shell.data.detections.forEach((raw, index) => {
     const parsed = DetectionSchema.safeParse(raw)
     if (parsed.success) detections.push(parsed.data)
     else issues.push(...toIssues(parsed.error, ['detections', index]))
   })
-  return { status: 'partial', data: { ...shell.data, detections }, issues }
+  return {
+    status: 'partial',
+    data: resolveDensityLevels({ ...shell.data, detections }),
+    issues,
+  }
 }
 
 /**

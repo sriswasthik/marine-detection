@@ -1,93 +1,8 @@
 import { CalendarDays } from 'lucide-react'
 import { useId } from 'react'
-import { buttonStyles, Button, Popover, SeveritySwatch } from '@/components/ui'
-import { DENSITY_LEVEL_IDS, type DensityLevel } from '@/features/observations/types'
+import { buttonStyles, Button, Popover } from '@/components/ui'
 import { cn } from '@/lib/cn'
-import { DENSITY_LEVELS } from '@/lib/density'
-import { formatConfidence, formatDate } from '@/lib/format'
-
-/** Minimum confidence as a compact inline slider with its live value. */
-export function ConfidenceFilter({
-  value,
-  onChange,
-  className,
-}: {
-  /** 0 to 1. */
-  value: number
-  onChange: (value: number) => void
-  className?: string
-}) {
-  const id = useId()
-  const percent = Math.round(value * 100)
-  return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <label htmlFor={id} className="text-caption font-medium whitespace-nowrap text-ink-muted">
-        Min. confidence
-      </label>
-      <span className="relative block h-5 w-24 shrink-0">
-        <span
-          aria-hidden
-          className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-border"
-        >
-          <span
-            className="absolute inset-y-0 left-0 rounded-full bg-accent"
-            style={{ width: `${percent}%` }}
-          />
-        </span>
-        <input
-          id={id}
-          type="range"
-          className="range-input absolute inset-0"
-          min={0}
-          max={100}
-          step={5}
-          value={percent}
-          aria-valuetext={formatConfidence(value)}
-          onChange={(event) => onChange(Number(event.target.value) / 100)}
-        />
-      </span>
-      <span className="num w-9 text-right text-caption text-ink">{formatConfidence(value)}</span>
-    </div>
-  )
-}
-
-/** Four toggle chips, one per density level, each with its swatch and label. */
-export function DensityChips({
-  value,
-  onChange,
-}: {
-  value: readonly DensityLevel[]
-  onChange: (levels: DensityLevel[]) => void
-}) {
-  const toggle = (level: DensityLevel) =>
-    onChange(
-      DENSITY_LEVEL_IDS.filter((l) => (l === level ? !value.includes(level) : value.includes(l))),
-    )
-  return (
-    <div role="group" aria-label="Density level" className="flex flex-wrap items-center gap-1">
-      {DENSITY_LEVEL_IDS.map((level) => {
-        const on = value.includes(level)
-        return (
-          <button
-            key={level}
-            type="button"
-            aria-pressed={on}
-            onClick={() => toggle(level)}
-            className={cn(
-              'inline-flex h-7 items-center gap-1.5 rounded-badge border px-2 text-caption font-medium transition-colors duration-150 ease-out',
-              on
-                ? 'border-border-strong bg-surface text-ink'
-                : 'border-dashed border-border bg-bg text-ink-muted hover:text-ink',
-            )}
-          >
-            <SeveritySwatch level={level} className={on ? '' : 'opacity-40'} />
-            {DENSITY_LEVELS[level].label}
-          </button>
-        )
-      })}
-    </div>
-  )
-}
+import { formatDate } from '@/lib/format'
 
 function DateFields({
   from,
@@ -101,11 +16,11 @@ function DateFields({
   const fromId = useId()
   const toId = useId()
   const input =
-    'h-8 rounded-control border border-border-strong bg-surface px-2 text-small text-ink shadow-subtle'
+    'data h-8 border-0 border-b border-rule bg-transparent px-0 text-ink hover:border-ink max-sm:h-10'
   return (
     <div className="flex flex-wrap items-end gap-2">
       <div className="flex flex-col gap-1">
-        <label htmlFor={fromId} className="text-caption font-medium text-ink-muted">
+        <label htmlFor={fromId} className="text-small font-medium text-ink-2">
           From
         </label>
         <input
@@ -118,7 +33,7 @@ function DateFields({
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label htmlFor={toId} className="text-caption font-medium text-ink-muted">
+        <label htmlFor={toId} className="text-small font-medium text-ink-2">
           To
         </label>
         <input
@@ -133,7 +48,8 @@ function DateFields({
       {from || to ? (
         <Button
           size="sm"
-          variant="ghost"
+          variant="tertiary"
+          iconEnd={null}
           onClick={() => onChange({ dateFrom: null, dateTo: null })}
         >
           Any date
@@ -174,7 +90,7 @@ export function DateRangeFilter({
           className={buttonStyles({
             variant: 'secondary',
             size: 'sm',
-            className: cn('font-normal', (from || to) && 'border-accent/40 text-accent'),
+            className: cn('font-normal', (from || to) && 'border-accent-ink/40 text-accent-ink'),
           })}
         >
           <CalendarDays aria-hidden />

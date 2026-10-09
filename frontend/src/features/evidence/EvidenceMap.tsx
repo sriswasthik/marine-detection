@@ -189,6 +189,11 @@ export const EvidenceMap = memo(function EvidenceMap({
         ) : null}
         {interactive ? <ClearOnMapClick onClear={clear} /> : null}
       </MapContainer>
+      {basemapUnavailable ? (
+        <p className="pointer-events-none absolute bottom-2 left-2 z-[500] border border-hairline bg-sheet px-2 py-1 text-small text-ink-2">
+          Basemap unavailable, detections are still shown
+        </p>
+      ) : null}
     </div>
   )
 })

@@ -1,76 +1,51 @@
-import { ChevronRight, Map as MapIcon } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { Badge, buttonStyles } from '@/components/ui'
-import type { ExportSource } from '@/features/export/exportFiles'
-import { ExportMenu } from '@/features/export/ExportMenu'
+import { ArrowLink, Tag } from '@/components/ui'
 import { isMockMode } from '@/features/observations/api'
+import { ProvenanceTag } from '@/features/observations/components/ProvenanceTag'
 import { SourceIcon } from '@/features/observations/components/SourceIcon'
 import { SOURCE_LABELS, STATUS_LABELS, STATUS_TONES } from '@/features/observations/labels'
 import type { Observation } from '@/features/observations/types'
 import { formatDateTime } from '@/lib/format'
+import { observationProvenance } from '@/lib/provenance'
 
+/**
+ * The observation's title (the page's h1), when and how it was captured, its status and where
+ * its figures come from. Breadcrumbs and the Export action sit in the context line above.
+ */
 export function ObservationHeader({
   observation,
   actions = true,
-  exportSource,
 }: {
   observation: Observation
-  /** What the Export menu exports. Without it the menu is left out. */
-  exportSource?: ExportSource
-  /** Off for failed and unfinished observations: there is nothing to open or export. */
+  /** Off for failed and unfinished observations: there is nothing to open. */
   actions?: boolean
 }) {
   const mapPath = `/map/${encodeURIComponent(observation.id)}`
+  const provenance = observationProvenance(observation, isMockMode())
+  const provenanceNote = provenance.kind === 'model' ? provenance.note : null
 
   return (
     <header className="flex flex-col gap-3">
-      <nav aria-label="Breadcrumb">
-        <ol className="flex min-w-0 items-center gap-1 text-small text-ink-muted">
-          <li>
-            <Link to="/observations" className="rounded-[4px] hover:text-ink hover:underline">
-              Observations
-            </Link>
-          </li>
-          <li aria-hidden>
-            <ChevronRight className="size-3.5" />
-          </li>
-          <li className="min-w-0 truncate">
-            <span aria-current="page" className="text-ink">
-              {observation.region}
-            </span>
-          </li>
-        </ol>
-      </nav>
-
-      <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-        <div className="flex min-w-0 flex-col gap-1.5">
-          <h1 className="text-title text-ink">{observation.region}</h1>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-small text-ink-muted">
-            <span className="num">
-              <span className="sr-only">Captured </span>
-              {formatDateTime(observation.capturedAt)}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <SourceIcon source={observation.source} className="size-4" />
-              {SOURCE_LABELS[observation.source]}
-            </span>
-            <Badge tone={STATUS_TONES[observation.status]} dot>
-              {STATUS_LABELS[observation.status]}
-            </Badge>
-            {isMockMode() ? <Badge tone="warning">Sample data</Badge> : null}
-          </div>
-        </div>
-
-        {actions ? (
-          <div className="flex shrink-0 items-center gap-2">
-            <Link to={mapPath} className={buttonStyles({ variant: 'secondary' })}>
-              <MapIcon aria-hidden />
-              Open on map
-            </Link>
-            {exportSource ? <ExportMenu source={exportSource} /> : null}
-          </div>
-        ) : null}
+      <h1 className="text-page text-ink">{observation.region}</h1>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-small text-ink-2">
+        <span className="data">
+          <span className="sr-only">Captured </span>
+          {formatDateTime(observation.capturedAt)}
+        </span>
+        <span className="inline-flex items-center gap-2">
+          <SourceIcon source={observation.source} className="size-4" />
+          {SOURCE_LABELS[observation.source]}
+        </span>
+        <Tag tone={STATUS_TONES[observation.status]}>{STATUS_LABELS[observation.status]}</Tag>
+        <ProvenanceTag observation={observation} mockMode={isMockMode()} />
       </div>
+      {provenanceNote ? (
+        <p className="max-w-[68ch] text-small text-ink-2">{provenanceNote}</p>
+      ) : null}
+      {actions ? (
+        <ArrowLink to={mapPath} className="self-start">
+          Open on map
+        </ArrowLink>
+      ) : null}
     </header>
   )
 }

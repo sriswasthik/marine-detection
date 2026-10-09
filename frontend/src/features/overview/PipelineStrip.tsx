@@ -11,9 +11,9 @@ import {
 import { cn } from '@/lib/cn'
 
 const STEPS: readonly { label: string; Icon: LucideIcon; description: string }[] = [
-  { label: 'Image', Icon: Image, description: 'Satellite or drone image' },
+  { label: 'Image', Icon: Image, description: '11-band Sentinel-2 image' },
   { label: 'Preprocess', Icon: SlidersHorizontal, description: 'Bands, masks, water only' },
-  { label: 'Detect', Icon: ScanSearch, description: 'UNet++ segmentation' },
+  { label: 'Detect', Icon: ScanSearch, description: 'U-Net segmentation' },
   { label: 'Geolocate', Icon: Crosshair, description: 'Pixels to coordinates' },
   { label: 'Analyze', Icon: LayoutGrid, description: 'Area, density, hotspots' },
   { label: 'Map', Icon: MapIcon, description: 'Regions on the map' },
@@ -32,22 +32,22 @@ export function PipelineStrip({ className }: { className?: string }) {
           {index < STEPS.length - 1 ? (
             <span
               aria-hidden
-              className="absolute top-4 right-[calc(-50%+1.25rem)] left-[calc(50%+1.25rem)] hidden h-px bg-border-strong sm:block"
+              className="absolute top-4 right-[calc(-50%+1.25rem)] left-[calc(50%+1.25rem)] hidden h-px bg-rule sm:block"
             />
           ) : null}
           <span
             aria-hidden
             className={cn(
-              'flex size-8 items-center justify-center rounded-full border bg-surface [&_svg]:size-4',
+              'flex size-8 items-center justify-center border bg-paper [&_svg]:size-4',
               index === STEPS.length - 1
-                ? 'border-accent text-accent'
-                : 'border-border-strong text-ink-muted',
+                ? 'border-accent-ink text-accent-ink'
+                : 'border-rule text-ink-2',
             )}
           >
             <Icon strokeWidth={1.75} />
           </span>
-          <span className="mt-2 text-caption font-medium text-ink">{label}</span>
-          <span className="mt-0.5 hidden text-caption text-ink-muted lg:block">{description}</span>
+          <span className="mt-2 text-small font-medium text-ink">{label}</span>
+          <span className="mt-1 hidden text-small text-ink-2 lg:block">{description}</span>
         </li>
       ))}
     </ol>

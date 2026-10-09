@@ -1,6 +1,7 @@
 import { MAX_UPLOAD_BYTES, MAX_UPLOAD_MB, MODEL_CARD } from '@/lib/config'
 import { ENV } from '@/lib/env'
 import { computeJobState, pipelineDurationMs, UPLOAD_SHARE } from '../mock/pipeline'
+import { loadRealSamples, type RealSampleLoader } from '../mock/realSamples'
 import { getSampleObservation, getSampleObservations, pickSampleIdForUpload } from '../mock/samples'
 import { getMockScenario, type MockScenario } from '../mock/scenario'
 import { parseObservation, parseObservationList } from '../schemas'
@@ -18,6 +19,8 @@ export interface MockApiOptions {
   now?: () => number
   scenario?: () => MockScenario
   random?: () => number
+  /** Real model output from public/samples. Default: fetched once per page load. */
+  realSamples?: RealSampleLoader
 }
 
 interface MockJob {
@@ -54,8 +57,27 @@ function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   })
 }
 
-function toSummary({ detections, ...rest }: Observation): ObservationSummary {
+function toSummary({ detections, densityGrid: _grid, ...rest }: Observation): ObservationSummary {
   return { ...rest, detectionCount: detections.length }
+}
+
+/** Renames detection ids everywhere they appear: detections, the service grid and hotspots. */
+function renameDetections(observation: Observation, rename: (id: string) => string): void {
+  observation.detections = observation.detections.map((d) => ({ ...d, id: rename(d.id) }))
+  if (observation.densityGrid) {
+    observation.densityGrid.cells = observation.densityGrid.cells.map((cell) => ({
+      ...cell,
+      detectionAreasM2: Object.fromEntries(
+        Object.entries(cell.detectionAreasM2).map(([id, area]) => [rename(id), area]),
+      ),
+    }))
+  }
+  if (observation.hotspots) {
+    observation.hotspots = observation.hotspots.map((hotspot) => ({
+      ...hotspot,
+      detectionIds: hotspot.detectionIds.map(rename).sort(),
+    }))
+  }
 }
 
 function stripExtension(fileName: string): string {
@@ -76,8 +98,9 @@ function invalidResponse(issues: { path: string; message: string }[]): ApiError 
 }
 
 /**
- * In-browser backend built on the six sample observations and a simulated pipeline.
- * Responses go through the same zod validation the HTTP client will use.
+ * In-browser backend built on the six synthetic sample observations, the real model output in
+ * public/samples (see ../mock/realSamples.ts) and a simulated pipeline. Responses go through the
+ * same zod validation the HTTP client will use.
  */
 export function createMockApi(options: MockApiOptions = {}): ObservationsApi {
   const latency = options.latencyMs ?? [250, 600]
@@ -86,6 +109,13 @@ export function createMockApi(options: MockApiOptions = {}): ObservationsApi {
   const now = options.now ?? (() => Date.now())
   const currentScenario = options.scenario ?? getMockScenario
   const random = options.random ?? Math.random
+  const loadReal = options.realSamples ?? loadRealSamples
+  /** The last loaded real samples, so a finished job can pick one synchronously. */
+  let realSamples: Observation[] = []
+  async function currentRealSamples(): Promise<Observation[]> {
+    realSamples = await loadReal()
+    return realSamples
+  }
 
   const jobs = new Map<string, MockJob>()
   /** Observations created by simulated uploads, newest first. */
@@ -98,32 +128,46 @@ export function createMockApi(options: MockApiOptions = {}): ObservationsApi {
   async function respond<T>(
     range: readonly [number, number],
     signal: AbortSignal | undefined,
-    produce: () => T,
+    produce: () => T | Promise<T>,
   ): Promise<T> {
     await delay(range, signal)
     if (currentScenario() === 'network') throw networkError()
     return produce()
   }
 
-  function findObservation(id: string): Observation | undefined {
-    return uploads.find((o) => o.id === id) ?? getSampleObservation(id)
+  async function findObservation(id: string): Promise<Observation | undefined> {
+    return (
+      uploads.find((o) => o.id === id) ??
+      getSampleObservation(id) ??
+      (await currentRealSamples()).find((o) => o.id === id)
+    )
   }
 
   function materialize(job: MockJob): string {
-    const sampleId = pickSampleIdForUpload(job)
-    const sample = getSampleObservation(sampleId)
+    // An uploaded MARIDA patch that was exported gets its real model output; anything else
+    // copies a synthetic sample.
+    const real =
+      job.scenario === 'success'
+        ? realSamples.find((o) => o.id === stripExtension(job.fileName))
+        : undefined
+    const sampleId = real ? real.id : pickSampleIdForUpload(job)
+    const sample = real ?? getSampleObservation(sampleId)
     if (!sample) throw new Error(`Sample ${sampleId} is missing.`)
     const id = `obs-upload-${job.id.replace(/^job-/, '')}`
     const observation = cloneObservation(sample)
     observation.id = id
     observation.name = stripExtension(job.fileName)
-    observation.region = job.region
+    // Like the service, an empty region keeps the scene's own place name.
+    observation.region = job.region.trim() || sample.region
     observation.capturedAt = job.capturedAt
     observation.source = job.source
-    observation.detections = observation.detections.map((detection, index) => ({
-      ...detection,
-      id: `${id}-d${String(index + 1).padStart(3, '0')}`,
-    }))
+    const newIds = new Map(
+      observation.detections.map((d, index) => [
+        d.id,
+        `${id}-d${String(index + 1).padStart(3, '0')}`,
+      ]),
+    )
+    renameDetections(observation, (old) => newIds.get(old) ?? old)
     observation.processing = {
       startedAt: new Date(job.createdAt).toISOString(),
       finishedAt: new Date(job.createdAt + job.totalMs).toISOString(),
@@ -136,18 +180,20 @@ export function createMockApi(options: MockApiOptions = {}): ObservationsApi {
 
   return {
     listObservations: ({ signal } = {}) =>
-      respond(latency, signal, (): Validated<ObservationSummary[]> => {
+      respond(latency, signal, async (): Promise<Validated<ObservationSummary[]>> => {
         // The "empty" scenario stands for a fresh install: only this session's uploads.
-        const samples = currentScenario() === 'empty' ? [] : getSampleObservations()
-        const all = [...uploads, ...samples].map(toSummary)
+        const empty = currentScenario() === 'empty'
+        const samples = empty ? [] : getSampleObservations()
+        const real = empty ? [] : await currentRealSamples()
+        const all = [...uploads, ...samples, ...real].map(toSummary)
         const result = parseObservationList(all)
         if (result.status === 'invalid') throw invalidResponse(result.issues)
         return { data: result.data, issues: result.issues }
       }),
 
     getObservation: (id, { signal } = {}) =>
-      respond(latency, signal, (): Validated<Observation> => {
-        const observation = findObservation(id)
+      respond(latency, signal, async (): Promise<Validated<Observation>> => {
+        const observation = await findObservation(id)
         if (!observation) {
           throw new ApiError(
             `Observation ${id} was not found. It may have been removed. Go back to the observation list and pick another.`,
@@ -174,6 +220,7 @@ export function createMockApi(options: MockApiOptions = {}): ObservationsApi {
         )
       }
 
+      await currentRealSamples()
       jobCounter += 1
       const job: MockJob = {
         id: `job-${String(jobCounter).padStart(4, '0')}`,

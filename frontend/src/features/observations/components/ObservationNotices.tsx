@@ -14,6 +14,7 @@ export function ObservationNotices({
   only,
   className,
   bannerClassName,
+  size = 'md',
 }: {
   observation: Observation
   /** Some detections failed validation and were dropped. */
@@ -22,13 +23,21 @@ export function ObservationNotices({
   only?: readonly NoticeId[]
   className?: string
   bannerClassName?: string
+  /** Banner size: `sm` for side panels. */
+  size?: 'md' | 'sm'
 }) {
   const notices = observationNotices(observation, { partialData, only })
   if (notices.length === 0) return null
   return (
     <div className={cn('flex flex-col gap-2', className)} data-testid="observation-notices">
       {notices.map((notice) => (
-        <Banner key={notice.id} tone="warning" title={notice.title} className={bannerClassName}>
+        <Banner
+          key={notice.id}
+          tone="warning"
+          size={size}
+          title={notice.title}
+          className={bannerClassName}
+        >
           {notice.message}
         </Banner>
       ))}

@@ -1,4 +1,4 @@
-export type BasemapId = 'light' | 'satellite'
+export type BasemapId = 'light' | 'satellite' | 'osm'
 
 export interface BasemapConfig {
   id: BasemapId
@@ -46,12 +46,22 @@ export const BASEMAPS: Readonly<Record<BasemapId, BasemapConfig>> = {
     credit: 'Esri World Imagery: Esri, Maxar, Earthstar Geographics and the GIS user community',
     maxNativeZoom: 19,
   },
+  // The OpenStreetMap standard style, for the analysis report's map. Not in BASEMAP_ORDER: the
+  // monitoring map keeps its two quiet choices.
+  osm: {
+    id: 'osm',
+    label: 'OpenStreetMap',
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '© OpenStreetMap contributors',
+    credit: 'OpenStreetMap standard tiles: © OpenStreetMap contributors (ODbL)',
+    maxNativeZoom: 19,
+  },
 }
 
 export const DEFAULT_BASEMAP: BasemapId = 'light'
 export const BASEMAP_ORDER: readonly BasemapId[] = ['light', 'satellite']
 
-/** Zoom limits. Drone scenes need very close zoom; tiles are upscaled past their native zoom. */
+/** Zoom limits. Close zoom shows single 10 m pixels; tiles are upscaled past their native zoom. */
 export const MAP_MIN_ZOOM = 3
 export const MAP_MAX_ZOOM = 22
 
@@ -60,7 +70,10 @@ export const MAP_MAX_ZOOM = 22
  * They mirror src/styles/tokens.css; a test keeps them equal.
  */
 export const MAP_COLORS = {
-  accent: '#2F6F6D',
+  /** Tar Black: selections, the footprint and hotspot selection rings, over a white halo. */
+  mark: '#15171A',
+  /** Slate Grey: quiet lines such as the image footprint. */
+  muted: '#5A5A55',
   halo: '#FFFFFF',
-  fallback: '#EEF2F1',
+  fallback: '#DCD8CE',
 } as const

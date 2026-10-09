@@ -247,7 +247,7 @@ export interface LocalProjection {
 
 /**
  * Equirectangular projection around a reference latitude. Accurate for areas a few kilometers
- * across, which covers a single satellite or drone scene.
+ * across, which covers a single satellite scene.
  */
 export function createLocalProjection(
   origin: LatLng,

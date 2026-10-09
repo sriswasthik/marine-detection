@@ -61,7 +61,7 @@ export function Tabs<T extends string>({
       <div
         role="tablist"
         aria-label={label}
-        className="flex gap-5 overflow-x-auto border-b border-border [scrollbar-width:none]"
+        className="flex gap-6 overflow-x-auto shadow-[inset_0_-1px_0_var(--color-hairline)] [scrollbar-width:none]"
       >
         {items.map((item, index) => {
           const selected = item.value === value
@@ -81,18 +81,14 @@ export function Tabs<T extends string>({
               onClick={() => activate(index)}
               onKeyDown={(event) => onKeyDown(event, index)}
               className={cn(
-                'relative -mb-px inline-flex h-10 shrink-0 items-center gap-1.5 border-b-2 text-small font-medium whitespace-nowrap',
-                'transition-colors duration-150 ease-out disabled:cursor-not-allowed disabled:opacity-50',
-                selected
-                  ? 'border-accent text-ink'
-                  : 'border-transparent text-ink-muted hover:text-ink',
+                'relative inline-flex h-10 shrink-0 items-center gap-2 border-b-2 text-small font-medium whitespace-nowrap',
+                'transition-colors duration-[120ms] ease-out disabled:cursor-not-allowed disabled:opacity-50',
+                selected ? 'border-ink text-ink' : 'border-transparent text-ink-2 hover:text-ink',
               )}
             >
               {item.label}
               {item.count !== undefined ? (
-                <span className="num rounded-badge bg-bg px-1.5 text-caption text-ink-muted">
-                  {item.count}
-                </span>
+                <span className="data text-ink-2">{item.count}</span>
               ) : null}
             </button>
           )

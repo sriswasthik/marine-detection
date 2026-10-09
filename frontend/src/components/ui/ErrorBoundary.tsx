@@ -56,12 +56,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     if (!error) return this.props.children
     if (this.props.fallback) return this.props.fallback(error, this.reset)
     return (
-      <div
-        className={cn(
-          'flex items-center justify-center rounded-card border border-dashed border-border-strong bg-surface',
-          this.props.className,
-        )}
-      >
+      <div className={cn('flex items-center border-t border-rule', this.props.className)}>
         <ErrorState
           size="sm"
           headingLevel={3}

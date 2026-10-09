@@ -1,9 +1,9 @@
 import { latLngBounds } from 'leaflet'
-import { ArrowRight, ChevronRight, Image, Layers, MapPin } from 'lucide-react'
+import { ChevronRight, Image, Layers, MapPin } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
-import { MapContainer, Polygon, TileLayer } from 'react-leaflet'
-import { Link } from 'react-router-dom'
-import { buttonStyles, Switch } from '@/components/ui'
+import { MapContainer, Polygon } from 'react-leaflet'
+import { BasemapLayer } from '@/features/map/layers/BasemapLayer'
+import { Switch } from '@/components/ui'
 import type { Detection } from '@/features/observations/types'
 import { cn } from '@/lib/cn'
 import { boundsToLeaflet, geometryBounds, geometryToLeaflet } from '@/lib/geo'
@@ -29,11 +29,11 @@ function Step({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        'inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-control border px-2 py-1.5 text-caption font-medium',
-        'transition-colors duration-150 ease-out [&_svg]:size-3.5 [&_svg]:shrink-0',
+        'inline-flex min-w-0 flex-1 items-center justify-center gap-2 border px-2 py-2 text-small font-medium',
+        'transition-colors duration-[120ms] ease-out [&_svg]:size-4 [&_svg]:shrink-0',
         active
-          ? 'border-accent bg-accent-soft text-accent'
-          : 'border-border bg-surface text-ink-muted hover:text-ink',
+          ? 'border-accent-ink bg-accent-wash text-accent-ink'
+          : 'border-hairline text-ink-2 hover:text-ink',
       )}
     >
       {icon}
@@ -44,18 +44,18 @@ function Step({
 
 /**
  * "Trace this detection": a still satellite crop around the detection that can show the raw
- * imagery or the segmentation outline, then the chain from source image to map location.
+ * imagery or the segmentation outline, then the chain from source image to map location. The
+ * drawer's "View evidence" continues the trace on the detail page.
  */
 export function TraceView({
   detection,
-  observationId,
   onShowOnMap,
 }: {
   detection: Detection
-  observationId: string
   onShowOnMap: () => void
 }) {
   const [showDetection, setShowDetection] = useState(true)
+  const [imageryUnavailable, setImageryUnavailable] = useState(false)
   const bounds = useMemo(
     () => latLngBounds(boundsToLeaflet(geometryBounds(detection.geometry))).pad(0.6),
     [detection.geometry],
@@ -66,7 +66,10 @@ export function TraceView({
   return (
     <div className="flex flex-col gap-3">
       {/* Decorative still image; the facts it shows are in the drawer as text. */}
-      <div aria-hidden className="isolate overflow-hidden rounded-control border border-border">
+      <div
+        aria-hidden
+        className="relative isolate overflow-hidden rounded-control border border-hairline bg-map-fallback"
+      >
         <MapContainer
           key={detection.id}
           bounds={bounds}
@@ -82,10 +85,9 @@ export function TraceView({
           preferCanvas
           className="mwi-map h-40 w-full"
         >
-          <TileLayer
-            url={BASEMAPS.satellite.url}
-            maxNativeZoom={BASEMAPS.satellite.maxNativeZoom}
-            maxZoom={MAP_MAX_ZOOM}
+          <BasemapLayer
+            basemap="satellite"
+            onAvailabilityChange={(_, available) => setImageryUnavailable(!available)}
           />
           {showDetection ? (
             <Polygon
@@ -100,9 +102,14 @@ export function TraceView({
             />
           ) : null}
         </MapContainer>
+        {imageryUnavailable ? (
+          <p className="pointer-events-none absolute inset-x-2 bottom-2 z-[500] border border-hairline bg-sheet px-2 py-1 text-small text-ink-2">
+            Satellite imagery unavailable; the outline is still drawn
+          </p>
+        ) : null}
       </div>
       <div className="flex items-start justify-between gap-3">
-        <p className="text-caption text-ink-muted">
+        <p className="text-small text-ink-2">
           Esri World Imagery at this location ({BASEMAPS.satellite.attribution}). The source image
           itself is in the evidence view.
         </p>
@@ -124,7 +131,7 @@ export function TraceView({
             onClick={() => setShowDetection(false)}
           />
         </li>
-        <ChevronRight aria-hidden className="size-3.5 shrink-0 text-ink-muted" />
+        <ChevronRight aria-hidden className="size-3.5 shrink-0 text-ink-2" />
         <li className="flex min-w-0 flex-1">
           <Step
             active={step === 'segmentation'}
@@ -133,7 +140,7 @@ export function TraceView({
             onClick={() => setShowDetection(true)}
           />
         </li>
-        <ChevronRight aria-hidden className="size-3.5 shrink-0 text-ink-muted" />
+        <ChevronRight aria-hidden className="size-3.5 shrink-0 text-ink-2" />
         <li className="flex min-w-0 flex-1">
           <Step
             active={false}
@@ -143,14 +150,6 @@ export function TraceView({
           />
         </li>
       </ol>
-
-      <Link
-        to={`/observations/${encodeURIComponent(observationId)}?detection=${encodeURIComponent(detection.id)}`}
-        className={buttonStyles({ variant: 'secondary', size: 'sm', className: 'self-start' })}
-      >
-        View evidence
-        <ArrowRight aria-hidden />
-      </Link>
     </div>
   )
 }
