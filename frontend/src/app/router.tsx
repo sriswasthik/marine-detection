@@ -36,7 +36,15 @@ const devRoutes: RouteObject[] = import.meta.env.DEV
 /** How each page's component is provided: lazily in the app, eagerly in tests (src/test/routes.tsx). */
 export type PageRoute = Pick<RouteObject, 'lazy' | 'Component'>
 export type PageKey =
-  'overview' | 'analyze' | 'map' | 'observations' | 'detail' | 'report' | 'settings' | 'compare'
+  | 'overview'
+  | 'analyze'
+  | 'map'
+  | 'observations'
+  | 'detail'
+  | 'report'
+  | 'settings'
+  | 'compare'
+  | 'monitoringAreas'
 
 const lazyPages: Record<PageKey, PageRoute> = {
   overview: page(async () => (await import('@/pages/OverviewPage')).OverviewPage),
@@ -47,6 +55,9 @@ const lazyPages: Record<PageKey, PageRoute> = {
   report: page(async () => (await import('@/pages/ReportPage')).ReportPage),
   settings: page(async () => (await import('@/pages/SettingsPage')).SettingsPage),
   compare: page(async () => (await import('@/pages/ComparePage')).ComparePage),
+  monitoringAreas: page(
+    async () => (await import('@/pages/MonitoringAreasPage')).MonitoringAreasPage,
+  ),
 }
 
 /** The route tree, the same for every way of providing the pages. */
@@ -70,6 +81,7 @@ export function buildRoutes(pages: Record<PageKey, PageRoute>): RouteObject[] {
             { path: 'observations/:id/report', ...pages.report },
             { path: 'settings', ...pages.settings },
             { path: 'compare', ...pages.compare },
+            { path: 'monitoring-areas', ...pages.monitoringAreas },
             ...devRoutes,
             { path: '*', element: <NotFoundPage /> },
           ],
@@ -78,6 +90,7 @@ export function buildRoutes(pages: Record<PageKey, PageRoute>): RouteObject[] {
     },
   ]
 }
+
 
 export const routes: RouteObject[] = buildRoutes(lazyPages)
 

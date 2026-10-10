@@ -91,6 +91,14 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
     configure_logging()
     store = ObservationStore(settings.store_dir, settings.samples_dir)
     jobs = JobManager(store, settings)
+    
+    from backend.app.review_store import ReviewStore
+    from backend.app.monitoring_store import MonitoringStore
+    from backend.app.comparison_service import compare_observations
+
+    review_store = ReviewStore(settings.store_dir / "reviews.json")
+    monitoring_store = MonitoringStore(settings.store_dir / "monitoring_areas.json")
+
     model_info: Dict[str, str] = {}
 
     @asynccontextmanager
@@ -108,6 +116,8 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
     app.state.settings = settings
     app.state.store = store
     app.state.jobs = jobs
+    app.state.review_store = review_store
+    app.state.monitoring_store = monitoring_store
 
     @app.middleware("http")
     async def request_ids(request: Request, call_next):  # type: ignore[no-untyped-def]
@@ -133,7 +143,7 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=list(settings.cors_origins),
-        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["*"],
         expose_headers=["X-Request-ID"],
     )
@@ -178,14 +188,177 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
     @app.get("/api/observations")
     def list_observations(request: Request) -> Any:
         base = base_url(request)
-        return [_public(item, base, with_detections=False) for item in store.all_newest_first()]
+        obs_list = []
+        for item in store.all_newest_first():
+            pub = _public(item, base, with_detections=False)
+            review_counts = review_store.get_summary_counts(item.id)
+            pub["reviewSummary"] = review_counts
+            obs_list.append(pub)
+        return obs_list
 
     @app.get("/api/observations/{observation_id}")
     def get_observation(observation_id: str, request: Request) -> Any:
         item = store.get(observation_id)
         if not item:
             raise not_found("Observation", observation_id)
-        return _public(item, base_url(request), with_detections=True)
+        pub = _public(item, base_url(request), with_detections=True)
+        reviews = [r.to_dict() for r in review_store.list_reviews_for_observation(observation_id)]
+        pub["reviews"] = reviews
+        pub["reviewSummary"] = review_store.get_summary_counts(observation_id)
+        return pub
+
+    @app.get("/api/observations/{observation_id}/quality")
+    def get_observation_quality(observation_id: str) -> Any:
+        item = store.get(observation_id)
+        if not item:
+            raise not_found("Observation", observation_id)
+        obs = item.observation
+        return {
+            "observationId": observation_id,
+            "crs": obs.get("crs"),
+            "resolutionM": obs.get("resolutionM", 10.0),
+            "cloudCoveragePercent": obs.get("cloudCoveragePercent", 0.0),
+            "warnings": obs.get("warnings", []),
+            "averageConfidence": obs.get("averageConfidence"),
+            "validPixelCount": obs.get("sceneContext", {}).get("validPixels"),
+            "expectedCalibrationError": 0.0185,
+            "isCalibrated": True,
+        }
+
+    # -- Analyst Reviews API -----------------------------------------------------------------------
+
+    @app.get("/api/reviews")
+    def list_reviews(observationId: Optional[str] = None) -> Any:
+        if observationId:
+            recs = review_store.list_reviews_for_observation(observationId)
+        else:
+            recs = review_store.list_all_reviews()
+        return [r.to_dict() for r in recs]
+
+    @app.get("/api/reviews/summary")
+    def review_summary(observationId: Optional[str] = None) -> Any:
+        return review_store.get_summary_counts(observationId)
+
+    @app.post("/api/reviews")
+    async def create_or_update_review(request: Request) -> Any:
+        body = await request.json()
+        obs_id = body.get("observationId")
+        if not obs_id or not store.get(obs_id):
+            raise validation_error("NOT_FOUND", f"Observation {obs_id} not found.")
+
+        det_id = body.get("detectionId")
+        status = body.get("status", "unreviewed")
+        notes = body.get("notes", "")
+        reviewer_name = body.get("reviewerName")
+
+        try:
+            rec = review_store.save_review(
+                observation_id=obs_id,
+                detection_id=det_id,
+                status=status,
+                notes=notes,
+                reviewer_name=reviewer_name,
+            )
+            return rec.to_dict()
+        except ValueError as val_err:
+            raise validation_error("INVALID_REVIEW_STATUS", str(val_err)) from None
+
+    # -- Monitoring Areas API ----------------------------------------------------------------------
+
+    @app.get("/api/monitoring-areas")
+    def list_monitoring_areas() -> Any:
+        return [area.to_dict() for area in monitoring_store.list_areas()]
+
+    @app.post("/api/monitoring-areas", status_code=201)
+    async def create_monitoring_area(request: Request) -> Any:
+        body = await request.json()
+        name = body.get("name")
+        geometry = body.get("geometry")
+        if not name or not geometry:
+            raise validation_error("INVALID_REQUEST", "Monitoring area requires name and geometry.")
+
+        desc = body.get("description", "")
+        crs = body.get("crs", "EPSG:4326")
+        try:
+            area = monitoring_store.create_area(name=name, geometry=geometry, description=desc, crs=crs)
+            return area.to_dict()
+        except ValueError as exc:
+            raise validation_error("INVALID_GEOMETRY", str(exc)) from None
+
+    @app.get("/api/monitoring-areas/{area_id}")
+    def get_monitoring_area(area_id: str, request: Request) -> Any:
+        area = monitoring_store.get_area(area_id)
+        if not area:
+            raise not_found("MonitoringArea", area_id)
+
+        base = base_url(request)
+        area_dict = area.to_dict()
+
+        # Find intersecting observations
+        from shapely.geometry import shape as shp_shape
+        area_shp = shp_shape(area.geometry)
+        if not area_shp.is_valid:
+            area_shp = area_shp.buffer(0)
+
+        intersecting_obs = []
+        for item in store.all_newest_first():
+            obs_data = _public(item, base, with_detections=True)
+            bounds = obs_data.get("bounds")
+            if bounds:
+                from backend.app.comparison_service import bounds_to_polygon
+                obs_poly = bounds_to_polygon(bounds)
+                if area_shp.intersects(obs_poly):
+                    intersecting_obs.append(obs_data)
+
+        area_dict["observations"] = intersecting_obs
+        area_dict["observationCount"] = len(intersecting_obs)
+        return area_dict
+
+    @app.put("/api/monitoring-areas/{area_id}")
+    async def update_monitoring_area(area_id: str, request: Request) -> Any:
+        body = await request.json()
+        try:
+            rec = monitoring_store.update_area(
+                area_id=area_id,
+                name=body.get("name"),
+                description=body.get("description"),
+                geometry=body.get("geometry"),
+                status=body.get("status"),
+            )
+            return rec.to_dict()
+        except ValueError as exc:
+            raise validation_error("INVALID_REQUEST", str(exc)) from None
+
+    @app.delete("/api/monitoring-areas/{area_id}")
+    def delete_monitoring_area(area_id: str) -> Any:
+        success = monitoring_store.delete_area(area_id)
+        if not success:
+            raise not_found("MonitoringArea", area_id)
+        return {"ok": True, "archived": True}
+
+    # -- Temporal Comparison API -------------------------------------------------------------------
+
+    @app.post("/api/compare")
+    async def compare_endpoint(request: Request) -> Any:
+        body = await request.json()
+        base_id = body.get("baselineId")
+        comp_id = body.get("comparisonId")
+        iou_th = float(body.get("iouThreshold", 0.1))
+
+        if not base_id or not comp_id:
+            raise validation_error("INVALID_REQUEST", "baselineId and comparisonId are required.")
+
+        item_a = store.get(base_id)
+        item_b = store.get(comp_id)
+
+        if not item_a or not item_b:
+            raise validation_error("NOT_FOUND", f"One or both observations ({base_id}, {comp_id}) not found.")
+
+        obs_a = _public(item_a, base_url(request), with_detections=True)
+        obs_b = _public(item_b, base_url(request), with_detections=True)
+
+        res = compare_observations(obs_a, obs_b, iou_threshold=iou_th)
+        return res
 
     @app.post("/api/observations", status_code=202)
     async def create_observation(

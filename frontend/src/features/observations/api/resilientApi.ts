@@ -79,5 +79,17 @@ export function withResilience(
       call((o) => api.createObservation(input, { ...options, ...o }), options, uploadTimeoutMs),
     getJob: (jobId, options) => call((o) => api.getJob(jobId, o), options),
     health: (options) => call((o) => api.health(o), options),
+
+    getReviews: (observationId, options) => call((o) => api.getReviews(observationId, o), options),
+    getReviewSummary: (options) => call((o) => api.getReviewSummary(o), options),
+    saveReview: (review, options) => call((o) => api.saveReview(review, o), options),
+    listMonitoringAreas: (options) => call((o) => api.listMonitoringAreas(o), options),
+    getMonitoringArea: (id, options) => call((o) => api.getMonitoringArea(id, o), options),
+    createMonitoringArea: (area, options) => call((o) => api.createMonitoringArea(area, o), options),
+    updateMonitoringArea: (id, area, options) => call((o) => api.updateMonitoringArea(id, area, o), options),
+    deleteMonitoringArea: (id, options) => call((o) => api.deleteMonitoringArea(id, o), options),
+    compareObservations: (input, options) => call((o) => api.compareObservations(input, o), options),
+    getQualityOverlays: (id, options) => call((o) => api.getQualityOverlays(id, o), options),
   }
 }
+

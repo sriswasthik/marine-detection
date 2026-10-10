@@ -25,3 +25,6 @@ backend/store/
 # Editors and OS
 .idea/
 .DS_Store
+
+/mdenv/
+/semantic_segmentation/unet/trained_models/candidate_*.pth

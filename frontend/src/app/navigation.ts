@@ -1,9 +1,11 @@
 import {
+  GitCompare,
   LayoutList,
   Map as MapIcon,
   Rows3,
   ScanSearch,
   Settings as SettingsIcon,
+  ShieldCheck,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -23,8 +25,11 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Analyze', to: '/analyze', icon: ScanSearch, tab: true },
   { label: 'Map', to: '/map', icon: MapIcon, tab: true },
   { label: 'Observations', to: '/observations', icon: Rows3, tab: true },
+  { label: 'Compare', to: '/compare', icon: GitCompare, tab: false },
+  { label: 'Monitoring Areas', to: '/monitoring-areas', icon: ShieldCheck, tab: false },
   { label: 'Settings', to: '/settings', icon: SettingsIcon, tab: false },
 ]
+
 
 /** The one primary action of most views, carried by the top bar. */
 export const ANALYZE_LABEL = 'Analyze new imagery'

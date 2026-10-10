@@ -278,5 +278,148 @@ export function createMockApi(options: MockApiOptions = {}): ObservationsApi {
         modelName: MODEL_CARD.name,
         modelVersion: MODEL_CARD.version,
       })),
+
+    // Phase 3 Mock Implementations
+    getReviews: (observationId, { signal } = {}) =>
+      respond(latency, signal, async () => ({
+        data: observationId ? mockReviews.filter((r) => r.observationId === observationId) : mockReviews,
+        issues: [],
+      })),
+
+    getReviewSummary: ({ signal } = {}) =>
+      respond(latency, signal, async () => {
+        const total = mockReviews.length
+        const confirmed = mockReviews.filter((r) => r.status === 'confirmed').length
+        const falsePositive = mockReviews.filter((r) => r.status === 'false_positive').length
+        const uncertain = mockReviews.filter((r) => r.status === 'uncertain').length
+        return { total, unreviewed: Math.max(0, 10 - total), confirmed, falsePositive, uncertain }
+      }),
+
+    saveReview: (review, { signal } = {}) =>
+      respond(latency, signal, async () => {
+        const existingIdx = mockReviews.findIndex(
+          (r) => r.observationId === review.observationId && r.detectionId === review.detectionId,
+        )
+        const record = {
+          id: existingIdx >= 0 ? mockReviews[existingIdx].id : `rev-${Date.now()}`,
+          observationId: review.observationId,
+          detectionId: review.detectionId,
+          status: review.status,
+          notes: review.notes,
+          reviewerId: review.reviewerId || 'analyst-1',
+          createdAt: existingIdx >= 0 ? mockReviews[existingIdx].createdAt : new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+        if (existingIdx >= 0) mockReviews[existingIdx] = record
+        else mockReviews.push(record)
+        return record
+      }),
+
+    listMonitoringAreas: ({ signal } = {}) =>
+      respond(latency, signal, async () => ({
+        data: mockMonitoringAreas,
+        issues: [],
+      })),
+
+    getMonitoringArea: (id, { signal } = {}) =>
+      respond(latency, signal, async () => {
+        const area = mockMonitoringAreas.find((a) => a.id === id) || mockMonitoringAreas[0]
+        return {
+          data: {
+            ...area,
+            intersectingObservations: [],
+          },
+          issues: [],
+        }
+      }),
+
+    createMonitoringArea: (areaInput, { signal } = {}) =>
+      respond(latency, signal, async () => {
+        const area = {
+          id: `ma-${Date.now()}`,
+          name: areaInput.name,
+          description: areaInput.description,
+          geometry: areaInput.geometry,
+          crs: areaInput.crs || 'EPSG:4326',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          purpose: areaInput.purpose || 'Surveillance',
+          status: 'active' as const,
+          areaM2: 500000,
+        }
+        mockMonitoringAreas.push(area)
+        return area
+      }),
+
+    updateMonitoringArea: (id, update, { signal } = {}) =>
+      respond(latency, signal, async () => {
+        const area = mockMonitoringAreas.find((a) => a.id === id)
+        if (!area) throw new Error('Monitoring area not found')
+        Object.assign(area, update, { updatedAt: new Date().toISOString() })
+        return area
+      }),
+
+    deleteMonitoringArea: (id, { signal } = {}) =>
+      respond(latency, signal, async () => {
+        const idx = mockMonitoringAreas.findIndex((a) => a.id === id)
+        if (idx >= 0) mockMonitoringAreas.splice(idx, 1)
+        return { ok: true }
+      }),
+
+    compareObservations: (input, { signal } = {}) =>
+      respond(latency, signal, async () => ({
+        baselineObservationId: input.baselineObservationId,
+        comparisonObservationId: input.comparisonObservationId,
+        comparability: { status: 'directly_comparable' as const, warnings: [] },
+        baselineDebrisAreaM2: 12500,
+        comparisonDebrisAreaM2: 15400,
+        areaDifferenceM2: 2900,
+        percentChange: 23.2,
+        baselineDetectionCount: 4,
+        comparisonDetectionCount: 5,
+        baselineHotspotCount: 1,
+        comparisonHotspotCount: 2,
+        spatialMatches: [
+          { baselineDetectionId: 'd1', comparisonDetectionId: 'd10', iou: 0.82, matchType: 'overlapping' as const },
+          { comparisonDetectionId: 'd11', iou: 0, matchType: 'newly_detected' as const },
+        ],
+        timestamp: new Date().toISOString(),
+      })),
+
+    getQualityOverlays: (_id, { signal } = {}) =>
+      respond(latency, signal, async () => ({
+        validCoverage: true,
+        cloudCoveragePercent: 5.2,
+        noDataMask: null,
+      })),
+
   }
 }
+
+const mockReviews: any[] = []
+const mockMonitoringAreas: any[] = [
+  {
+    id: 'ma-sample-1',
+    name: 'North Pacific Gyre Sector Alpha',
+    description: 'High-density plastic accumulation monitoring zone',
+    geometry: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [-150.5, 25.5],
+          [-149.5, 25.5],
+          [-149.5, 26.5],
+          [-150.5, 26.5],
+          [-150.5, 25.5],
+        ],
+      ],
+    },
+    crs: 'EPSG:4326',
+    createdAt: '2026-03-01T10:00:00Z',
+    updatedAt: '2026-03-01T10:00:00Z',
+    purpose: 'Marine Debris Watch',
+    status: 'active',
+    areaM2: 12500000000,
+  },
+]
+

@@ -1,5 +1,17 @@
 import type { ParseIssue } from '../schemas'
-import type { GeoBounds, Observation, ObservationSource, ObservationSummary } from '../types'
+import type {
+  AnalystReviewRecord,
+  AnalystReviewState,
+  GeoBounds,
+  MonitoringArea,
+  MonitoringAreaDetail,
+  Observation,
+  ObservationSource,
+  ObservationSummary,
+  ReviewSummary,
+  TemporalComparisonResult,
+} from '../types'
+
 
 /** Data that passed validation, plus anything that had to be dropped along the way. */
 export interface Validated<T> {
@@ -70,7 +82,35 @@ export interface ObservationsApi {
   ): Promise<{ jobId: string }>
   getJob(jobId: string, options?: RequestOptions): Promise<Job>
   health(options?: RequestOptions): Promise<HealthStatus>
+
+  // Phase 3 — Analyst Features
+  getReviews(observationId?: string, options?: RequestOptions): Promise<Validated<AnalystReviewRecord[]>>
+  getReviewSummary(options?: RequestOptions): Promise<ReviewSummary>
+  saveReview(
+    review: { observationId: string; detectionId?: string; status: AnalystReviewState; notes?: string; reviewerId?: string },
+    options?: RequestOptions,
+  ): Promise<AnalystReviewRecord>
+
+  listMonitoringAreas(options?: RequestOptions): Promise<Validated<MonitoringArea[]>>
+  getMonitoringArea(id: string, options?: RequestOptions): Promise<Validated<MonitoringAreaDetail>>
+  createMonitoringArea(
+    area: { name: string; description?: string; geometry: any; crs?: string; purpose?: string },
+    options?: RequestOptions,
+  ): Promise<MonitoringArea>
+  updateMonitoringArea(
+    id: string,
+    area: Partial<{ name: string; description?: string; geometry: any; purpose?: string; status: 'active' | 'archived' }>,
+    options?: RequestOptions,
+  ): Promise<MonitoringArea>
+  deleteMonitoringArea(id: string, options?: RequestOptions): Promise<{ ok: boolean }>
+
+  compareObservations(
+    input: { baselineObservationId: string; comparisonObservationId: string; matchingIoUThreshold?: number },
+    options?: RequestOptions,
+  ): Promise<TemporalComparisonResult>
+  getQualityOverlays(id: string, options?: RequestOptions): Promise<Record<string, unknown>>
 }
+
 
 export function isTerminalJob(job: Pick<Job, 'status'>): boolean {
   return job.status === 'completed' || job.status === 'failed'

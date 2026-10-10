@@ -363,3 +363,87 @@ export function parseObservationList(input: unknown): ParseResult<ObservationSum
   if (items.length === 0) return { status: 'invalid', data: null, issues }
   return { status: 'partial', data: items, issues }
 }
+
+// ---------------------------------------------------------------------------
+// Phase 3 Schemas
+// ---------------------------------------------------------------------------
+
+export const AnalystReviewStateSchema = z.enum(['unreviewed', 'confirmed', 'false_positive', 'uncertain'])
+
+export const AnalystReviewRecordSchema = z.object({
+  id: z.string().min(1),
+  observationId: z.string().min(1),
+  detectionId: z.string().optional(),
+  status: AnalystReviewStateSchema,
+  notes: z.string().optional(),
+  reviewerId: z.string().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  provenance: z.record(z.string(), z.unknown()).optional(),
+})
+
+export const ReviewSummarySchema = z.object({
+  total: z.number().int().min(0),
+  unreviewed: z.number().int().min(0),
+  confirmed: z.number().int().min(0),
+  falsePositive: z.number().int().min(0),
+  uncertain: z.number().int().min(0),
+})
+
+export const MonitoringAreaSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().optional(),
+  geometry: DetectionGeometrySchema,
+  crs: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  purpose: z.string().optional(),
+  status: z.enum(['active', 'archived']),
+  areaM2: z.number().min(0),
+})
+
+export const IntersectingObservationSummarySchema = z.object({
+  observationId: z.string().min(1),
+  capturedAt: z.string(),
+  region: z.string(),
+  debrisAreaM2InArea: z.number().min(0),
+  totalObservationDebrisAreaM2: z.number().min(0),
+  detectionCountInArea: z.number().int().min(0),
+  coveragePercent: z.number().min(0).max(100),
+  reviewStatusSummary: z.record(z.string(), z.number().int().min(0)),
+})
+
+export const MonitoringAreaDetailSchema = MonitoringAreaSchema.extend({
+  intersectingObservations: z.array(IntersectingObservationSummarySchema),
+})
+
+export const ComparabilityInfoSchema = z.object({
+  status: z.enum(['directly_comparable', 'comparable_with_warnings', 'incompatible']),
+  warnings: z.array(z.string()),
+})
+
+export const SpatialMatchSchema = z.object({
+  baselineDetectionId: z.string().optional(),
+  comparisonDetectionId: z.string().optional(),
+  iou: z.number().min(0).max(1),
+  matchType: z.enum(['overlapping', 'newly_detected', 'not_detected_in_later', 'geometric_change']),
+})
+
+export const TemporalComparisonResultSchema = z.object({
+  baselineObservationId: z.string().min(1),
+  comparisonObservationId: z.string().min(1),
+  comparability: ComparabilityInfoSchema,
+  baselineDebrisAreaM2: z.number().min(0),
+  comparisonDebrisAreaM2: z.number().min(0),
+  areaDifferenceM2: z.number(),
+  percentChange: z.number().nullable(),
+  baselineDetectionCount: z.number().int().min(0),
+  comparisonDetectionCount: z.number().int().min(0),
+  baselineHotspotCount: z.number().int().min(0),
+  comparisonHotspotCount: z.number().int().min(0),
+  spatialMatches: z.array(SpatialMatchSchema),
+  changeLayerGeoJSON: z.record(z.string(), z.unknown()).optional(),
+  timestamp: z.string(),
+})
+
