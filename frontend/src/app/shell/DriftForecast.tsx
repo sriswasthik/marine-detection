@@ -17,7 +17,7 @@ function formatCoord({ lat, lng }: { lat: number; lng: number }) {
 }
 
 /**
- * A yellow box fixed to the bottom right of every page: where the plastic is now (observed
+ * A yellow box fixed to the bottom right of the map page: where the plastic is now (observed
  * hotspot), where wind and currents carry it (predicted trajectory), the area to search, and the
  * predicted location. Can be collapsed to its header.
  */
@@ -65,7 +65,6 @@ export function DriftForecast() {
             <h3 className="font-semibold">Predicted location</h3>
             <p className="font-mono text-mono">{formatCoord(PREDICTED_LOCATION)}</p>
           </section>
-          <p className="text-label uppercase">Sample values</p>
         </div>
       )}
     </aside>

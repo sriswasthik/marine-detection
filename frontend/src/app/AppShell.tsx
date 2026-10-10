@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
+import { matchPath, Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
 import { useRememberRouteObservation } from '@/features/observations/currentObservationContext'
 import { useShortcuts } from '@/hooks/useShortcuts'
 import { CommandPalette } from './shell/CommandPalette'
@@ -91,7 +91,7 @@ export function AppShell() {
             <MoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} />
             <ShortcutsDialog open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
             <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
-            <DriftForecast />
+            {matchPath('/map/:observationId?', location.pathname) && <DriftForecast />}
           </div>
         </PrimaryActionContext>
       </CommandPaletteContext>
