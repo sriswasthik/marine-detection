@@ -48,5 +48,8 @@ export function getDefaultObservationsApi(): ObservationsApi {
   return observationsApiFor(dataSource, apiBaseUrl)
 }
 
+export { getDefaultObservationsApi as getApi }
+
 /** True while the app runs on sample data. Every screen labels it "Sample data". */
 export const isMockMode = (): boolean => getAppSettingsStore().get().dataSource === 'mock'
+

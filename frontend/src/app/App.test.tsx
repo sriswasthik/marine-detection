@@ -55,8 +55,9 @@ describe('app shell', { timeout: 15_000 }, () => {
     [`/observations/${SAMPLE_IDS.ennore}`, 'Ennore coast, Bay of Bengal'],
     [`/observations/${SAMPLE_IDS.ennore}/report`, 'Ennore coast, Bay of Bengal'],
     ['/settings', 'Settings'],
-    ['/compare', 'Compare'],
+    ['/compare', 'Temporal Comparison'],
   ])('routes %s to its page', async (path, title) => {
+
     renderAt(path)
     expect(await screen.findByRole('heading', { level: 1, name: title }, LAZY)).toBeInTheDocument()
   })

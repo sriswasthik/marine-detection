@@ -6,6 +6,7 @@ import { buildRoutes } from '@/app/router'
 import { AnalyzePage } from '@/pages/AnalyzePage'
 import { ComparePage } from '@/pages/ComparePage'
 import { MapPage } from '@/pages/MapPage'
+import { MonitoringAreasPage } from '@/pages/MonitoringAreasPage'
 import { ObservationDetailPage } from '@/pages/ObservationDetailPage'
 import { ObservationsPage } from '@/pages/ObservationsPage'
 import { OverviewPage } from '@/pages/OverviewPage'
@@ -21,4 +22,6 @@ export const routes = buildRoutes({
   report: { Component: ReportPage },
   settings: { Component: SettingsPage },
   compare: { Component: ComparePage },
+  monitoringAreas: { Component: MonitoringAreasPage },
 })
+

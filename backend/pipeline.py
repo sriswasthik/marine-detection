@@ -246,46 +246,42 @@ def load_model_metrics() -> Optional[Dict[str, Any]]:
 
 def read_scene(tif_path: PathLike) -> Scene:
     path = Path(tif_path)
-    if not path.is_file():
+    if not path.is_file() and not path.is_dir():
         raise PipelineError("UNREADABLE", f"The file {path.name} was not found. Choose the image again.")
-    size = path.stat().st_size
-    if size > MAX_FILE_BYTES:
-        raise PipelineError(
-            "TOO_LARGE",
-            f"The file is {size / 1024 / 1024:.1f} MB. The limit is {MAX_FILE_BYTES // (1024 * 1024)} MB. "
-            "Crop the image to the area of interest.",
-        )
+
+    from backend.adapters.registry import registry as adapter_registry
+    from backend.validation import DataValidator
+
+    # Run adapter inspection
+    val_meta = adapter_registry.inspect(path)
+    if not val_meta.is_valid:
+        primary_err = val_meta.errors[0] if val_meta.errors else None
+        err_code = primary_err.code if primary_err and primary_err.code in ERROR_CODES else "UNREADABLE"
+        err_msg = primary_err.message if primary_err else "Failed input format validation."
+        raise PipelineError(err_code, err_msg)
+
     try:
-        with rasterio.open(path) as ds:
-            if ds.count != INPUT_BANDS:
-                raise PipelineError(
-                    "INVALID_BANDS",
-                    f"The image has {ds.count} {'band' if ds.count == 1 else 'bands'}. The model needs "
-                    f"{INPUT_BANDS} Sentinel-2 bands: B1 to B8A, B11 and B12, in that order.",
-                )
-            if ds.width * ds.height > MAX_PIXELS:
-                raise PipelineError(
-                    "TOO_LARGE",
-                    f"The image is {ds.width} x {ds.height} pixels, larger than one Sentinel-2 tile. "
-                    "Crop it to the area of interest.",
-                )
-            if ds.crs is None or ds.transform.is_identity or ds.transform == Affine.identity():
-                raise PipelineError(
-                    "NO_GEOREF",
-                    "The image has no coordinate system or geotransform, so detections cannot be "
-                    "placed on the map. Export it as a georeferenced GeoTIFF.",
-                )
-            image = ds.read(out_dtype="float32")
-            if ds.nodata is not None and not np.isnan(ds.nodata):
-                # app.py ignores nodata (MARIDA patches have none); treating it as NaN lets the
-                # same imputation fill it and keeps it out of every statistic.
-                image[image == np.float32(ds.nodata)] = np.nan
-            return Scene(path, image, ds.crs, ds.transform, ds.width, ds.height, str(ds.dtypes[0]))
+        canonical_scene = adapter_registry.read(path)
+        scene_val = DataValidator.validate_scene(canonical_scene)
+        if not scene_val.is_valid:
+            primary_err = scene_val.errors[0]
+            err_code = primary_err.code if primary_err.code in ERROR_CODES else "UNREADABLE"
+            raise PipelineError(err_code, primary_err.message)
+
+        return Scene(
+            path=canonical_scene.path,
+            image=canonical_scene.image,
+            crs=canonical_scene.crs,
+            transform=canonical_scene.transform,
+            width=canonical_scene.width,
+            height=canonical_scene.height,
+            dtype=canonical_scene.dtype,
+        )
     except PipelineError:
         raise
     except (RasterioError, OSError, ValueError) as error:
         raise PipelineError(
-            "UNREADABLE", f"The file could not be read as a GeoTIFF ({error}). Export it again and retry."
+            "UNREADABLE", f"The file could not be processed ({error}). Export it again and retry."
         ) from error
 
 

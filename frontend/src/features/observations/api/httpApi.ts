@@ -287,5 +287,131 @@ export function createHttpApi(
       }
       return { ...parsed.data, mode: 'http' }
     },
+
+    // Phase 3 — Analyst Methods
+    async getReviews(observationId?: string, requestOptions = {}) {
+      const path = observationId
+        ? `/api/reviews?observation_id=${encodeURIComponent(observationId)}`
+        : '/api/reviews'
+      const body = await requestJson(url(path), requestOptions, fetchImpl)
+      return { data: body as any, issues: [] }
+    },
+
+    async getReviewSummary(requestOptions = {}) {
+      const body = await requestJson(url('/api/reviews/summary'), requestOptions, fetchImpl)
+      return body as any
+    },
+
+    async saveReview(review, requestOptions = {}) {
+      let response: Response
+      try {
+        response = await fetchImpl(url('/api/reviews'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(review),
+          signal: requestOptions.signal,
+        })
+      } catch (error) {
+        throw networkError(error)
+      }
+      const text = await response.text().catch(() => '')
+      const body = parseJson(text)
+      if (!response.ok) throw errorFromResponse(response.status, body)
+      return body as any
+    },
+
+    async listMonitoringAreas(requestOptions = {}) {
+      const body = await requestJson(url('/api/monitoring-areas'), requestOptions, fetchImpl)
+      return { data: body as any, issues: [] }
+    },
+
+    async getMonitoringArea(id, requestOptions = {}) {
+      const body = await requestJson(
+        url(`/api/monitoring-areas/${encodeURIComponent(id)}`),
+        requestOptions,
+        fetchImpl,
+      )
+      return { data: body as any, issues: [] }
+    },
+
+    async createMonitoringArea(area, requestOptions = {}) {
+      let response: Response
+      try {
+        response = await fetchImpl(url('/api/monitoring-areas'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(area),
+          signal: requestOptions.signal,
+        })
+      } catch (error) {
+        throw networkError(error)
+      }
+      const text = await response.text().catch(() => '')
+      const body = parseJson(text)
+      if (!response.ok) throw errorFromResponse(response.status, body)
+      return body as any
+    },
+
+    async updateMonitoringArea(id, area, requestOptions = {}) {
+      let response: Response
+      try {
+        response = await fetchImpl(url(`/api/monitoring-areas/${encodeURIComponent(id)}`), {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(area),
+          signal: requestOptions.signal,
+        })
+      } catch (error) {
+        throw networkError(error)
+      }
+      const text = await response.text().catch(() => '')
+      const body = parseJson(text)
+      if (!response.ok) throw errorFromResponse(response.status, body)
+      return body as any
+    },
+
+    async deleteMonitoringArea(id, requestOptions = {}) {
+      let response: Response
+      try {
+        response = await fetchImpl(url(`/api/monitoring-areas/${encodeURIComponent(id)}`), {
+          method: 'DELETE',
+          signal: requestOptions.signal,
+        })
+      } catch (error) {
+        throw networkError(error)
+      }
+      const text = await response.text().catch(() => '')
+      const body = parseJson(text)
+      if (!response.ok) throw errorFromResponse(response.status, body)
+      return body as any
+    },
+
+    async compareObservations(input, requestOptions = {}) {
+      let response: Response
+      try {
+        response = await fetchImpl(url('/api/compare'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(input),
+          signal: requestOptions.signal,
+        })
+      } catch (error) {
+        throw networkError(error)
+      }
+      const text = await response.text().catch(() => '')
+      const body = parseJson(text)
+      if (!response.ok) throw errorFromResponse(response.status, body)
+      return body as any
+    },
+
+    async getQualityOverlays(id, requestOptions = {}) {
+      const body = await requestJson(
+        url(`/api/observations/${encodeURIComponent(id)}/quality`),
+        requestOptions,
+        fetchImpl,
+      )
+      return body as Record<string, unknown>
+    },
   }
 }
+

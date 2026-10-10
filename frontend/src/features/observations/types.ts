@@ -288,3 +288,88 @@ export interface Observation {
 export type ObservationSummary = Omit<Observation, 'detections' | 'densityGrid'> & {
   detectionCount: number
 }
+
+// ---------------------------------------------------------------------------
+// Phase 3 — Analyst Review, Monitoring Areas, and Temporal Comparison
+// ---------------------------------------------------------------------------
+
+export const ANALYST_REVIEW_STATES = ['unreviewed', 'confirmed', 'false_positive', 'uncertain'] as const
+export type AnalystReviewState = (typeof ANALYST_REVIEW_STATES)[number]
+
+export interface AnalystReviewRecord {
+  id: string
+  observationId: string
+  detectionId?: string
+  status: AnalystReviewState
+  notes?: string
+  reviewerId?: string
+  createdAt: string
+  updatedAt: string
+  provenance?: Record<string, unknown>
+}
+
+export interface ReviewSummary {
+  total: number
+  unreviewed: number
+  confirmed: number
+  falsePositive: number
+  uncertain: number
+}
+
+export interface MonitoringArea {
+  id: string
+  name: string
+  description?: string
+  geometry: Polygon | MultiPolygon
+  crs: string
+  createdAt: string
+  updatedAt: string
+  purpose?: string
+  status: 'active' | 'archived'
+  areaM2: number
+}
+
+export interface IntersectingObservationSummary {
+  observationId: string
+  capturedAt: string
+  region: string
+  debrisAreaM2InArea: number
+  totalObservationDebrisAreaM2: number
+  detectionCountInArea: number
+  coveragePercent: number
+  reviewStatusSummary: Record<string, number>
+}
+
+export interface MonitoringAreaDetail extends MonitoringArea {
+  intersectingObservations: IntersectingObservationSummary[]
+}
+
+export interface ComparabilityInfo {
+  status: 'directly_comparable' | 'comparable_with_warnings' | 'incompatible'
+  warnings: string[]
+}
+
+export interface SpatialMatch {
+  baselineDetectionId?: string
+  comparisonDetectionId?: string
+  iou: number
+  matchType: 'overlapping' | 'newly_detected' | 'not_detected_in_later' | 'geometric_change'
+}
+
+export interface TemporalComparisonResult {
+  baselineObservationId: string
+  comparisonObservationId: string
+  comparability: ComparabilityInfo
+  baselineDebrisAreaM2: number
+  comparisonDebrisAreaM2: number
+  areaDifferenceM2: number
+  percentChange: number | null
+  baselineDetectionCount: number
+  comparisonDetectionCount: number
+  baselineHotspotCount: number
+  comparisonHotspotCount: number
+  spatialMatches: SpatialMatch[]
+  changeLayerGeoJSON?: Record<string, unknown>
+  timestamp: string
+}
+
